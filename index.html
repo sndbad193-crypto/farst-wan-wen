@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ديوان قبيلة الحياني - السجل الرقمي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        heritage: {
+                            emerald: '#064e3b', // Deep Emerald
+                            gold: '#d4af37',    // Metallic Gold
+                            cream: '#fdfbf7',   // Soft Cream
+                            dark: '#022c22'     // Darker Emerald
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #fdfbf7;
+            color: #064e3b;
+        }
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .hero-pattern {
+            background-color: #064e3b;
+            background-image: url("https://www.transparenttextures.com/patterns/arabesque.png");
+            background-attachment: fixed;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdfbf7; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #064e3b; }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+
+    <!-- Sidebar (Hidden by default) -->
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-heritage-emerald text-heritage-cream sidebar-transition -translate-x-full z-50 shadow-2xl border-r border-heritage-gold/30">
+        <div class="p-6 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-xl font-black text-heritage-gold">لوحة التحكم</h2>
+                <button onclick="toggleSidebar()" class="text-heritage-cream hover:text-heritage-gold transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-4 flex-grow">
+                <!-- Sidebar Logo Section -->
+                <div class="bg-white/5 p-5 rounded-2xl border border-white/10 mb-8 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-heritage-gold rounded-full flex items-center justify-center text-heritage-emerald font-black shadow-[0_0_20px_rgba(212,175,55,0.3)] text-xl border-2 border-heritage-cream/20">
+                       حي
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-heritage-gold uppercase tracking-widest font-black mb-0.5">سجل التوثيق الرقمي</p>
+                        <p class="font-black text-lg leading-tight">ديوان قبيلة الحياني</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-3">
+                    <button onclick="openBulkModal()" class="w-full flex items-center justify-between px-4 py-4 rounded-xl bg-white/5 hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold group">
+                        <span class="flex items-center gap-3"><span>⚡</span> إضافة أسماء</span>
+                        <span class="opacity-0 group-hover:opacity-100 transition-opacity">←</span>
+                    </button>
+                    <button onclick="document.getElementById('importTrigger').click()" class="w-full flex items-center justify-between px-4 py-4 rounded-xl bg-white/5 hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold group">
+                        <span class="flex items-center gap-3"><span>📂</span> رفع السجل</span>
+                        <span class="opacity-0 group-hover:opacity-100 transition-opacity">←</span>
+                    </button>
+                    <input type="file" id="importTrigger" class="hidden" onchange="importVault(this)">
+                    <button onclick="exportVault()" class="w-full flex items-center justify-between px-4 py-4 rounded-xl bg-white/5 hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold group">
+                        <span class="flex items-center gap-3"><span>🛡️</span> تصدير نسخة</span>
+                        <span class="opacity-0 group-hover:opacity-100 transition-opacity">←</span>
+                    </button>
+                    <div class="pt-6">
+                        <button onclick="clearMatrixData()" class="w-full flex items-center gap-3 px-4 py-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition-all font-bold">
+                            <span>🗑️</span> مسح البيانات
+                        </button>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="mt-auto pt-6 border-t border-white/10 text-center">
+                <p class="text-[10px] text-heritage-gold/40 font-bold">منصة ديوان قبيلة الحياني © 2024</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-40 transition-opacity"></div>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-30 flex justify-between items-center p-6 bg-transparent pointer-events-none">
+        <!-- Dashboard Shortcut (Top Right in RTL) -->
+        <div class="pointer-events-auto">
+            <button onclick="toggleSidebar()" class="px-8 py-3 bg-heritage-gold text-heritage-emerald font-black rounded-full shadow-[0_10px_30px_rgba(212,175,55,0.4)] hover:bg-heritage-cream hover:scale-105 transition-all border-2 border-heritage-gold active:scale-95 flex items-center gap-2">
+                <span>لوحة التحكم</span>
+                <span class="text-xs opacity-50">✦</span>
+            </button>
+        </div>
+
+        <!-- Sidebar Toggle (Top Left in RTL) -->
+        <div class="pointer-events-auto">
+            <button onclick="toggleSidebar()" class="p-3.5 bg-heritage-emerald text-heritage-gold rounded-2xl shadow-2xl hover:bg-heritage-dark hover:scale-110 transition-all border border-heritage-gold/30 active:rotate-90 group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16m-16 6h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-h-screen hero-pattern flex flex-col items-center pt-32 pb-20 px-6 relative">
+        <!-- Background Overlay -->
+        <div class="absolute inset-0 bg-heritage-emerald/40 pointer-events-none"></div>
+
+        <div class="relative z-10 w-full max-w-5xl flex flex-col items-center">
+            <!-- Logo Area -->
+            <div class="mb-10 relative group">
+                <div class="absolute inset-0 bg-heritage-gold blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                <div class="relative w-32 h-32 bg-heritage-gold rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(212,175,55,0.4)] text-heritage-emerald text-5xl font-black border-4 border-heritage-cream">
+                   حي
+                </div>
+            </div>
+
+            <div class="text-center mb-12">
+                <h1 class="text-5xl md:text-8xl font-black text-heritage-cream mb-4 drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)] tracking-tight">ديوان قبيلة الحياني</h1>
+                <p class="text-heritage-gold text-xl md:text-3xl font-bold drop-shadow-md">المنصة الرقمية الموثقة لأبناء القبيلة</p>
+            </div>
+
+            <!-- Search Container -->
+            <div class="w-full max-w-3xl mb-16 relative">
+                <div class="relative group">
+                    <input type="text" id="searchInput" onkeyup="searchName()" placeholder="ابحث عن اسمك في سجل القبيلة..."
+                        class="w-full py-7 px-10 pr-20 bg-heritage-cream text-heritage-emerald rounded-2xl text-2xl font-black shadow-[0_20px_50px_rgba(0,0,0,0.3)] focus:outline-none focus:ring-4 focus:ring-heritage-gold/50 transition-all placeholder:text-heritage-emerald/30">
+                    <div class="absolute right-7 top-1/2 -translate-y-1/2 text-heritage-gold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Stats Badge -->
+                <div id="stats-container" class="mt-8 flex justify-center">
+                    <div id="stats-badge" class="px-8 py-3 bg-heritage-gold/90 text-heritage-emerald rounded-full font-black shadow-xl border-2 border-heritage-cream flex items-center gap-3 scale-0 transition-transform duration-500">
+                        <span class="text-xs uppercase tracking-widest opacity-70">تم توثيق</span>
+                        <span id="memberCount" class="text-2xl">0</span>
+                        <span class="text-sm">من أفراد القبيلة</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="w-full hidden space-y-6">
+                <div class="flex items-center justify-between border-b-2 border-heritage-gold/30 pb-4 mb-8">
+                    <h2 class="text-2xl font-black text-heritage-gold flex items-center gap-3">
+                        <span class="w-3 h-8 bg-heritage-gold rounded-full"></span>
+                        نتائج البحث
+                    </h2>
+                    <span id="resultsCount" class="bg-heritage-cream text-heritage-emerald px-4 py-1 rounded-full font-black text-sm">0 نتيجة</span>
+                </div>
+
+                <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Results dynamically injected -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Hud -->
+    <div id="hy-hud" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-heritage-emerald text-heritage-gold px-10 py-5 rounded-2xl font-black shadow-[0_20px_40px_rgba(0,0,0,0.4)] border-2 border-heritage-gold z-[100] transform translate-y-32 transition-transform duration-500 flex items-center gap-4">
+        <span class="text-2xl">🛡️</span>
+        <span id="hud-text">تمت العملية بنجاح</span>
+    </div>
+
+    <!-- Bulk Entry Modal -->
+    <div id="bulkModal" class="fixed inset-0 bg-heritage-dark/90 backdrop-blur-md z-[100] hidden items-center justify-center p-6 overflow-y-auto">
+        <div class="max-w-3xl w-full glass-effect rounded-[3rem] p-8 md:p-12 border-2 border-heritage-gold/50 shadow-2xl relative">
+            <button onclick="closeBulkModal()" class="absolute top-8 left-8 text-heritage-emerald/50 hover:text-heritage-emerald transition-colors">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <h2 class="text-4xl font-black mb-2 text-heritage-emerald">توثيق سجلات</h2>
+            <p class="text-heritage-emerald/60 font-bold mb-10">إضافة مجموعة من الأفراد دفعة واحدة إلى ديوان القبيلة</p>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-black text-heritage-emerald mb-2 mr-2">المنطقة أو الفرع</label>
+                    <input type="text" id="govInput" placeholder="مثلاً: الأنبار - عشيرة البو حياني"
+                        class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl p-5 outline-none focus:border-heritage-gold text-heritage-emerald font-black transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-black text-heritage-emerald mb-2 mr-2">قائمة الأسماء</label>
+                    <textarea id="bulkInput" class="w-full h-64 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl p-5 font-black text-xl outline-none focus:border-heritage-gold text-heritage-emerald resize-none transition-all"
+                        placeholder="الصق الأسماء هنا.. اسم واحد في كل سطر"></textarea>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 pt-4">
+                    <button onclick="processBulkData()" class="flex-grow py-6 bg-heritage-emerald hover:bg-heritage-dark text-heritage-gold font-black rounded-2xl shadow-xl transition-all text-2xl active:scale-95">
+                        حفظ وتوثيق السجل ⚡
+                    </button>
+                    <button onclick="closeBulkModal()" class="px-10 py-6 bg-heritage-gold/20 text-heritage-emerald rounded-2xl font-black hover:bg-heritage-gold/30 transition-all">
+                        إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_KEY = 'HY_TRIBE_VAULT_V1';
+        let vault = [];
+
+        function initSystem() {
+            const raw = localStorage.getItem(DB_KEY);
+            vault = raw ? JSON.parse(raw) : [];
+            updateStats();
+        }
+
+        function updateStats() {
+            const badge = document.getElementById('stats-badge');
+            const countEl = document.getElementById('memberCount');
+            countEl.innerText = vault.length.toLocaleString('ar-EG');
+
+            if (vault.length > 0) {
+                badge.classList.remove('scale-0');
+                badge.classList.add('scale-100');
+            } else {
+                badge.classList.add('scale-0');
+                badge.classList.remove('scale-100');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function hyHud(m) {
+            const h = document.getElementById('hy-hud');
+            const t = document.getElementById('hud-text');
+            t.innerText = m;
+            h.classList.remove('translate-y-32');
+            setTimeout(() => h.classList.add('translate-y-32'), 4000);
+        }
+
+        function openBulkModal() {
+            document.getElementById('bulkModal').classList.remove('hidden');
+            document.getElementById('bulkModal').classList.add('flex');
+            toggleSidebar();
+        }
+        function closeBulkModal() {
+            document.getElementById('bulkModal').classList.add('hidden');
+            document.getElementById('bulkModal').classList.remove('flex');
+        }
+
+        function processBulkData() {
+            const names = document.getElementById('bulkInput').value.split('\n').filter(n => n.trim() !== "");
+            const gov = document.getElementById('govInput').value || "غير محدد";
+
+            if(names.length === 0) return alert("يرجى إدخال أسماء!");
+
+            const newEntries = names.map(name => ({
+                id: `HY-${Math.floor(Math.random()*90000) + 10000}`,
+                name: name.trim(),
+                gov: gov,
+                verified: true,
+                date: new Date().toLocaleDateString('ar-EG')
+            }));
+
+            vault = [...vault, ...newEntries];
+            localStorage.setItem(DB_KEY, JSON.stringify(vault));
+
+            updateStats();
+            closeBulkModal();
+            hyHud(`تم توثيق ${names.length} من أفراد القبيلة بنجاح`);
+            document.getElementById('bulkInput').value = '';
+            document.getElementById('govInput').value = '';
+
+            // If searching, refresh search
+            if (document.getElementById('searchInput').value) searchName();
+        }
+
+        function searchName() {
+            const query = document.getElementById('searchInput').value.trim();
+            const resultsSection = document.getElementById('results');
+            const resultsGrid = document.getElementById('resultsGrid');
+            const resultsCountEl = document.getElementById('resultsCount');
+
+            if (query.length < 2) {
+                resultsSection.classList.add('hidden');
+                return;
+            }
+
+            const results = vault.filter(m => m.name.includes(query));
+            resultsSection.classList.remove('hidden');
+            resultsCountEl.innerText = `${results.length} نتيجة`;
+
+            if (results.length === 0) {
+                resultsGrid.innerHTML = `
+                    <div class="col-span-full bg-white/10 backdrop-blur-xl p-12 rounded-[2rem] border-2 border-heritage-gold/20 text-heritage-cream text-center">
+                        <p class="text-4xl mb-4">🔍</p>
+                        <p class="text-2xl font-black mb-2">عذراً، لم نجد هذا الاسم</p>
+                        <p class="font-bold opacity-60">يرجى التأكد من كتابة الاسم بشكل صحيح أو التواصل مع إدارة الديوان للتوثيق</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsGrid.innerHTML = results.map(m => `
+                <div class="registry-card bg-heritage-cream p-8 rounded-[2rem] border-b-8 border-heritage-gold shadow-2xl flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300">
+                    <div class="flex justify-between w-full items-start">
+                        <span class="text-[10px] bg-heritage-emerald text-heritage-gold px-3 py-1 rounded-full font-black tracking-widest">${m.id}</span>
+                        <div class="flex flex-col items-end">
+                            <span class="text-heritage-emerald/40 text-[10px] font-black">${m.date}</span>
+                            <span class="text-[10px] text-green-600 font-black">موثق ✓</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-black text-heritage-emerald leading-tight">${m.name}</h3>
+                    <div class="mt-auto w-full pt-4 border-t border-heritage-emerald/10 flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-heritage-emerald font-black">📍 ${m.gov}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-heritage-gold bg-heritage-emerald px-2 py-0.5 rounded">نسب موثق</span>
+                            </div>
+                        </div>
+                        <button onclick="window.print()" class="w-full py-2 bg-heritage-gold/10 hover:bg-heritage-gold hover:text-heritage-emerald text-heritage-gold text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2">
+                            <span>تحميل شهادة التوثيق</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Scroll a bit if it's the first result set
+            if (results.length > 0 && resultsSection.getBoundingClientRect().top > window.innerHeight) {
+                 resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function exportVault() {
+            const dataStr = JSON.stringify(vault, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AlHayyani_Registry_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            hyHud("تم تصدير نسخة من السجل 🛡️");
+        }
+
+        function importVault(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    vault = [...vault, ...importedData];
+                    localStorage.setItem(DB_KEY, JSON.stringify(vault));
+                    updateStats();
+                    hyHud("تم دمج السجلات بنجاح");
+                } catch(e) {
+                    alert("ملف غير صالح");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearMatrixData() {
+            if(confirm("هل أنت متأكد من مسح جميع السجلات؟ هذا الإجراء لا يمكن التراجع عنه.")) {
+                localStorage.removeItem(DB_KEY);
+                vault = [];
+                updateStats();
+                document.getElementById('results').classList.add('hidden');
+                hyHud("تم تصفير النظام بنجاح");
+                toggleSidebar();
+            }
+        }
+
+        window.onload = initSystem;
+    </script>
+</body>
+</html>
