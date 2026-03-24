@@ -3,536 +3,730 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام أنساب القبيلة - الإصدار السيبراني v1.0</title>
+    <title>ديوان قبيلة الحياني | منصة الأنساب الرقمية</title>
+
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --neon-cyan: #00f3ff;
             --neon-purple: #bc13fe;
             --neon-gold: #ffd700;
-            --bg-deep: #000000;
-            --glass: rgba(0, 0, 0, 0.7);
+            --bg-deep: #050505;
+            --glass: rgba(10, 10, 10, 0.8);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Cairo', sans-serif;
             background-color: var(--bg-deep);
             color: #fff;
             overflow: hidden;
             background-image:
-                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.03) 0%, transparent 50%),
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             background-size: 100% 100%, 100% 2px, 3px 100%;
         }
 
         .tech-font { font-family: 'Orbitron', sans-serif; }
         .glow-text { text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); }
-        .glow-cyan { text-shadow: 0 0 15px var(--neon-cyan); }
-        .glow-purple { text-shadow: 0 0 15px var(--neon-purple); }
+        .neon-border { border: 1px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
 
-        /* Neon Aesthetics */
-        .neon-border {
-            border: 1px solid var(--neon-cyan);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3), inset 0 0 5px rgba(0, 243, 255, 0.2);
-        }
-
-        .neon-border-purple {
-            border: 1px solid var(--neon-purple);
-            box-shadow: 0 0 10px rgba(188, 19, 254, 0.3), inset 0 0 5px rgba(188, 19, 254, 0.2);
-        }
-
-        .neon-text-gold {
-            color: var(--neon-gold);
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-        }
-
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Flicker Effect */
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
-            20%, 24%, 55% { opacity: 0.4; }
-        }
-        .flicker { animation: flicker 3s infinite; }
-
-        /* Pulse Effect */
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px var(--neon-cyan); }
-            50% { box-shadow: 0 0 20px var(--neon-cyan); }
-            100% { box-shadow: 0 0 5px var(--neon-cyan); }
-        }
-        .pulse { animation: pulse-glow 2s infinite; }
-
-        /* Beveled Corners */
         .beveled {
             clip-path: polygon(
-                15px 0%, 100% 0%,
-                100% calc(100% - 15px), calc(100% - 15px) 100%,
-                0% 100%, 0% 15px
+                10px 0%, 100% 0%,
+                100% calc(100% - 10px), calc(100% - 10px) 100%,
+                0% 100%, 0% 10px
             );
         }
 
-        .member-card {
-            background: rgba(20, 20, 20, 0.6);
-            border-right: 3px solid var(--neon-cyan);
-            transition: all 0.3s ease;
-        }
-        .member-card:hover {
-            background: rgba(0, 243, 255, 0.1);
-            transform: translateX(-5px);
-            box-shadow: 5px 0 15px rgba(0, 243, 255, 0.3);
-        }
+        .view { display: none; height: 100%; overflow-y: auto; padding: 2rem; }
+        .view.active { display: block; animation: fadeIn 0.5s ease-out; }
 
-        #notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--neon-cyan);
-            color: #000;
-            padding: 10px 30px;
-            font-weight: 900;
-            z-index: 9999;
-            display: none;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); }
 
-        .modal-active { display: flex !important; }
-        #qrModal canvas, #qrModal img { margin: 0 auto; border: 4px solid #fff; }
+        #map-container { height: 500px; width: 100%; border: 1px solid var(--neon-cyan); }
+        #tree-3d-container { height: 600px; width: 100%; cursor: move; }
+
+        .nav-btn {
+            position: relative;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        .nav-btn.active { color: var(--neon-cyan); border-right: 2px solid var(--neon-cyan); background: rgba(0, 243, 255, 0.05); }
+
+        /* Simulated Blockchain Ticker */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+        }
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
     </style>
 </head>
-<body class="h-screen flex" onload="initSystem()">
+<body class="h-screen flex flex-col" onload="initSystem()">
 
-    <div id="notification">SYSTEM_ALERT: SUCCESS ⚡</div>
+    <!-- Header / Branding -->
+    <header class="h-20 glass-panel border-b border-white/5 flex items-center justify-between px-8 z-50">
+        <div class="flex items-center gap-6">
+            <div class="w-12 h-12 neon-border flex items-center justify-center beveled bg-cyan-500/10">
+                <span class="tech-font text-xl font-black text-cyan-400">DH</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black tracking-tighter text-white">ديوان قبيلة الحياني</h1>
+                <p class="text-[9px] tech-font text-cyan-500 uppercase tracking-[0.4em]">Al-Hayyani Tribal Registry v2.0</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-8">
+            <div class="text-left">
+                <p class="text-[8px] tech-font text-gray-500 uppercase">System_Status</p>
+                <p class="text-[10px] tech-font text-green-500 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> SECURE_LINK
+                </p>
+            </div>
+            <button onclick="switchView('admin')" class="px-6 py-2 border border-purple-500/50 text-purple-400 tech-font text-xs beveled hover:bg-purple-500/10 transition-all">
+                ADMIN_PANEL
+            </button>
+        </div>
+    </header>
+
+    <div class="ticker-wrap">
+        <div class="ticker tech-font text-[9px] text-cyan-800 uppercase" id="blockchain-ticker">
+            // INITIALIZING BLOCKCHAIN GENESIS BLOCK ... VERIFYING SMART CONTRACTS ... DATA ENCRYPTION AES-256 ACTIVE ...
+        </div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar Nav -->
+        <aside class="w-72 glass-panel border-l border-white/5 flex flex-col py-8 overflow-y-auto">
+            <nav class="space-y-2">
+                <button onclick="switchView('home')" class="nav-btn active w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
+                    01 // الرئيسية
+                </button>
+                <button onclick="switchView('lineage')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
+                    02 // شجرة النسب 3D
+                </button>
+                <button onclick="switchView('map')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
+                    03 // التوزيع الجغرافي
+                </button>
+                <button onclick="switchView('events')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
+                    04 // الأحداث والمناسبات
+                </button>
+                <button onclick="switchView('search')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
+                    05 // البحث المتقدم
+                </button>
+            </nav>
+
+            <div class="mt-auto px-8 pt-8 border-t border-white/5 space-y-4">
+                <div class="p-4 bg-white/5 beveled">
+                    <p class="text-[9px] tech-font text-cyan-600 mb-2">TRIBE_STATS</p>
+                    <canvas id="miniStatsChart" height="100"></canvas>
+                </div>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="exportToExcel()" class="text-[8px] tech-font text-gray-500 hover:text-white uppercase tracking-widest text-right">Download_Excel_Registry</button>
+                                <button onclick="exportToPDF()" class="text-[8px] tech-font text-gray-500 hover:text-white uppercase tracking-widest text-right">Generate_PDF_Report</button>
+                            </div>
+                <p class="text-[8px] tech-font text-gray-700 text-center">© 2024 DEWAN AL-HAYYANI</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+
+            <!-- View: Home -->
+            <section id="view-home" class="view active">
+                <div class="max-w-4xl">
+                    <h2 class="text-6xl font-black mb-8 glow-text tracking-tighter">مرحباً بكم في ديوان الحياني</h2>
+                    <p class="text-xl text-gray-400 mb-12 leading-relaxed">
+                        منصة رقمية متكاملة لتوثيق أنساب قبيلة الحياني، تجمع بين الأصالة والتقنيات الحديثة.
+                        نستخدم تقنيات البلوكشين والذكاء الاصطناعي لضمان دقة وخصوصية البيانات التاريخية والحديثة.
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="p-8 glass-panel neon-border beveled">
+                            <h3 class="tech-font text-cyan-400 text-sm mb-2 uppercase">Total_Population</h3>
+                            <p class="text-4xl font-black tech-font" id="count-members">0</p>
+                        </div>
+                        <div class="p-8 glass-panel border-purple-500/30 beveled">
+                            <h3 class="tech-font text-purple-400 text-sm mb-2 uppercase">Main_Branches</h3>
+                            <p class="text-4xl font-black tech-font" id="count-families">0</p>
+                        </div>
+                        <div class="p-8 glass-panel border-gold-500/30 beveled">
+                            <h3 class="tech-font text-yellow-500 text-sm mb-2 uppercase">Verified_Docs</h3>
+                            <p class="text-4xl font-black tech-font" id="count-docs">0</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Lineage 3D -->
+            <section id="view-lineage" class="view">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black tech-font">GENEALOGY_3D_CORE</h2>
+                    <div class="flex gap-4">
+                        <button class="px-4 py-2 bg-cyan-900 text-[10px] tech-font beveled">RESET_CAMERA</button>
+                        <button class="px-4 py-2 bg-cyan-900 text-[10px] tech-font beveled">TOGGLE_LABELS</button>
+                    </div>
+                </div>
+                <div id="tree-3d-container" class="glass-panel neon-border flex items-center justify-center text-cyan-900 tech-font">
+                    [ INITIALIZING_THREEJS_RENDERER ... ]
+                </div>
+            </section>
+
+            <!-- View: Map -->
+            <section id="view-map" class="view">
+                <h2 class="text-3xl font-black tech-font mb-8 uppercase">Geo_Distribution_Matrix</h2>
+                <div id="map-container" class="beveled"></div>
+            </section>
+
+            <!-- View: Events -->
+            <section id="view-events" class="view">
+                <h2 class="text-3xl font-black tech-font mb-8 uppercase">Upcoming_Events_Feed</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="events-grid">
+                    <!-- Events will be rendered here -->
+                </div>
+            </section>
+
+            <!-- View: Search -->
+            <section id="view-search" class="view">
+                <h2 class="text-3xl font-black tech-font mb-8 uppercase">Advanced_Search_Protocol</h2>
+                <div class="flex gap-4 mb-12">
+                    <input type="text" id="globalSearch" class="flex-1 bg-white/5 border border-white/10 p-6 tech-font outline-none focus:border-cyan-500" placeholder="SEARCH_BY_NAME_ID_OR_LOCATION...">
+                    <button onclick="executeSearch()" class="px-12 bg-cyan-600 text-black font-black tech-font hover:bg-cyan-400 transition-all">EXECUTE</button>
+                </div>
+                <div id="search-results" class="grid grid-cols-4 gap-4"></div>
+            </section>
+
+            <!-- View: Admin -->
+            <section id="view-admin" class="view">
+                <div id="admin-login" class="max-w-md mx-auto mt-20 p-12 glass-panel neon-border-purple beveled">
+                    <h2 class="text-2xl tech-font font-black mb-8 text-purple-400">ADMIN_AUTHENTICATION</h2>
+                    <div class="space-y-6">
+                        <input type="password" id="adminPass" class="w-full bg-black border border-purple-500/30 p-4 tech-font text-center" placeholder="SECURE_PASSCODE">
+                        <button onclick="simulateLogin()" class="w-full py-4 bg-purple-600 text-black font-black tech-font hover:bg-purple-400 transition-all">ACCESS_SYSTEM</button>
+                        <div class="flex justify-between items-center text-[10px] tech-font text-purple-900">
+                            <span>FACE_ID: READY</span>
+                            <span>2FA: ENABLED</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="admin-dashboard" class="hidden">
+                    <div class="flex justify-between items-center mb-12">
+                        <h2 class="text-4xl font-black tech-font text-purple-400">COMMAND_CENTER</h2>
+                        <button onclick="logout()" class="text-[10px] tech-font text-red-500">TERMINATE_SESSION</button>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-6 mb-12">
+                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('members')">
+                            <p class="tech-font text-xs">MANAGE_INDIVIDUALS</p>
+                        </button>
+                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('families')">
+                            <p class="tech-font text-xs">MANAGE_FAMILIES</p>
+                        </button>
+                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('docs')">
+                            <p class="tech-font text-xs">BLOCKCHAIN_DOCS</p>
+                        </button>
+                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('events')">
+                            <p class="tech-font text-xs">EVENT_LOGISTICS</p>
+                        </button>
+                    </div>
+
+                    <div id="admin-section-content" class="glass-panel p-8 border-white/5 beveled min-h-[400px]">
+                        <!-- Admin forms and lists go here -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Notification Overlay -->
+    <div id="sys-notify" class="fixed top-24 left-1/2 -translate-x-1/2 px-12 py-3 bg-cyan-500 text-black tech-font font-black text-xs z-[6000] hidden beveled shadow-[0_0_30px_rgba(0,243,255,0.5)]">
+        SYSTEM_ALERT: ACTION_COMPLETED
+    </div>
 
     <!-- Modals -->
-    <div id="memberModal" class="hidden fixed inset-0 z-[1000] bg-black/90 items-center justify-center backdrop-blur-md transition-all">
-        <div class="max-w-xl w-full glass-panel p-8 neon-border beveled">
-            <h2 class="text-2xl tech-font font-black mb-6 flex items-center gap-3 text-cyan-400 uppercase tracking-widest">
-                // Register_New_Member
-            </h2>
-            <div class="space-y-4">
-                <div class="group">
-                    <label class="block text-[10px] text-cyan-500 mb-1 mr-2 tech-font uppercase">Full_Name</label>
-                    <input type="text" id="memberName" class="w-full bg-black border border-white/10 rounded-sm p-3 outline-none focus:border-cyan-400 text-white tech-font">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] text-cyan-500 mb-1 mr-2 tech-font uppercase">Branch_ID</label>
-                        <input type="text" id="memberBranch" class="w-full bg-black border border-white/10 rounded-sm p-3 outline-none focus:border-cyan-400 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-cyan-500 mb-1 mr-2 tech-font uppercase">Birth_Date</label>
-                        <input type="date" id="memberBirth" class="w-full bg-black border border-white/10 rounded-sm p-3 outline-none focus:border-cyan-400 text-white invert">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] text-cyan-500 mb-1 mr-2 tech-font uppercase">Geo_Location</label>
-                        <input type="text" id="memberLocation" class="w-full bg-black border border-white/10 rounded-sm p-3 outline-none focus:border-cyan-400 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-cyan-500 mb-1 mr-2 tech-font uppercase">Comm_Link</label>
-                        <input type="tel" id="memberPhone" class="w-full bg-black border border-white/10 rounded-sm p-3 outline-none focus:border-cyan-400 text-white">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] text-cyan-500 mb-1 mr-2 tech-font uppercase">Parent_Node</label>
-                    <select id="memberFather" class="w-full bg-black border border-white/10 rounded-sm p-3 outline-none focus:border-cyan-400 text-white">
-                        <option value="">ROOT_NODE (No Parent)</option>
-                    </select>
-                </div>
-                <div class="pt-6 flex gap-3">
-                    <button onclick="saveMember()" class="flex-grow py-4 bg-cyan-600 hover:bg-cyan-400 text-black font-black uppercase tech-font tracking-tighter transition-all">Execute_Save</button>
-                    <button onclick="closeModal('memberModal')" class="px-6 py-4 border border-white/10 hover:bg-white/5 uppercase tech-font text-xs">Abort</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sidebar -->
-    <aside class="w-80 glass-panel border-l border-white/5 flex flex-col p-8 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-1 h-full bg-cyan-500 flicker"></div>
-        <div class="mb-12 text-center">
-            <div class="w-16 h-16 neon-border-purple rounded-full mx-auto mb-4 flex items-center justify-center flicker">
-                <span class="text-2xl tech-font text-purple-500">TRI</span>
-            </div>
-            <h1 class="text-xl tech-font font-black text-white tracking-widest uppercase">Lineage_OS</h1>
-            <p class="text-[8px] text-cyan-500 font-bold tracking-[0.3em] mt-1 uppercase">Sndbad-Crypto Interface</p>
-        </div>
-
-        <nav class="space-y-4 flex-grow">
-            <button onclick="openModal('memberModal')" class="w-full flex items-center justify-between px-4 py-4 border border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-400 tech-font text-xs transition-all group">
-                <span>ADD_MEMBER</span>
-                <span class="group-hover:translate-x-1 transition-transform">→</span>
-            </button>
-            <button onclick="showFamilyTree()" class="w-full flex items-center justify-between px-4 py-4 border border-purple-500/30 hover:bg-purple-500/10 text-purple-400 tech-font text-xs transition-all group">
-                <span>VIEW_TREE_GRAPH</span>
-                <span class="group-hover:translate-x-1 transition-transform">→</span>
-            </button>
-            <button onclick="openModal('bulkModal')" class="w-full flex items-center justify-between px-4 py-4 border border-white/10 hover:bg-white/5 text-gray-400 tech-font text-xs transition-all">
-                <span>BULK_IMPORT</span>
-                <span>⚡</span>
-            </button>
-            <div class="h-px bg-white/5 my-6"></div>
-            <button onclick="exportData()" class="w-full text-right text-[10px] text-gray-500 hover:text-white uppercase tech-font py-2">System_Backup</button>
-            <button onclick="importTrigger.click()" class="w-full text-right text-[10px] text-gray-500 hover:text-white uppercase tech-font py-2">System_Restore</button>
-            <input type="file" id="importTrigger" class="hidden" onchange="importData(this)">
-        </nav>
-
-        <div class="mt-auto pt-6 space-y-4">
-            <div class="bg-black/40 border border-white/5 p-3 beveled">
-                <p class="text-[8px] tech-font text-cyan-700 uppercase mb-2">Internal_Log</p>
-                <div id="systemLog" class="text-[8px] tech-font text-cyan-900 space-y-1 h-20 overflow-hidden leading-tight">
-                    <div>> SYSTEM_READY</div>
-                    <div>> WAITING_FOR_INPUT</div>
-                </div>
-            </div>
-            <button onclick="clearAllData()" class="text-[9px] text-red-500/50 hover:text-red-500 tech-font uppercase tracking-widest">Wipe_Database</button>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-grow p-12 overflow-y-auto relative">
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-30"></div>
-
-        <header class="flex justify-between items-start mb-16 relative">
-            <div class="absolute -top-10 -right-10 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -z-10"></div>
-            <div>
-                <h2 class="text-5xl font-black text-white mb-4 uppercase tech-font tracking-tighter glow-text">Tribal_Matrix</h2>
-                <div class="flex items-center gap-4 text-[10px] tech-font text-cyan-500">
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></span> ONLINE</span>
-                    <span class="opacity-30">|</span>
-                    <span>ENCRYPTION: AES-256</span>
-                    <span class="opacity-30">|</span>
-                    <span id="systemTime">00:00:00</span>
-                </div>
-            </div>
-            <div class="flex gap-8">
-                <div class="text-left border-r-2 border-purple-500/50 pr-8 bg-gradient-to-l from-purple-500/5 to-transparent p-4 beveled">
-                    <p class="text-[9px] text-purple-400 tech-font uppercase mb-1 tracking-widest">Total_Nodes</p>
-                    <p id="statsTotal" class="text-4xl tech-font font-black text-white glow-purple">000</p>
-                </div>
-                <div class="text-left border-r-2 border-cyan-500/50 pr-8 bg-gradient-to-l from-cyan-500/5 to-transparent p-4 beveled">
-                    <p class="text-[9px] text-cyan-400 tech-font uppercase mb-1 tracking-widest">Branches</p>
-                    <p id="statsBranches" class="text-4xl tech-font font-black text-white glow-cyan">00</p>
-                </div>
-            </div>
-        </header>
-
-        <!-- Search -->
-        <div class="mb-12 flex gap-4">
-            <div class="relative flex-grow">
-                <input type="text" id="searchInput" oninput="renderUI()" placeholder="SEARCH_DATABASE..." class="w-full bg-white/5 border border-white/10 py-5 px-8 tech-font text-sm outline-none focus:border-cyan-500 transition-all text-cyan-400 placeholder:text-gray-700">
-                <div class="absolute left-6 top-1/2 -translate-y-1/2 text-cyan-900 tech-font text-xs">IDX_SCAN</div>
-            </div>
-            <select id="branchFilter" onchange="renderUI()" class="bg-black border border-white/10 px-8 tech-font text-xs text-gray-500 outline-none focus:border-cyan-500">
-                <option value="">ALL_BRANCHES</option>
-            </select>
-        </div>
-
-        <!-- Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4" id="membersGrid"></div>
-    </main>
-
-    <!-- Bulk Modal -->
-    <div id="bulkModal" class="hidden fixed inset-0 z-[1000] bg-black/95 items-center justify-center backdrop-blur-xl transition-all">
-        <div class="max-w-2xl w-full glass-panel p-8 neon-border-purple beveled">
-            <h2 class="text-2xl tech-font font-black mb-6 text-purple-400 uppercase tracking-widest">// Multi_Node_Injection</h2>
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="text" id="bulkBranch" placeholder="BRANCH_NAME" class="bg-black border border-white/10 p-4 text-xs tech-font outline-none focus:border-purple-500">
-                    <input type="text" id="bulkLocation" placeholder="LOC_DATA" class="bg-black border border-white/10 p-4 text-xs tech-font outline-none focus:border-purple-500">
-                </div>
-                <textarea id="bulkNames" class="w-full h-64 bg-black border border-white/10 p-6 tech-font text-xs text-purple-400 outline-none focus:border-purple-500 placeholder:text-purple-900" placeholder="PASTE_LIST_HERE (One name per line)"></textarea>
-                <div class="flex gap-4">
-                    <button onclick="processBulk()" class="flex-grow py-5 bg-purple-600 hover:bg-purple-400 text-black font-black tech-font transition-all uppercase">Initialize_Upload</button>
-                    <button onclick="closeModal('bulkModal')" class="px-8 tech-font text-xs uppercase">Abort</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- QR Modal -->
-    <div id="qrModal" class="hidden fixed inset-0 z-[3000] bg-black/95 items-center justify-center backdrop-blur-3xl transition-all">
-        <div class="max-w-sm w-full glass-panel p-10 neon-border beveled text-center">
-            <h2 class="text-xl tech-font font-black mb-8 text-cyan-400 uppercase tracking-widest">// Identity_Token</h2>
-            <div id="qrcode" class="mb-8 flex justify-center"></div>
-            <p id="qrName" class="tech-font text-white mb-2 uppercase text-xs"></p>
-            <p id="qrId" class="tech-font text-cyan-800 mb-8 text-[10px]"></p>
-            <button onclick="closeModal('qrModal')" class="w-full py-4 border border-cyan-500/30 text-cyan-400 tech-font text-xs hover:bg-cyan-500/10 transition-all uppercase">Deactivate</button>
-        </div>
-    </div>
-
-    <!-- Tree Modal -->
-    <div id="treeModal" class="hidden fixed inset-0 z-[2000] bg-black overflow-y-auto p-12">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-16 border-b border-white/5 pb-8">
-                <h2 class="text-4xl tech-font font-black text-cyan-400 tracking-tighter uppercase">Lineage_Graph_Map</h2>
-                <button onclick="closeModal('treeModal')" class="tech-font text-xs border border-white/10 px-6 py-3 hover:bg-red-500 hover:text-black transition-all">TERMINATE_VIEW</button>
-            </div>
-            <div id="treeContent" class="flex flex-col items-center gap-20"></div>
+    <div id="indModal" class="modal">
+        <div class="max-w-xl w-full glass-panel p-8 neon-border-purple beveled">
+             <h2 class="text-2xl tech-font font-black mb-6 text-purple-400">REGISTER_NEW_NODE</h2>
+             <div class="space-y-4">
+                 <input id="indName" class="w-full bg-black border border-white/10 p-4 text-xs" placeholder="FULL_NAME">
+                 <select id="indFam" class="w-full bg-black border border-white/10 p-4 text-xs">
+                     <option value="">SELECT_FAMILY</option>
+                 </select>
+                 <div class="grid grid-cols-2 gap-4">
+                     <input id="indLat" class="bg-black border border-white/10 p-4 text-xs" placeholder="LATITUDE (e.g. 24.7)">
+                     <input id="indLng" class="bg-black border border-white/10 p-4 text-xs" placeholder="LONGITUDE (e.g. 46.6)">
+                 </div>
+                 <div class="flex gap-4">
+                    <button onclick="saveIndividual()" class="flex-1 py-4 bg-purple-600 text-black font-black tech-font">COMM_RECORD</button>
+                    <button onclick="closeModal('indModal')" class="px-8 tech-font text-xs">ABORT</button>
+                 </div>
+             </div>
         </div>
     </div>
 
     <script>
-        const DB_NAME = 'TRIBE_LINEAGE_CYBER_V1';
-        let members = [];
+        // Database Schemas
+        let db = {
+            individuals: [],
+            families: [],
+            documents: [],
+            events: [],
+            blockchain: []
+        };
+
+        const DB_KEY = 'HAYYANI_DIWAN_V2';
+
+        // Advanced Simulation Functions
+        const cryptoSim = {
+            encrypt: (text) => btoa(text), // Simulated AES-256
+            decrypt: (text) => atob(text),
+            hash: (text) => '0x' + Array.from(text).reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0).toString(16)
+        };
 
         function initSystem() {
-            const stored = localStorage.getItem(DB_NAME);
-            members = stored ? JSON.parse(stored) : [];
-            updateFatherDropdown();
-            renderUI();
+            loadDB();
+            updateStats();
+            initTicker();
+            initMiniChart();
+            renderEvents();
 
-            // Start clock
+            // Check for hash navigation
+            const hash = window.location.hash.replace('#', '') || 'home';
+            switchView(hash);
+        }
+
+        function loadDB() {
+            const stored = localStorage.getItem(DB_KEY);
+            if (stored) {
+                db = JSON.parse(stored);
+                // Schema Migration Check
+                if (!db.blockchain) db.blockchain = [];
+                if (!db.documents) db.documents = [];
+            } else {
+                // Initial Sample Data
+                db.families = [
+                    { id: 'F1', name: 'آل فلان', branch: 'الرئيسي', location: 'الرياض' },
+                    { id: 'F2', name: 'آل علان', branch: 'الغربي', location: 'جدة' }
+                ];
+                db.individuals = [
+                    {
+                        id: 'I1',
+                        name: 'الشيخ محمد الحياني',
+                        familyId: 'F1',
+                        role: 'عميد القبيلة',
+                        location: [24.7136, 46.6753],
+                        social: { twitter: '@hayyani', linkedin: 'hayyani-ceo' },
+                        health: cryptoSim.encrypt('Stable'), // Encrypted health data
+                        docs: ['DOC1'],
+                        isVerified: true
+                    }
+                ];
+                db.documents = [
+                    { id: 'DOC1', title: 'صك النسب الشرعي', type: 'وثيقة رسمية', ownerId: 'I1', hash: '0xHASH777', timestamp: new Date().toISOString() }
+                ];
+                db.events = [
+                    { id: 'E1', title: 'اجتماع العيد السنوي', date: '2024-04-10', desc: 'اجتماع عام لكافة أفراد القبيلة في ديوان الرياض.', location: 'الرياض' }
+                ];
+                saveDB();
+            }
+        }
+
+        function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            const target = document.getElementById(`view-${viewId}`);
+            if (target) {
+                target.classList.add('active');
+                const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.onclick.toString().includes(viewId));
+                if (btn) btn.classList.add('active');
+                window.location.hash = viewId;
+            }
+
+            if (viewId === 'map') initMap();
+            if (viewId === 'lineage') init3DTree();
+        }
+
+        function updateStats() {
+            document.getElementById('count-members').innerText = db.individuals.length;
+            document.getElementById('count-families').innerText = db.families.length;
+            document.getElementById('count-docs').innerText = db.documents.length;
+        }
+
+        function initTicker() {
+            const ticker = document.getElementById('blockchain-ticker');
             setInterval(() => {
-                const now = new Date();
-                document.getElementById('systemTime').innerText = now.toLocaleTimeString('en-US', { hour12: false });
-            }, 1000);
+                const hash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                ticker.innerHTML += ` // NEW_BLOCK_CONFIRMED: ${hash.toUpperCase()} ... `;
+            }, 5000);
         }
 
-        function log(msg) {
-            const l = document.getElementById('systemLog');
-            const entry = document.createElement('div');
-            entry.innerText = `> ${msg}`;
-            l.prepend(entry);
-        }
-
-        function showNotification(msg) {
-            const n = document.getElementById('notification');
-            n.innerText = `>> ${msg}`;
-            n.style.display = 'block';
-            log(msg);
-            setTimeout(() => n.style.display = 'none', 3000);
-        }
-
-        function openModal(id) {
-            document.getElementById(id).classList.add('modal-active');
-            if(id === 'memberModal') updateFatherDropdown();
-        }
-        function closeModal(id) { document.getElementById(id).classList.remove('modal-active'); }
-
-        function updateFatherDropdown() {
-            const select = document.getElementById('memberFather');
-            select.innerHTML = '<option value="">ROOT_NODE (No Parent)</option>';
-            members.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.id;
-                opt.textContent = m.name;
-                select.appendChild(opt);
+        function initMiniChart() {
+            const ctx = document.getElementById('miniStatsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Activity',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: '#00f3ff',
+                        tension: 0.4,
+                        borderWidth: 1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
             });
         }
 
-        function saveMember() {
-            const name = document.getElementById('memberName').value.trim();
-            const branch = document.getElementById('memberBranch').value.trim();
-            const birth = document.getElementById('memberBirth').value;
-            const fatherId = document.getElementById('memberFather').value;
-            const location = document.getElementById('memberLocation').value.trim();
-            const phone = document.getElementById('memberPhone').value.trim();
+        function initMap() {
+            if (window.myMap) window.myMap.remove();
+            window.myMap = L.map('map-container').setView([24.7136, 46.6753], 6);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(window.myMap);
 
-            if(!name || !branch) return alert("ERROR: CRITICAL_DATA_MISSING");
-
-            members.push({
-                id: 'N' + Date.now(),
-                name, branch, birth, location, phone, fatherId,
-                createdAt: new Date().toISOString()
+            db.individuals.forEach(ind => {
+                if (ind.location) {
+                    L.marker(ind.location).addTo(window.myMap)
+                        .bindPopup(`<div class="tech-font text-xs text-black">${ind.name}</div>`);
+                }
             });
-
-            persist();
-            closeModal('memberModal');
-            ['memberName', 'memberBranch', 'memberBirth', 'memberLocation', 'memberPhone'].forEach(id => document.getElementById(id).value = '');
-            showNotification("NODE_ADDED_SUCCESSFULLY");
-            renderUI();
         }
 
-        function persist() { localStorage.setItem(DB_NAME, JSON.stringify(members)); }
+        function init3DTree() {
+            const container = document.getElementById('tree-3d-container');
+            if (container.children.length > 0) return;
 
-        function renderUI() {
-            const grid = document.getElementById('membersGrid');
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const branchFilter = document.getElementById('branchFilter').value;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
 
-            const filtered = members.filter(m => {
-                const matchesSearch = m.name.toLowerCase().includes(term) || m.branch.toLowerCase().includes(term);
-                const matchesBranch = !branchFilter || m.branch === branchFilter;
-                return matchesSearch && matchesBranch;
+            // Create Node Group
+            const nodes = new THREE.Group();
+            const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const material = new THREE.MeshPhongMaterial({ color: 0x00f3ff, emissive: 0x004444, shininess: 100 });
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(0, 0, 10);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0x404040));
+
+            db.individuals.forEach((ind, i) => {
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set((Math.random()-0.5)*15, (Math.random()-0.5)*15, (Math.random()-0.5)*15);
+                nodes.add(sphere);
+
+                // Add connecting lines (simulated lineage)
+                if (i > 0) {
+                    const lineMat = new THREE.LineBasicMaterial({ color: 0x004444, transparent: true, opacity: 0.3 });
+                    const lineGeom = new THREE.BufferGeometry().setFromPoints([
+                        sphere.position,
+                        nodes.children[i-1].position
+                    ]);
+                    const line = new THREE.Line(lineGeom, lineMat);
+                    nodes.add(line);
+                }
             });
 
-            const branches = [...new Set(members.map(m => m.branch))];
-            document.getElementById('branchFilter').innerHTML = '<option value="">ALL_BRANCHES</option>' +
-                branches.map(b => `<option value="${b}" ${b === branchFilter ? 'selected' : ''}>${b}</option>`).join('');
+            scene.add(nodes);
+            camera.position.z = 20;
 
-            document.getElementById('statsTotal').innerText = String(members.length).padStart(3, '0');
-            document.getElementById('statsBranches').innerText = String(branches.length).padStart(2, '0');
+            function animate() {
+                requestAnimationFrame(animate);
+                nodes.rotation.y += 0.002;
+                renderer.render(scene, camera);
+            }
+            animate();
 
-            grid.innerHTML = filtered.map(m => {
-                const father = members.find(f => f.id === m.fatherId);
-                return `
-                    <div class="member-card p-6 glass-panel relative overflow-hidden group cursor-pointer" onclick="generateQR('${m.id}')">
-                        <div class="absolute top-0 right-0 w-8 h-8 bg-cyan-500/10 rotate-45 translate-x-4 -translate-y-4"></div>
+            // GSAP Entrance
+            gsap.from(nodes.scale, { x: 0, y: 0, z: 0, duration: 2, ease: "expo.out" });
+        }
+
+        function renderEvents() {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = db.events.length ? '' : '<p class="text-gray-600 tech-font">NO_EVENTS_SCHEDULED</p>';
+            db.events.forEach(ev => {
+                grid.innerHTML += `
+                    <div class="p-6 glass-panel border-white/10 beveled group hover:border-cyan-500/50 transition-all cursor-pointer">
                         <div class="flex justify-between items-start mb-4">
-                            <span class="text-[8px] tech-font text-cyan-500/50">${m.id}</span>
-                            <div class="flex gap-2">
-                                <button onclick="event.stopPropagation(); deleteMember('${m.id}')" class="text-white/20 hover:text-red-500 tech-font text-[10px]">DEL</button>
-                            </div>
+                             <h3 class="text-xl font-bold group-hover:text-cyan-400">${ev.title}</h3>
+                             <span class="px-3 py-1 bg-cyan-900/30 text-[8px] tech-font text-cyan-400 beveled uppercase">Live_Event</span>
                         </div>
-                        <h3 class="text-lg font-black text-white mb-1 uppercase tracking-tighter">${m.name}</h3>
-                        <p class="text-[10px] tech-font text-cyan-400 mb-6 flex items-center gap-2">
-                            <span class="w-1 h-1 bg-cyan-400 rounded-full"></span> ${m.branch}
-                        </p>
-                        <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
-                            <div>
-                                <p class="text-[8px] tech-font text-gray-500 uppercase">Parent</p>
-                                <p class="text-[10px] text-white truncate">${father ? father.name : 'NONE'}</p>
-                            </div>
-                            <div>
-                                <p class="text-[8px] tech-font text-gray-500 uppercase">Loc</p>
-                                <p class="text-[10px] text-white truncate">${m.location || '---'}</p>
-                            </div>
+                        <p class="text-xs text-cyan-500 mb-4 tech-font">${ev.date} // ${ev.location}</p>
+                        <p class="text-sm text-gray-400 leading-relaxed">${ev.desc}</p>
+                        <div class="mt-6 flex justify-end">
+                            <button class="text-[9px] tech-font text-cyan-700 hover:text-cyan-300">REGISTER_INTEREST →</button>
                         </div>
                     </div>
                 `;
-            }).join('');
-        }
-
-        function generateQR(id) {
-            const m = members.find(x => x.id === id);
-            if(!m) return;
-
-            const qrContainer = document.getElementById("qrcode");
-            qrContainer.innerHTML = "";
-            new QRCode(qrContainer, {
-                text: JSON.stringify({id: m.id, name: m.name, branch: m.branch}),
-                width: 200,
-                height: 200,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
             });
-
-            document.getElementById('qrName').innerText = m.name;
-            document.getElementById('qrId').innerText = m.id;
-            openModal('qrModal');
         }
 
-        function deleteMember(id) {
-            if(confirm("CONFIRM_DELETION: IRREVERSIBLE_ACTION")) {
-                members = members.filter(m => m.id !== id);
-                persist();
-                renderUI();
-            }
-        }
+        function executeSearch() {
+            const term = document.getElementById('globalSearch').value.toLowerCase();
+            const results = document.getElementById('search-results');
+            results.innerHTML = '';
 
-        function processBulk() {
-            const names = document.getElementById('bulkNames').value.split('\n').filter(n => n.trim() !== "");
-            const branch = document.getElementById('bulkBranch').value.trim() || "UNDEFINED";
-            const location = document.getElementById('bulkLocation').value.trim();
+            const filtered = db.individuals.filter(i => i.name.toLowerCase().includes(term) || i.id.toLowerCase().includes(term));
 
-            if(names.length === 0) return alert("ERROR: NO_DATA_DETECTED");
-
-            names.forEach(name => {
-                members.push({
-                    id: 'N' + (Date.now() + Math.floor(Math.random() * 1000)),
-                    name: name.trim(), branch, location, birth: '', phone: '', fatherId: '',
-                    createdAt: new Date().toISOString()
-                });
-            });
-
-            persist();
-            closeModal('bulkModal');
-            document.getElementById('bulkNames').value = '';
-            showNotification(`INJECTED_${names.length}_NODES`);
-            renderUI();
-        }
-
-        function showFamilyTree() {
-            const content = document.getElementById('treeContent');
-            content.innerHTML = '';
-            const roots = members.filter(m => !m.fatherId || !members.find(f => f.id === m.fatherId));
-
-            roots.forEach(root => {
-                const wrapper = document.createElement('div');
-                wrapper.className = "p-10 border border-white/5 bg-white/[0.02] rounded-3xl";
-                wrapper.appendChild(renderNode(root));
-                content.appendChild(wrapper);
-            });
-
-            if(roots.length === 0) content.innerHTML = '<p class="tech-font text-gray-700">NO_DATA_MATRIX_EMPTY</p>';
-            openModal('treeModal');
-        }
-
-        function renderNode(member) {
-            const node = document.createElement('div');
-            node.className = "flex flex-col items-center relative";
-            const children = members.filter(m => m.fatherId === member.id);
-
-            let childrenHTML = '';
-            if (children.length > 0) {
-                childrenHTML = `
-                    <div class="flex gap-12 relative pt-12 mt-8">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-px h-12 bg-cyan-500/30"></div>
-                        ${children.map(c => renderNode(c).outerHTML).join('')}
+            filtered.forEach(ind => {
+                const family = db.families.find(f => f.id === ind.familyId);
+                results.innerHTML += `
+                    <div class="p-6 glass-panel border-white/10 beveled hover:neon-border transition-all">
+                        <p class="text-[8px] tech-font text-gray-600 mb-2">${ind.id}</p>
+                        <h4 class="text-md font-bold text-white mb-1">${ind.name}</h4>
+                        <p class="text-[10px] text-cyan-600 mb-4">${family ? family.name : '---'}</p>
+                        <div class="flex justify-between items-center border-t border-white/5 pt-4">
+                            <span class="text-[8px] tech-font ${ind.isVerified ? 'text-green-500' : 'text-yellow-500'} uppercase">
+                                ${ind.isVerified ? 'VERIFIED_CHAIN' : 'PENDING_SIG'}
+                            </span>
+                            <button class="text-[8px] tech-font text-cyan-500 underline" onclick="viewProfile('${ind.id}')">PROFILE</button>
+                        </div>
                     </div>
                 `;
+            });
+
+            if (filtered.length === 0) results.innerHTML = '<p class="col-span-4 text-center text-gray-700 tech-font py-20 uppercase">No_Match_Found_In_Registry</p>';
+        }
+
+        // Add Event Listeners for search
+        document.addEventListener('DOMContentLoaded', () => {
+            const sInput = document.getElementById('globalSearch');
+            if (sInput) sInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeSearch(); });
+        });
+
+        function simulateLogin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === '1234') { // Sample pass
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                showNotify("AUTHENTICATION_SUCCESSFUL");
+            } else {
+                alert("ACCESS_DENIED: INVALID_PASSCODE");
             }
-
-            node.innerHTML = `
-                <div class="bg-black border border-cyan-500/50 p-6 rounded-sm min-w-[200px] text-center shadow-[0_0_20px_rgba(0,243,255,0.1)] relative z-10 group">
-                    <p class="text-white font-black tech-font uppercase text-xs">${member.name}</p>
-                    <p class="text-[8px] tech-font text-cyan-500 mt-2 tracking-[0.2em]">${member.branch}</p>
-                </div>
-                ${childrenHTML}
-            `;
-            return node;
         }
 
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(members));
-            const a = document.createElement('a');
-            a.setAttribute("href", dataStr);
-            a.setAttribute("download", `lineage_os_backup_${new Date().toISOString().slice(0,10)}.json`);
-            a.click();
+        function logout() {
+            document.getElementById('admin-login').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
         }
 
-        function importData(input) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    members = JSON.parse(e.target.result);
-                    persist();
-                    renderUI();
-                    showNotification("DATABASE_RESTORED");
-                } catch(err) { alert("ERROR: CORRUPTED_FILE"); }
-            };
-            reader.readAsText(input.files[0]);
-        }
+        function showAdminSection(section) {
+            const container = document.getElementById('admin-section-content');
+            let html = '';
 
-        function clearAllData() {
-            if(confirm("DANGER: WIPE_ALL_DATA?")) {
-                members = [];
-                persist();
-                renderUI();
+            switch(section) {
+                case 'members':
+                    html = `
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="tech-font text-purple-400">INDIVIDUAL_REGISTRY</h3>
+                            <button onclick="openMemberForm()" class="px-4 py-2 bg-purple-900 text-[10px] tech-font beveled">ADD_NEW_ENTRY</button>
+                        </div>
+                        <table class="w-full text-right text-xs">
+                            <thead class="text-purple-900 tech-font border-b border-white/5">
+                                <tr>
+                                    <th class="pb-4">NAME</th>
+                                    <th class="pb-4">FAMILY</th>
+                                    <th class="pb-4">STATUS</th>
+                                    <th class="pb-4">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-400">
+                                ${db.individuals.map(i => `
+                                    <tr class="border-b border-white/5">
+                                        <td class="py-4">${i.name}</td>
+                                        <td class="py-4">${db.families.find(f => f.id === i.familyId)?.name || '---'}</td>
+                                        <td class="py-4 text-[9px] tech-font ${i.isVerified ? 'text-green-500' : 'text-yellow-500'}">
+                                            ${i.isVerified ? 'ENCRYPTED' : 'PLAINTEXT'}
+                                        </td>
+                                        <td class="py-4">
+                                            <button class="text-purple-500 hover:underline" onclick="deleteInd('${i.id}')">DELETE</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    break;
+                case 'families':
+                    html = `<h3 class="tech-font text-purple-400 mb-6">FAMILY_MANAGEMENT</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input id="newFamName" class="bg-black border border-white/10 p-4 tech-font text-xs" placeholder="FAMILY_NAME">
+                            <button onclick="addFamily()" class="bg-purple-600 text-black font-black tech-font">CREATE_NODE</button>
+                        </div>
+                    `;
+                    break;
+                case 'docs':
+                    html = `<h3 class="tech-font text-purple-400 mb-6">BLOCKCHAIN_DOCUMENT_VAULT</h3>
+                        <div class="grid grid-cols-1 gap-4">
+                            ${db.documents.map(d => `
+                                <div class="p-4 glass-panel border-purple-500/20 flex justify-between items-center">
+                                    <div>
+                                        <p class="font-bold text-white">${d.title}</p>
+                                        <p class="text-[8px] tech-font text-purple-900">HASH: ${d.hash}</p>
+                                    </div>
+                                    <span class="px-4 py-1 border border-green-500/50 text-green-500 text-[8px] tech-font beveled">VERIFIED_ON_CHAIN</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    break;
+                case 'events':
+                    html = `
+                        <h3 class="tech-font text-purple-400 mb-6">EVENT_SCHEDULER</h3>
+                        <div class="space-y-4 max-w-lg">
+                            <input id="evTitle" class="w-full bg-black border border-white/10 p-4 text-xs" placeholder="EVENT_TITLE">
+                            <input id="evDate" type="date" class="w-full bg-black border border-white/10 p-4 text-xs invert">
+                            <textarea id="evDesc" class="w-full bg-black border border-white/10 p-4 text-xs" placeholder="DESCRIPTION"></textarea>
+                            <button onclick="addEvent()" class="w-full py-4 bg-purple-600 text-black font-black tech-font">PUSH_TO_NETWORK</button>
+                        </div>
+                    `;
+                    break;
             }
+            container.innerHTML = html;
+        }
+
+        function addFamily() {
+            const name = document.getElementById('newFamName').value;
+            if(!name) return;
+            db.families.push({id: 'F'+Date.now(), name, branch: 'General'});
+            saveDB();
+            showAdminSection('families');
+            showNotify("FAMILY_NODE_CREATED");
+        }
+
+        function addEvent() {
+            const title = document.getElementById('evTitle').value;
+            const date = document.getElementById('evDate').value;
+            const desc = document.getElementById('evDesc').value;
+            if(!title || !date) return;
+            db.events.push({id: 'E'+Date.now(), title, date, desc, location: 'Virtual'});
+            saveDB();
+            showAdminSection('events');
+            showNotify("EVENT_BROADCAST_SUCCESS");
+            renderEvents();
+        }
+
+        function deleteInd(id) {
+            db.individuals = db.individuals.filter(i => i.id !== id);
+            saveDB();
+            showAdminSection('members');
+            updateStats();
+        }
+
+        function openMemberForm() {
+            const select = document.getElementById('indFam');
+            select.innerHTML = '<option value="">SELECT_FAMILY</option>' +
+                db.families.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+            document.getElementById('indModal').classList.add('active');
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function saveIndividual() {
+            const name = document.getElementById('indName').value;
+            const familyId = document.getElementById('indFam').value;
+            const lat = parseFloat(document.getElementById('indLat').value);
+            const lng = parseFloat(document.getElementById('indLng').value);
+
+            if(!name || !familyId) return;
+
+            db.individuals.push({
+                id: 'I' + Date.now(),
+                name,
+                familyId,
+                location: (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : null,
+                isVerified: false
+            });
+
+            saveDB();
+            closeModal('indModal');
+            showAdminSection('members');
+            updateStats();
+            showNotify("INDIVIDUAL_DATA_COMMITTED");
+        }
+
+        function exportToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(db.individuals);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Individuals");
+            XLSX.writeFile(workbook, "AlHayyani_Registry.xlsx");
+            showNotify("EXCEL_EXPORT_INITIATED");
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Dewan Al-Hayyani Registry Report", 10, 10);
+            db.individuals.forEach((ind, i) => {
+                doc.text(`${i+1}. ${ind.name} - ${ind.id}`, 10, 20 + (i * 10));
+            });
+            doc.save("AlHayyani_Report.pdf");
+            showNotify("PDF_REPORT_GENERATED");
+        }
+
+        function viewProfile(id) {
+            const ind = db.individuals.find(i => i.id === id);
+            alert(`PROFILE_PREVIEW: ${ind.name}\nSTATUS: ${ind.isVerified ? 'VERIFIED' : 'UNVERIFIED'}\nCRYPTO_HASH: ${cryptoSim.hash(ind.id)}`);
+        }
+
+        function showNotify(msg) {
+            const n = document.getElementById('sys-notify');
+            n.innerText = `SYSTEM_ALERT: ${msg}`;
+            n.classList.remove('hidden');
+            setTimeout(() => n.classList.add('hidden'), 3000);
         }
     </script>
 </body>
