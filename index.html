@@ -16,80 +16,73 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --neon-cyan: #00f3ff;
-            --neon-purple: #bc13fe;
-            --neon-gold: #ffd700;
-            --bg-deep: #050505;
-            --glass: rgba(10, 10, 10, 0.8);
+            --heritage-green: #064e3b; /* Emerald/Deep Green */
+            --heritage-gold: #c5a059;   /* Muted Gold */
+            --heritage-cream: #f9fafb;  /* Off-white */
+            --heritage-dark: #111827;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-deep);
-            color: #fff;
+            background-color: var(--heritage-cream);
+            color: var(--heritage-dark);
             overflow: hidden;
-            background-image:
-                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.03) 0%, transparent 50%),
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 100%, 100% 2px, 3px 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
         }
 
-        .tech-font { font-family: 'Orbitron', sans-serif; }
-        .glow-text { text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); }
-        .neon-border { border: 1px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
-        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        h1, h2, h3, .amiri { font-family: 'Amiri', serif; }
 
-        .beveled {
-            clip-path: polygon(
-                10px 0%, 100% 0%,
-                100% calc(100% - 10px), calc(100% - 10px) 100%,
-                0% 100%, 0% 10px
-            );
-        }
+        .gold-border { border: 1.5px solid var(--heritage-gold); }
+        .green-panel { background: var(--heritage-green); color: white; }
+        .card-panel { background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 
-        .view { display: none; height: 100%; overflow-y: auto; padding: 2rem; }
-        .view.active { display: block; animation: fadeIn 0.5s ease-out; }
+        .view { display: none; height: 100%; overflow-y: auto; padding: 3rem; }
+        .view.active { display: block; animation: fadeIn 0.6s ease-out; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--heritage-cream); }
+        ::-webkit-scrollbar-thumb { background: var(--heritage-green); border-radius: 10px; }
 
-        #map-container { height: 500px; width: 100%; border: 1px solid var(--neon-cyan); }
-        #tree-3d-container { height: 600px; width: 100%; cursor: move; }
+        #map-container { height: 500px; width: 100%; border: 2px solid var(--heritage-gold); border-radius: 8px; }
+        #tree-3d-container { height: 600px; width: 100%; border-radius: 12px; background: #fff; }
 
         .nav-btn {
             position: relative;
             transition: all 0.3s;
-            overflow: hidden;
+            border-right: 4px solid transparent;
         }
-        .nav-btn.active { color: var(--neon-cyan); border-right: 2px solid var(--neon-cyan); background: rgba(0, 243, 255, 0.05); }
+        .nav-btn.active {
+            color: var(--heritage-green);
+            border-right: 4px solid var(--heritage-green);
+            background: rgba(6, 78, 59, 0.05);
+            font-weight: 900;
+        }
 
-        /* Simulated Blockchain Ticker */
-        .ticker-wrap {
-            width: 100%;
-            overflow: hidden;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+        .btn-primary {
+            background: var(--heritage-green);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.3s;
         }
-        .ticker {
-            display: inline-block;
-            white-space: nowrap;
-            padding-right: 100%;
-            animation: ticker 30s linear infinite;
-        }
-        @keyframes ticker {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
+        .btn-primary:hover { background: #043c2d; transform: translateY(-1px); }
+
+        .btn-gold {
+            background: var(--heritage-gold);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
         .modal {
@@ -97,105 +90,138 @@
             position: fixed;
             inset: 0;
             z-index: 5000;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             align-items: center;
             justify-content: center;
         }
         .modal.active { display: flex; }
+
+        /* Arabic Calligraphy Style Logo */
+        .logo-box {
+            background: var(--heritage-green);
+            padding: 10px;
+            border: 2px solid var(--heritage-gold);
+            border-radius: 8px;
+            transform: rotate(-2deg);
+        }
+
+        /* Ticker for Heritage */
+        .heritage-ticker {
+            background: var(--heritage-gold);
+            color: white;
+            padding: 8px 0;
+            font-size: 0.8rem;
+            font-weight: bold;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker-scroll {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100%, 0); }
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col" onload="initSystem()">
 
     <!-- Header / Branding -->
-    <header class="h-20 glass-panel border-b border-white/5 flex items-center justify-between px-8 z-50">
-        <div class="flex items-center gap-6">
-            <div class="w-12 h-12 neon-border flex items-center justify-center beveled bg-cyan-500/10">
-                <span class="tech-font text-xl font-black text-cyan-400">DH</span>
+    <header class="h-24 bg-white border-b border-gray-200 flex items-center justify-between px-12 z-50 shadow-sm">
+        <div class="flex items-center gap-8">
+            <div class="logo-box">
+                <span class="amiri text-2xl font-bold text-white">دح</span>
             </div>
             <div>
-                <h1 class="text-2xl font-black tracking-tighter text-white">ديوان قبيلة الحياني</h1>
-                <p class="text-[9px] tech-font text-cyan-500 uppercase tracking-[0.4em]">Al-Hayyani Tribal Registry v2.0</p>
+                <h1 class="text-3xl font-black text-emerald-900 leading-none">ديوان قبيلة الحياني</h1>
+                <p class="text-xs text-amber-700 font-bold mt-1 tracking-widest">التوثيق الرقمي للأنساب والتاريخ</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-8">
-            <div class="text-left">
-                <p class="text-[8px] tech-font text-gray-500 uppercase">System_Status</p>
-                <p class="text-[10px] tech-font text-green-500 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> SECURE_LINK
+        <div class="flex items-center gap-6">
+            <div class="text-right border-r-2 border-emerald-800 pr-6">
+                <p class="text-[10px] text-gray-400 uppercase">حالة النظام</p>
+                <p class="text-sm font-bold text-emerald-700 flex items-center gap-2">
+                    اتصال آمن وموثق <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                 </p>
             </div>
-            <button onclick="switchView('admin')" class="px-6 py-2 border border-purple-500/50 text-purple-400 tech-font text-xs beveled hover:bg-purple-500/10 transition-all">
-                ADMIN_PANEL
+            <button onclick="switchView('admin')" class="btn-primary text-sm">
+                لوحة الإدارة
             </button>
         </div>
     </header>
 
-    <div class="ticker-wrap">
-        <div class="ticker tech-font text-[9px] text-cyan-800 uppercase" id="blockchain-ticker">
-            // INITIALIZING BLOCKCHAIN GENESIS BLOCK ... VERIFYING SMART CONTRACTS ... DATA ENCRYPTION AES-256 ACTIVE ...
+    <div class="heritage-ticker">
+        <div class="ticker-scroll" id="heritage-news">
+            // توثيق النسب الشريف ... تحديث سجلات العائلات ... أرشفة الوثائق التاريخية بالبلوكشين ... أهلاً بكم في المنصة الرسمية لقبيلة الحياني //
         </div>
     </div>
 
     <div class="flex flex-1 overflow-hidden">
         <!-- Sidebar Nav -->
-        <aside class="w-72 glass-panel border-l border-white/5 flex flex-col py-8 overflow-y-auto">
-            <nav class="space-y-2">
-                <button onclick="switchView('home')" class="nav-btn active w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
-                    01 // الرئيسية
+        <aside class="w-80 bg-white border-l border-gray-100 flex flex-col py-10 shadow-lg">
+            <nav class="space-y-1">
+                <button onclick="switchView('home')" class="nav-btn active w-full text-right px-10 py-5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between">
+                    <span>الرئيسية</span>
+                    <span class="text-emerald-800 opacity-20">●</span>
                 </button>
-                <button onclick="switchView('lineage')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
-                    02 // شجرة النسب 3D
+                <button onclick="switchView('lineage')" class="nav-btn w-full text-right px-10 py-5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between">
+                    <span>شجرة النسب التفاعلية</span>
+                    <span class="text-emerald-800 opacity-20">●</span>
                 </button>
-                <button onclick="switchView('map')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
-                    03 // التوزيع الجغرافي
+                <button onclick="switchView('map')" class="nav-btn w-full text-right px-10 py-5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between">
+                    <span>خارطة التوزيع</span>
+                    <span class="text-emerald-800 opacity-20">●</span>
                 </button>
-                <button onclick="switchView('events')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
-                    04 // الأحداث والمناسبات
+                <button onclick="switchView('events')" class="nav-btn w-full text-right px-10 py-5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between">
+                    <span>الأحداث والمناسبات</span>
+                    <span class="text-emerald-800 opacity-20">●</span>
                 </button>
-                <button onclick="switchView('search')" class="nav-btn w-full text-right px-8 py-4 tech-font text-xs hover:text-cyan-400 transition-all">
-                    05 // البحث المتقدم
+                <button onclick="switchView('search')" class="nav-btn w-full text-right px-10 py-5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between">
+                    <span>البحث في السجلات</span>
+                    <span class="text-emerald-800 opacity-20">●</span>
                 </button>
             </nav>
 
-            <div class="mt-auto px-8 pt-8 border-t border-white/5 space-y-4">
-                <div class="p-4 bg-white/5 beveled">
-                    <p class="text-[9px] tech-font text-cyan-600 mb-2">TRIBE_STATS</p>
-                    <canvas id="miniStatsChart" height="100"></canvas>
+            <div class="mt-auto px-10 pt-10 border-t border-gray-50 space-y-6">
+                <div class="p-6 bg-emerald-900 rounded-lg shadow-inner">
+                    <p class="text-[10px] text-amber-500 font-bold mb-3">إحصائيات القبيلة</p>
+                    <canvas id="miniStatsChart" height="120"></canvas>
                 </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="exportToExcel()" class="text-[8px] tech-font text-gray-500 hover:text-white uppercase tracking-widest text-right">Download_Excel_Registry</button>
-                                <button onclick="exportToPDF()" class="text-[8px] tech-font text-gray-500 hover:text-white uppercase tracking-widest text-right">Generate_PDF_Report</button>
-                            </div>
-                <p class="text-[8px] tech-font text-gray-700 text-center">© 2024 DEWAN AL-HAYYANI</p>
+                <div class="flex flex-col gap-2">
+                    <button onclick="exportToExcel()" class="text-[10px] text-gray-500 hover:text-emerald-800 text-right font-bold transition-colors">تحميل السجل (Excel)</button>
+                    <button onclick="exportToPDF()" class="text-[10px] text-gray-500 hover:text-emerald-800 text-right font-bold transition-colors">إصدار تقرير (PDF)</button>
+                </div>
+                <p class="text-[10px] text-gray-300 text-center pb-4">حقوق الطبع محفوظة © 2024</p>
             </div>
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-1 relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+        <main class="flex-1 relative overflow-hidden">
 
             <!-- View: Home -->
             <section id="view-home" class="view active">
-                <div class="max-w-4xl">
-                    <h2 class="text-6xl font-black mb-8 glow-text tracking-tighter">مرحباً بكم في ديوان الحياني</h2>
-                    <p class="text-xl text-gray-400 mb-12 leading-relaxed">
-                        منصة رقمية متكاملة لتوثيق أنساب قبيلة الحياني، تجمع بين الأصالة والتقنيات الحديثة.
-                        نستخدم تقنيات البلوكشين والذكاء الاصطناعي لضمان دقة وخصوصية البيانات التاريخية والحديثة.
+                <div class="max-w-5xl">
+                    <h2 class="text-7xl font-bold mb-10 text-emerald-900 leading-tight">مرحباً بكم في ديوان الحياني الرقمي</h2>
+                    <p class="text-2xl text-gray-600 mb-16 leading-relaxed text-justify">
+                        منصة رقمية متكاملة تهدف إلى صون وتوثيق أنساب قبيلة الحياني. نجمع بين أصالة التراث العربي العريق وأحدث تقنيات التشفير لضمان خصوصية ودقة البيانات عبر الأجيال.
                     </p>
 
-                    <div class="grid grid-cols-3 gap-6">
-                        <div class="p-8 glass-panel neon-border beveled">
-                            <h3 class="tech-font text-cyan-400 text-sm mb-2 uppercase">Total_Population</h3>
-                            <p class="text-4xl font-black tech-font" id="count-members">0</p>
+                    <div class="grid grid-cols-3 gap-8">
+                        <div class="p-10 card-panel border-t-4 border-emerald-800 rounded-lg text-center">
+                            <h3 class="text-amber-700 text-sm font-bold mb-4 uppercase">إجمالي عدد الأفراد</h3>
+                            <p class="text-5xl font-black text-emerald-950" id="count-members">0</p>
                         </div>
-                        <div class="p-8 glass-panel border-purple-500/30 beveled">
-                            <h3 class="tech-font text-purple-400 text-sm mb-2 uppercase">Main_Branches</h3>
-                            <p class="text-4xl font-black tech-font" id="count-families">0</p>
+                        <div class="p-10 card-panel border-t-4 border-amber-600 rounded-lg text-center">
+                            <h3 class="text-amber-700 text-sm font-bold mb-4 uppercase">عدد الأفخاذ والعائلات</h3>
+                            <p class="text-5xl font-black text-emerald-950" id="count-families">0</p>
                         </div>
-                        <div class="p-8 glass-panel border-gold-500/30 beveled">
-                            <h3 class="tech-font text-yellow-500 text-sm mb-2 uppercase">Verified_Docs</h3>
-                            <p class="text-4xl font-black tech-font" id="count-docs">0</p>
+                        <div class="p-10 card-panel border-t-4 border-emerald-400 rounded-lg text-center">
+                            <h3 class="text-amber-700 text-sm font-bold mb-4 uppercase">الوثائق المؤرشفة</h3>
+                            <p class="text-5xl font-black text-emerald-950" id="count-docs">0</p>
                         </div>
                     </div>
                 </div>
@@ -203,79 +229,95 @@
 
             <!-- View: Lineage 3D -->
             <section id="view-lineage" class="view">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-black tech-font">GENEALOGY_3D_CORE</h2>
+                <div class="flex justify-between items-center mb-10">
+                    <h2 class="text-4xl font-bold text-emerald-900">محرك شجرة النسب ثلاثي الأبعاد</h2>
                     <div class="flex gap-4">
-                        <button class="px-4 py-2 bg-cyan-900 text-[10px] tech-font beveled">RESET_CAMERA</button>
-                        <button class="px-4 py-2 bg-cyan-900 text-[10px] tech-font beveled">TOGGLE_LABELS</button>
+                        <button class="btn-primary text-xs" onclick="init3DTree()">تحديث الرؤية</button>
                     </div>
                 </div>
-                <div id="tree-3d-container" class="glass-panel neon-border flex items-center justify-center text-cyan-900 tech-font">
-                    [ INITIALIZING_THREEJS_RENDERER ... ]
+                <div id="tree-3d-container" class="card-panel gold-border shadow-2xl overflow-hidden relative">
+                    <!-- Three.js will inject here -->
+                    <div class="absolute bottom-6 right-6 p-4 bg-white/80 backdrop-blur rounded text-[10px] font-bold text-emerald-900">
+                        * استخدم الفأرة للتدوير والتحريك
+                    </div>
                 </div>
             </section>
 
             <!-- View: Map -->
             <section id="view-map" class="view">
-                <h2 class="text-3xl font-black tech-font mb-8 uppercase">Geo_Distribution_Matrix</h2>
-                <div id="map-container" class="beveled"></div>
+                <h2 class="text-4xl font-bold text-emerald-900 mb-10">خارطة الانتشار الجغرافي للقبيلة</h2>
+                <div id="map-container" class="shadow-2xl"></div>
             </section>
 
             <!-- View: Events -->
             <section id="view-events" class="view">
-                <h2 class="text-3xl font-black tech-font mb-8 uppercase">Upcoming_Events_Feed</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="events-grid">
-                    <!-- Events will be rendered here -->
-                </div>
+                <h2 class="text-4xl font-bold text-emerald-900 mb-10">المناسبات والأحداث القادمة</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="events-grid"></div>
             </section>
 
             <!-- View: Search -->
             <section id="view-search" class="view">
-                <h2 class="text-3xl font-black tech-font mb-8 uppercase">Advanced_Search_Protocol</h2>
-                <div class="flex gap-4 mb-12">
-                    <input type="text" id="globalSearch" class="flex-1 bg-white/5 border border-white/10 p-6 tech-font outline-none focus:border-cyan-500" placeholder="SEARCH_BY_NAME_ID_OR_LOCATION...">
-                    <button onclick="executeSearch()" class="px-12 bg-cyan-600 text-black font-black tech-font hover:bg-cyan-400 transition-all">EXECUTE</button>
+                <h2 class="text-4xl font-bold text-emerald-900 mb-10">محرك البحث المتقدم في السجلات</h2>
+                <div class="flex gap-4 mb-16 bg-white p-2 rounded-lg shadow-lg border border-gray-100">
+                    <input type="text" id="globalSearch" class="flex-1 p-6 text-xl outline-none rounded-lg" placeholder="ابحث عن فرد، عائلة، أو موقع...">
+                    <button onclick="executeSearch()" class="btn-primary text-xl px-16">بـحث</button>
                 </div>
-                <div id="search-results" class="grid grid-cols-4 gap-4"></div>
+                <div id="search-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
             </section>
 
             <!-- View: Admin -->
             <section id="view-admin" class="view">
-                <div id="admin-login" class="max-w-md mx-auto mt-20 p-12 glass-panel neon-border-purple beveled">
-                    <h2 class="text-2xl tech-font font-black mb-8 text-purple-400">ADMIN_AUTHENTICATION</h2>
-                    <div class="space-y-6">
-                        <input type="password" id="adminPass" class="w-full bg-black border border-purple-500/30 p-4 tech-font text-center" placeholder="SECURE_PASSCODE">
-                        <button onclick="simulateLogin()" class="w-full py-4 bg-purple-600 text-black font-black tech-font hover:bg-purple-400 transition-all">ACCESS_SYSTEM</button>
-                        <div class="flex justify-between items-center text-[10px] tech-font text-purple-900">
-                            <span>FACE_ID: READY</span>
-                            <span>2FA: ENABLED</span>
+                <div id="admin-login" class="max-w-md mx-auto mt-24 p-12 card-panel gold-border rounded-xl">
+                    <div class="text-center mb-10">
+                        <div class="w-20 h-20 bg-emerald-900 text-white flex items-center justify-center rounded-full mx-auto mb-4 amiri text-3xl border-4 border-amber-500 shadow-xl">ق</div>
+                        <h2 class="text-2xl font-bold text-emerald-900">دخول المشرف المصرح</h2>
+                    </div>
+                    <div class="space-y-8">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-2">كلمة مرور النظام الآمنة</label>
+                            <input type="password" id="adminPass" class="w-full bg-gray-50 border border-gray-200 p-5 rounded text-center text-2xl tracking-[0.5em] focus:border-emerald-800 transition-colors" placeholder="••••">
+                        </div>
+                        <button onclick="simulateLogin()" class="w-full btn-primary text-xl py-5 shadow-lg">تسجيل الدخول</button>
+                        <div class="flex justify-between items-center text-[10px] font-bold text-emerald-800 opacity-50 px-2">
+                            <span>التحقق الحيوي: جاهز</span>
+                            <span>التشفير: AES-256</span>
                         </div>
                     </div>
                 </div>
 
                 <div id="admin-dashboard" class="hidden">
-                    <div class="flex justify-between items-center mb-12">
-                        <h2 class="text-4xl font-black tech-font text-purple-400">COMMAND_CENTER</h2>
-                        <button onclick="logout()" class="text-[10px] tech-font text-red-500">TERMINATE_SESSION</button>
+                    <div class="flex justify-between items-center mb-16 border-b pb-8 border-gray-100">
+                        <div>
+                            <h2 class="text-4xl font-bold text-emerald-900">مركز التحكم بالديوان</h2>
+                            <p class="text-xs text-amber-700 font-bold mt-1 uppercase">Sovereign_Admin_Interface</p>
+                        </div>
+                        <button onclick="logout()" class="text-sm font-bold text-red-700 bg-red-50 px-6 py-2 rounded-full hover:bg-red-100 transition-all">إنهاء الجلسة</button>
                     </div>
 
-                    <div class="grid grid-cols-4 gap-6 mb-12">
-                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('members')">
-                            <p class="tech-font text-xs">MANAGE_INDIVIDUALS</p>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+                        <button class="p-10 card-panel border-b-4 border-emerald-800 text-center hover:bg-emerald-50 transition-all group" onclick="showAdminSection('members')">
+                            <p class="text-emerald-900 font-bold text-sm">إدارة الأفراد</p>
+                            <span class="text-[10px] text-gray-400 group-hover:text-emerald-700">تعديل وإضافة أعضاء</span>
                         </button>
-                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('families')">
-                            <p class="tech-font text-xs">MANAGE_FAMILIES</p>
+                        <button class="p-10 card-panel border-b-4 border-amber-600 text-center hover:bg-amber-50 transition-all group" onclick="showAdminSection('families')">
+                            <p class="text-emerald-900 font-bold text-sm">إدارة العائلات</p>
+                            <span class="text-[10px] text-gray-400 group-hover:text-amber-700">إضافة أفخاذ وفروع</span>
                         </button>
-                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('docs')">
-                            <p class="tech-font text-xs">BLOCKCHAIN_DOCS</p>
+                        <button class="p-10 card-panel border-b-4 border-emerald-400 text-center hover:bg-emerald-50 transition-all group" onclick="showAdminSection('docs')">
+                            <p class="text-emerald-900 font-bold text-sm">أرشفة الوثائق</p>
+                            <span class="text-[10px] text-gray-400 group-hover:text-emerald-600">إدارة البلوكشين</span>
                         </button>
-                        <button class="p-8 glass-panel border-purple-500/20 text-center hover:bg-purple-500/10" onclick="showAdminSection('events')">
-                            <p class="tech-font text-xs">EVENT_LOGISTICS</p>
+                        <button class="p-10 card-panel border-b-4 border-blue-400 text-center hover:bg-blue-50 transition-all group" onclick="showAdminSection('events')">
+                            <p class="text-emerald-900 font-bold text-sm">تنظيم الفعاليات</p>
+                            <span class="text-[10px] text-gray-400 group-hover:text-blue-700">إدارة الأنشطة</span>
                         </button>
                     </div>
 
-                    <div id="admin-section-content" class="glass-panel p-8 border-white/5 beveled min-h-[400px]">
-                        <!-- Admin forms and lists go here -->
+                    <div id="admin-section-content" class="card-panel p-12 rounded-xl min-h-[500px] shadow-2xl">
+                        <div class="flex flex-col items-center justify-center h-full text-gray-300">
+                            <p class="amiri text-6xl mb-6">قـبيلة الحياني</p>
+                            <p class="text-sm font-bold">الرجاء اختيار قسم من الأعلى للبدء</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -284,101 +326,80 @@
     </div>
 
     <!-- Notification Overlay -->
-    <div id="sys-notify" class="fixed top-24 left-1/2 -translate-x-1/2 px-12 py-3 bg-cyan-500 text-black tech-font font-black text-xs z-[6000] hidden beveled shadow-[0_0_30px_rgba(0,243,255,0.5)]">
-        SYSTEM_ALERT: ACTION_COMPLETED
+    <div id="sys-notify" class="fixed top-12 left-1/2 -translate-x-1/2 px-12 py-4 bg-emerald-900 text-amber-400 font-bold text-sm z-[6000] hidden rounded-full shadow-2xl border border-amber-500">
+        تنبيه النظام: تمت العملية بنجاح
     </div>
 
     <!-- Modals -->
     <div id="indModal" class="modal">
-        <div class="max-w-xl w-full glass-panel p-8 neon-border-purple beveled">
-             <h2 class="text-2xl tech-font font-black mb-6 text-purple-400">REGISTER_NEW_NODE</h2>
-             <div class="space-y-4">
-                 <input id="indName" class="w-full bg-black border border-white/10 p-4 text-xs" placeholder="FULL_NAME">
-                 <select id="indFam" class="w-full bg-black border border-white/10 p-4 text-xs">
-                     <option value="">SELECT_FAMILY</option>
-                 </select>
-                 <div class="grid grid-cols-2 gap-4">
-                     <input id="indLat" class="bg-black border border-white/10 p-4 text-xs" placeholder="LATITUDE (e.g. 24.7)">
-                     <input id="indLng" class="bg-black border border-white/10 p-4 text-xs" placeholder="LONGITUDE (e.g. 46.6)">
+        <div class="max-w-2xl w-full card-panel p-12 rounded-xl shadow-2xl gold-border">
+             <h2 class="text-3xl font-bold mb-10 text-emerald-900 border-b pb-4">تسجيل فرد جديد في السجلات</h2>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                 <div class="col-span-2">
+                    <label class="block text-xs font-bold text-gray-500 mb-2">الاسم الرباعي</label>
+                    <input id="indName" class="w-full bg-gray-50 border border-gray-100 p-4 rounded outline-none focus:border-emerald-800" placeholder="أدخل الاسم الكامل">
                  </div>
-                 <div class="flex gap-4">
-                    <button onclick="saveIndividual()" class="flex-1 py-4 bg-purple-600 text-black font-black tech-font">COMM_RECORD</button>
-                    <button onclick="closeModal('indModal')" class="px-8 tech-font text-xs">ABORT</button>
+                 <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">الانتماء العائلي</label>
+                    <select id="indFam" class="w-full bg-gray-50 border border-gray-100 p-4 rounded outline-none focus:border-emerald-800">
+                        <option value="">اختر العائلة/الفخذ</option>
+                    </select>
                  </div>
+                 <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">الإحداثيات الجغرافية</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input id="indLat" class="bg-gray-50 border border-gray-100 p-4 rounded text-xs" placeholder="خط العرض">
+                        <input id="indLng" class="bg-gray-50 border border-gray-100 p-4 rounded text-xs" placeholder="خط الطول">
+                    </div>
+                 </div>
+             </div>
+             <div class="flex gap-4">
+                <button onclick="saveIndividual()" class="btn-primary flex-1 text-lg">تثبيت السجل</button>
+                <button onclick="closeModal('indModal')" class="px-10 text-gray-400 font-bold hover:text-red-700 transition-colors">إلغاء</button>
              </div>
         </div>
     </div>
 
     <script>
-        // Database Schemas
-        let db = {
-            individuals: [],
-            families: [],
-            documents: [],
-            events: [],
-            blockchain: []
-        };
+        // API Configuration
+        const API_BASE = 'http://localhost:3000/api';
+        let db = { individuals: [], families: [], documents: [], events: [] };
+        let authToken = localStorage.getItem('hayyani_token');
 
-        const DB_KEY = 'HAYYANI_DIWAN_V2';
-
-        // Advanced Simulation Functions
-        const cryptoSim = {
-            encrypt: (text) => btoa(text), // Simulated AES-256
-            decrypt: (text) => atob(text),
-            hash: (text) => '0x' + Array.from(text).reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0).toString(16)
-        };
-
-        function initSystem() {
-            loadDB();
+        async function initSystem() {
+            await loadAllData();
             updateStats();
-            initTicker();
             initMiniChart();
             renderEvents();
 
-            // Check for hash navigation
             const hash = window.location.hash.replace('#', '') || 'home';
             switchView(hash);
         }
 
-        function loadDB() {
-            const stored = localStorage.getItem(DB_KEY);
-            if (stored) {
-                db = JSON.parse(stored);
-                // Schema Migration Check
-                if (!db.blockchain) db.blockchain = [];
-                if (!db.documents) db.documents = [];
-            } else {
-                // Initial Sample Data
-                db.families = [
-                    { id: 'F1', name: 'آل فلان', branch: 'الرئيسي', location: 'الرياض' },
-                    { id: 'F2', name: 'آل علان', branch: 'الغربي', location: 'جدة' }
-                ];
-                db.individuals = [
-                    {
-                        id: 'I1',
-                        name: 'الشيخ محمد الحياني',
-                        familyId: 'F1',
-                        role: 'عميد القبيلة',
-                        location: [24.7136, 46.6753],
-                        social: { twitter: '@hayyani', linkedin: 'hayyani-ceo' },
-                        health: cryptoSim.encrypt('Stable'), // Encrypted health data
-                        docs: ['DOC1'],
-                        isVerified: true
-                    }
-                ];
-                db.documents = [
-                    { id: 'DOC1', title: 'صك النسب الشرعي', type: 'وثيقة رسمية', ownerId: 'I1', hash: '0xHASH777', timestamp: new Date().toISOString() }
-                ];
-                db.events = [
-                    { id: 'E1', title: 'اجتماع العيد السنوي', date: '2024-04-10', desc: 'اجتماع عام لكافة أفراد القبيلة في ديوان الرياض.', location: 'الرياض' }
-                ];
-                saveDB();
+        async function apiFetch(endpoint, options = {}) {
+            if (authToken) {
+                options.headers = { ...options.headers, 'Authorization': `Bearer ${authToken}` };
+            }
+            const response = await fetch(`${API_BASE}${endpoint}`, options);
+            if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+            return response.status === 204 ? null : response.json();
+        }
+
+        async function loadAllData() {
+            try {
+                const [individuals, families, documents, events] = await Promise.all([
+                    apiFetch('/individuals'),
+                    apiFetch('/families'),
+                    apiFetch('/documents'),
+                    apiFetch('/events')
+                ]);
+                db = { individuals, families, documents, events };
+            } catch (err) {
+                console.error("Failed to load data from API", err);
             }
         }
 
-        function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-
-        function switchView(viewId) {
+        async function switchView(viewId) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
@@ -391,7 +412,11 @@
             }
 
             if (viewId === 'map') initMap();
-            if (viewId === 'lineage') init3DTree();
+            if (viewId === 'lineage') {
+                await loadAllData(); // Refresh data for tree
+                setTimeout(init3DTree, 100);
+            }
+            if (viewId === 'home') updateStats();
         }
 
         function updateStats() {
@@ -400,26 +425,18 @@
             document.getElementById('count-docs').innerText = db.documents.length;
         }
 
-        function initTicker() {
-            const ticker = document.getElementById('blockchain-ticker');
-            setInterval(() => {
-                const hash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                ticker.innerHTML += ` // NEW_BLOCK_CONFIRMED: ${hash.toUpperCase()} ... `;
-            }, 5000);
-        }
-
         function initMiniChart() {
             const ctx = document.getElementById('miniStatsChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: ['محرم', 'صفر', 'ربيع', 'جمادى', 'رجب', 'رمضان'],
                     datasets: [{
-                        label: 'Activity',
-                        data: [12, 19, 3, 5, 2, 3],
-                        borderColor: '#00f3ff',
+                        label: 'نشاط السجلات',
+                        data: [5, 12, 8, 15, 10, 20],
+                        borderColor: '#c5a059',
                         tension: 0.4,
-                        borderWidth: 1,
+                        borderWidth: 2,
                         pointRadius: 0
                     }]
                 },
@@ -432,85 +449,112 @@
 
         function initMap() {
             if (window.myMap) window.myMap.remove();
-            window.myMap = L.map('map-container').setView([24.7136, 46.6753], 6);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(window.myMap);
+            window.myMap = L.map('map-container').setView([24.7136, 46.6753], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(window.myMap);
 
             db.individuals.forEach(ind => {
                 if (ind.location) {
+                    const popup = document.createElement('div');
+                    popup.className = "font-bold text-emerald-900";
+                    popup.textContent = ind.name;
                     L.marker(ind.location).addTo(window.myMap)
-                        .bindPopup(`<div class="tech-font text-xs text-black">${ind.name}</div>`);
+                        .bindPopup(popup);
                 }
             });
         }
 
         function init3DTree() {
             const container = document.getElementById('tree-3d-container');
-            if (container.children.length > 0) return;
+            container.innerHTML = ''; // Clear previous
 
             const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xfcfcfc);
             const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
 
-            // Create Node Group
-            const nodes = new THREE.Group();
-            const geometry = new THREE.SphereGeometry(0.5, 32, 32);
-            const material = new THREE.MeshPhongMaterial({ color: 0x00f3ff, emissive: 0x004444, shininess: 100 });
+            const group = new THREE.Group();
+            const geometry = new THREE.SphereGeometry(0.4, 32, 32);
+            const lineMat = new THREE.LineBasicMaterial({ color: 0xc5a059 });
 
-            const light = new THREE.PointLight(0xffffff, 1, 100);
-            light.position.set(0, 0, 10);
-            scene.add(light);
-            scene.add(new THREE.AmbientLight(0x404040));
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
 
-            db.individuals.forEach((ind, i) => {
-                const sphere = new THREE.Mesh(geometry, material);
-                sphere.position.set((Math.random()-0.5)*15, (Math.random()-0.5)*15, (Math.random()-0.5)*15);
-                nodes.add(sphere);
+            const nodeMap = {};
+            const levelGap = 5;
+            const horizontalGap = 4;
 
-                // Add connecting lines (simulated lineage)
-                if (i > 0) {
-                    const lineMat = new THREE.LineBasicMaterial({ color: 0x004444, transparent: true, opacity: 0.3 });
-                    const lineGeom = new THREE.BufferGeometry().setFromPoints([
-                        sphere.position,
-                        nodes.children[i-1].position
-                    ]);
-                    const line = new THREE.Line(lineGeom, lineMat);
-                    nodes.add(line);
-                }
-            });
+            function buildLevel(parentId, level, xOffset) {
+                const children = db.individuals.filter(i => i.parentId === parentId);
+                children.forEach((child, index) => {
+                    const x = xOffset + (index - (children.length - 1) / 2) * horizontalGap;
+                    const y = -level * levelGap;
+                    const z = (Math.random() - 0.5) * 2;
 
-            scene.add(nodes);
-            camera.position.z = 20;
+                    const mat = new THREE.MeshPhongMaterial({ color: child.parentId ? 0x064e3b : 0xc5a059 });
+                    const sphere = new THREE.Mesh(geometry, mat);
+                    sphere.position.set(x, y, z);
+                    group.add(sphere);
+                    nodeMap[child.id] = sphere.position;
+
+                    if (parentId && nodeMap[parentId]) {
+                        const points = [nodeMap[parentId], sphere.position];
+                        const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                        const line = new THREE.Line(lineGeo, lineMat);
+                        group.add(line);
+                    }
+
+                    buildLevel(child.id, level + 1, x);
+                });
+            }
+
+            buildLevel(null, 0, 0);
+            scene.add(group);
+            camera.position.set(0, -5, 15);
 
             function animate() {
                 requestAnimationFrame(animate);
-                nodes.rotation.y += 0.002;
+                group.rotation.y += 0.002;
                 renderer.render(scene, camera);
             }
             animate();
-
-            // GSAP Entrance
-            gsap.from(nodes.scale, { x: 0, y: 0, z: 0, duration: 2, ease: "expo.out" });
         }
 
         function renderEvents() {
             const grid = document.getElementById('events-grid');
-            grid.innerHTML = db.events.length ? '' : '<p class="text-gray-600 tech-font">NO_EVENTS_SCHEDULED</p>';
+            grid.innerHTML = '';
+            if (!db.events.length) {
+                grid.innerHTML = '<p class="text-gray-400">لا توجد فعاليات قادمة حالياً</p>';
+                return;
+            }
             db.events.forEach(ev => {
-                grid.innerHTML += `
-                    <div class="p-6 glass-panel border-white/10 beveled group hover:border-cyan-500/50 transition-all cursor-pointer">
-                        <div class="flex justify-between items-start mb-4">
-                             <h3 class="text-xl font-bold group-hover:text-cyan-400">${ev.title}</h3>
-                             <span class="px-3 py-1 bg-cyan-900/30 text-[8px] tech-font text-cyan-400 beveled uppercase">Live_Event</span>
-                        </div>
-                        <p class="text-xs text-cyan-500 mb-4 tech-font">${ev.date} // ${ev.location}</p>
-                        <p class="text-sm text-gray-400 leading-relaxed">${ev.desc}</p>
-                        <div class="mt-6 flex justify-end">
-                            <button class="text-[9px] tech-font text-cyan-700 hover:text-cyan-300">REGISTER_INTEREST →</button>
-                        </div>
-                    </div>
-                `;
+                const card = document.createElement('div');
+                card.className = "p-8 card-panel rounded-xl border-r-8 border-emerald-800 hover:shadow-xl transition-all";
+
+                const header = document.createElement('div');
+                header.className = "flex justify-between items-start mb-4";
+                const title = document.createElement('h3');
+                title.className = "text-2xl font-bold text-emerald-900";
+                title.textContent = ev.title;
+                header.appendChild(title);
+
+                const info = document.createElement('p');
+                info.className = "text-sm text-amber-600 font-bold mb-4";
+                info.textContent = `${ev.date} | ${ev.location}`;
+
+                const desc = document.createElement('p');
+                desc.className = "text-gray-500 leading-relaxed";
+                desc.textContent = ev.desc;
+
+                const btn = document.createElement('button');
+                btn.className = "mt-8 text-xs font-black text-emerald-800 hover:underline";
+                btn.textContent = "المزيد من التفاصيل ←";
+
+                card.append(header, info, desc, btn);
+                grid.appendChild(card);
             });
         }
 
@@ -519,214 +563,282 @@
             const results = document.getElementById('search-results');
             results.innerHTML = '';
 
-            const filtered = db.individuals.filter(i => i.name.toLowerCase().includes(term) || i.id.toLowerCase().includes(term));
+            const filtered = db.individuals.filter(i => i.name.includes(term) || i.id.includes(term));
 
             filtered.forEach(ind => {
                 const family = db.families.find(f => f.id === ind.familyId);
-                results.innerHTML += `
-                    <div class="p-6 glass-panel border-white/10 beveled hover:neon-border transition-all">
-                        <p class="text-[8px] tech-font text-gray-600 mb-2">${ind.id}</p>
-                        <h4 class="text-md font-bold text-white mb-1">${ind.name}</h4>
-                        <p class="text-[10px] text-cyan-600 mb-4">${family ? family.name : '---'}</p>
-                        <div class="flex justify-between items-center border-t border-white/5 pt-4">
-                            <span class="text-[8px] tech-font ${ind.isVerified ? 'text-green-500' : 'text-yellow-500'} uppercase">
-                                ${ind.isVerified ? 'VERIFIED_CHAIN' : 'PENDING_SIG'}
-                            </span>
-                            <button class="text-[8px] tech-font text-cyan-500 underline" onclick="viewProfile('${ind.id}')">PROFILE</button>
-                        </div>
-                    </div>
-                `;
+                const card = document.createElement('div');
+                card.className = "p-6 card-panel rounded-lg hover:border-emerald-800 transition-all border-2 border-transparent";
+
+                const idTag = document.createElement('p');
+                idTag.className = "text-[9px] font-bold text-amber-600 mb-2";
+                idTag.textContent = ind.id;
+
+                const name = document.createElement('h4');
+                name.className = "text-lg font-bold text-emerald-950 mb-1";
+                name.textContent = ind.name;
+
+                const fam = document.createElement('p');
+                fam.className = "text-xs text-gray-400 mb-6";
+                fam.textContent = family ? family.name : '---';
+
+                const footer = document.createElement('div');
+                footer.className = "flex justify-between items-center border-t pt-4";
+
+                const status = document.createElement('span');
+                status.className = `text-[9px] font-bold ${ind.isVerified ? 'text-emerald-600' : 'text-amber-500'}`;
+                status.textContent = ind.isVerified ? '● سجل موثق' : '○ قيد المراجعة';
+
+                const btn = document.createElement('button');
+                btn.className = "text-xs font-bold text-emerald-800";
+                btn.textContent = "التفاصيل";
+                btn.onclick = () => viewProfile(ind.id);
+
+                footer.append(status, btn);
+                card.append(idTag, name, fam, footer);
+                results.appendChild(card);
             });
 
-            if (filtered.length === 0) results.innerHTML = '<p class="col-span-4 text-center text-gray-700 tech-font py-20 uppercase">No_Match_Found_In_Registry</p>';
+            if (filtered.length === 0) results.innerHTML = '<p class="col-span-full text-center text-gray-400 py-20 font-bold">لم يتم العثور على نتائج تطابق بحثك</p>';
         }
 
-        // Add Event Listeners for search
-        document.addEventListener('DOMContentLoaded', () => {
-            const sInput = document.getElementById('globalSearch');
-            if (sInput) sInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeSearch(); });
-        });
-
-        function simulateLogin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === '1234') { // Sample pass
-                document.getElementById('admin-login').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                showNotify("AUTHENTICATION_SUCCESSFUL");
-            } else {
-                alert("ACCESS_DENIED: INVALID_PASSCODE");
+        async function simulateLogin() {
+            const password = document.getElementById('adminPass').value;
+            try {
+                const res = await apiFetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                if (res.success) {
+                    authToken = res.token;
+                    localStorage.setItem('hayyani_token', authToken);
+                    document.getElementById('admin-login').classList.add('hidden');
+                    document.getElementById('admin-dashboard').classList.remove('hidden');
+                    showNotify("تم الدخول بنجاح - مرحباً بك يا مشرف النظام");
+                }
+            } catch (err) {
+                alert("خطأ: كلمة المرور غير صحيحة");
             }
         }
 
         function logout() {
+            authToken = null;
+            localStorage.removeItem('hayyani_token');
             document.getElementById('admin-login').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
         }
 
         function showAdminSection(section) {
             const container = document.getElementById('admin-section-content');
-            let html = '';
+            container.innerHTML = '';
 
             switch(section) {
                 case 'members':
-                    html = `
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="tech-font text-purple-400">INDIVIDUAL_REGISTRY</h3>
-                            <button onclick="openMemberForm()" class="px-4 py-2 bg-purple-900 text-[10px] tech-font beveled">ADD_NEW_ENTRY</button>
-                        </div>
-                        <table class="w-full text-right text-xs">
-                            <thead class="text-purple-900 tech-font border-b border-white/5">
-                                <tr>
-                                    <th class="pb-4">NAME</th>
-                                    <th class="pb-4">FAMILY</th>
-                                    <th class="pb-4">STATUS</th>
-                                    <th class="pb-4">ACTIONS</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-gray-400">
-                                ${db.individuals.map(i => `
-                                    <tr class="border-b border-white/5">
-                                        <td class="py-4">${i.name}</td>
-                                        <td class="py-4">${db.families.find(f => f.id === i.familyId)?.name || '---'}</td>
-                                        <td class="py-4 text-[9px] tech-font ${i.isVerified ? 'text-green-500' : 'text-yellow-500'}">
-                                            ${i.isVerified ? 'ENCRYPTED' : 'PLAINTEXT'}
-                                        </td>
-                                        <td class="py-4">
-                                            <button class="text-purple-500 hover:underline" onclick="deleteInd('${i.id}')">DELETE</button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
+                    const mHeader = document.createElement('div');
+                    mHeader.className = "flex justify-between items-center mb-10";
+                    mHeader.innerHTML = '<h3 class="text-2xl font-bold text-emerald-900">سجل أفراد القبيلة</h3>';
+                    const addBtn = document.createElement('button');
+                    addBtn.className = "btn-primary";
+                    addBtn.textContent = "إضافة فرد جديد";
+                    addBtn.onclick = openMemberForm;
+                    mHeader.appendChild(addBtn);
+
+                    const table = document.createElement('table');
+                    table.className = "w-full text-right";
+                    table.innerHTML = `
+                        <thead>
+                            <tr class="text-gray-400 text-sm border-b pb-4">
+                                <th class="pb-4">الاسم الكامل</th>
+                                <th class="pb-4">العائلة</th>
+                                <th class="pb-4">حالة التوثيق</th>
+                                <th class="pb-4">إجراءات</th>
+                            </tr>
+                        </thead>
                     `;
+                    const tbody = document.createElement('tbody');
+                    db.individuals.forEach(i => {
+                        const tr = document.createElement('tr');
+                        tr.className = "border-b last:border-0 hover:bg-gray-50 transition-colors";
+
+                        const nameTd = document.createElement('td');
+                        nameTd.className = "py-6 font-bold text-emerald-950";
+                        nameTd.textContent = i.name;
+
+                        const famTd = document.createElement('td');
+                        famTd.className = "py-6 text-gray-500";
+                        famTd.textContent = db.families.find(f => f.id === i.familyId)?.name || '---';
+
+                        const statusTd = document.createElement('td');
+                        statusTd.className = "py-6";
+                        const statusSpan = document.createElement('span');
+                        statusSpan.className = `px-3 py-1 rounded-full text-[10px] font-bold ${i.isVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`;
+                        statusSpan.textContent = i.isVerified ? 'موثق رقمياً' : 'بانتظار التأكيد';
+                        statusTd.appendChild(statusSpan);
+
+                        const actionTd = document.createElement('td');
+                        actionTd.className = "py-6";
+                        const delBtn = document.createElement('button');
+                        delBtn.className = "text-red-600 font-bold text-xs";
+                        delBtn.textContent = "حذف";
+                        delBtn.onclick = () => deleteInd(i.id);
+                        actionTd.appendChild(delBtn);
+
+                        tr.append(nameTd, famTd, statusTd, actionTd);
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+                    container.append(mHeader, table);
                     break;
                 case 'families':
-                    html = `<h3 class="tech-font text-purple-400 mb-6">FAMILY_MANAGEMENT</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <input id="newFamName" class="bg-black border border-white/10 p-4 tech-font text-xs" placeholder="FAMILY_NAME">
-                            <button onclick="addFamily()" class="bg-purple-600 text-black font-black tech-font">CREATE_NODE</button>
-                        </div>
-                    `;
+                    container.innerHTML = '<h3 class="text-2xl font-bold text-emerald-900 mb-10">إدارة الأفخاذ والعوائل</h3>';
+                    const fDiv = document.createElement('div');
+                    fDiv.className = "flex gap-4 p-8 bg-gray-50 rounded-lg";
+                    const fInput = document.createElement('input');
+                    fInput.id = "newFamName";
+                    fInput.className = "flex-1 p-4 rounded border outline-none focus:border-emerald-800";
+                    fInput.placeholder = "اسم العائلة الجديدة";
+                    const fAddBtn = document.createElement('button');
+                    fAddBtn.className = "btn-primary";
+                    fAddBtn.textContent = "إضافة كفرع جديد";
+                    fAddBtn.onclick = addFamily;
+                    fDiv.append(fInput, fAddBtn);
+                    container.appendChild(fDiv);
                     break;
                 case 'docs':
-                    html = `<h3 class="tech-font text-purple-400 mb-6">BLOCKCHAIN_DOCUMENT_VAULT</h3>
-                        <div class="grid grid-cols-1 gap-4">
-                            ${db.documents.map(d => `
-                                <div class="p-4 glass-panel border-purple-500/20 flex justify-between items-center">
-                                    <div>
-                                        <p class="font-bold text-white">${d.title}</p>
-                                        <p class="text-[8px] tech-font text-purple-900">HASH: ${d.hash}</p>
-                                    </div>
-                                    <span class="px-4 py-1 border border-green-500/50 text-green-500 text-[8px] tech-font beveled">VERIFIED_ON_CHAIN</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                    break;
-                case 'events':
-                    html = `
-                        <h3 class="tech-font text-purple-400 mb-6">EVENT_SCHEDULER</h3>
-                        <div class="space-y-4 max-w-lg">
-                            <input id="evTitle" class="w-full bg-black border border-white/10 p-4 text-xs" placeholder="EVENT_TITLE">
-                            <input id="evDate" type="date" class="w-full bg-black border border-white/10 p-4 text-xs invert">
-                            <textarea id="evDesc" class="w-full bg-black border border-white/10 p-4 text-xs" placeholder="DESCRIPTION"></textarea>
-                            <button onclick="addEvent()" class="w-full py-4 bg-purple-600 text-black font-black tech-font">PUSH_TO_NETWORK</button>
-                        </div>
-                    `;
+                    container.innerHTML = '<h3 class="text-2xl font-bold text-emerald-900 mb-10">خزنة الوثائق التاريخية</h3>';
+                    const dGrid = document.createElement('div');
+                    dGrid.className = "grid grid-cols-1 gap-4";
+                    db.documents.forEach(d => {
+                        const dCard = document.createElement('div');
+                        dCard.className = "p-6 card-panel flex justify-between items-center rounded-lg border-l-4 border-amber-500";
+
+                        const dInfo = document.createElement('div');
+                        const dTitle = document.createElement('p');
+                        dTitle.className = "font-bold text-emerald-950 mb-1";
+                        dTitle.textContent = d.title;
+                        const dHash = document.createElement('p');
+                        dHash.className = "text-[10px] font-bold text-gray-400";
+                        dHash.textContent = `بصمة البلوكشين: ${d.hash}`;
+                        dInfo.append(dTitle, dHash);
+
+                        const dBadge = document.createElement('span');
+                        dBadge.className = "px-4 py-2 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded";
+                        dBadge.textContent = "موثق شرعياً";
+
+                        dCard.append(dInfo, dBadge);
+                        dGrid.appendChild(dCard);
+                    });
+                    container.appendChild(dGrid);
                     break;
             }
-            container.innerHTML = html;
-        }
-
-        function addFamily() {
-            const name = document.getElementById('newFamName').value;
-            if(!name) return;
-            db.families.push({id: 'F'+Date.now(), name, branch: 'General'});
-            saveDB();
-            showAdminSection('families');
-            showNotify("FAMILY_NODE_CREATED");
-        }
-
-        function addEvent() {
-            const title = document.getElementById('evTitle').value;
-            const date = document.getElementById('evDate').value;
-            const desc = document.getElementById('evDesc').value;
-            if(!title || !date) return;
-            db.events.push({id: 'E'+Date.now(), title, date, desc, location: 'Virtual'});
-            saveDB();
-            showAdminSection('events');
-            showNotify("EVENT_BROADCAST_SUCCESS");
-            renderEvents();
-        }
-
-        function deleteInd(id) {
-            db.individuals = db.individuals.filter(i => i.id !== id);
-            saveDB();
-            showAdminSection('members');
-            updateStats();
         }
 
         function openMemberForm() {
             const select = document.getElementById('indFam');
-            select.innerHTML = '<option value="">SELECT_FAMILY</option>' +
-                db.families.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+            select.innerHTML = '';
+            const defOpt = document.createElement('option');
+            defOpt.value = "";
+            defOpt.textContent = "اختر العائلة/الفخذ";
+            select.appendChild(defOpt);
+
+            db.families.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.textContent = f.name;
+                select.appendChild(opt);
+            });
             document.getElementById('indModal').classList.add('active');
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        function saveIndividual() {
+        async function saveIndividual() {
             const name = document.getElementById('indName').value;
             const familyId = document.getElementById('indFam').value;
             const lat = parseFloat(document.getElementById('indLat').value);
             const lng = parseFloat(document.getElementById('indLng').value);
 
-            if(!name || !familyId) return;
+            if(!name || !familyId) return alert("الرجاء ملء كافة الحقول الأساسية");
 
-            db.individuals.push({
-                id: 'I' + Date.now(),
-                name,
-                familyId,
-                location: (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : null,
-                isVerified: false
-            });
+            try {
+                await apiFetch('/individuals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        familyId,
+                        location: (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : null,
+                        isVerified: false
+                    })
+                });
+                await loadAllData();
+                closeModal('indModal');
+                showAdminSection('members');
+                updateStats();
+                showNotify("تم تسجيل الفرد الجديد بنجاح");
+            } catch (err) {
+                alert("فشل في حفظ البيانات");
+            }
+        }
 
-            saveDB();
-            closeModal('indModal');
-            showAdminSection('members');
-            updateStats();
-            showNotify("INDIVIDUAL_DATA_COMMITTED");
+        async function deleteInd(id) {
+            if(!confirm("هل أنت متأكد من حذف هذا السجل؟ لا يمكن التراجع عن هذه الخطوة.")) return;
+            try {
+                await apiFetch(`/individuals/${id}`, { method: 'DELETE' });
+                await loadAllData();
+                showAdminSection('members');
+                updateStats();
+            } catch (err) {
+                alert("فشل في حذف السجل");
+            }
+        }
+
+        async function addFamily() {
+            const name = document.getElementById('newFamName').value;
+            if(!name) return;
+            try {
+                await apiFetch('/families', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, branch: 'عام' })
+                });
+                await loadAllData();
+                showAdminSection('families');
+                updateStats();
+                showNotify("تمت إضافة العائلة الجديدة للسجلات");
+            } catch (err) {
+                alert("فشل في إضافة العائلة");
+            }
         }
 
         function exportToExcel() {
             const worksheet = XLSX.utils.json_to_sheet(db.individuals);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Individuals");
-            XLSX.writeFile(workbook, "AlHayyani_Registry.xlsx");
-            showNotify("EXCEL_EXPORT_INITIATED");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "الأفراد");
+            XLSX.writeFile(workbook, "سجل_قبيلة_الحياني.xlsx");
         }
 
         function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.text("Dewan Al-Hayyani Registry Report", 10, 10);
+            doc.text("Hayyani Tribe Registry Report", 10, 10);
             db.individuals.forEach((ind, i) => {
-                doc.text(`${i+1}. ${ind.name} - ${ind.id}`, 10, 20 + (i * 10));
+                doc.text(`${i+1}. ${ind.name}`, 10, 20 + (i * 10));
             });
-            doc.save("AlHayyani_Report.pdf");
-            showNotify("PDF_REPORT_GENERATED");
-        }
-
-        function viewProfile(id) {
-            const ind = db.individuals.find(i => i.id === id);
-            alert(`PROFILE_PREVIEW: ${ind.name}\nSTATUS: ${ind.isVerified ? 'VERIFIED' : 'UNVERIFIED'}\nCRYPTO_HASH: ${cryptoSim.hash(ind.id)}`);
+            doc.save("تقرير_ديوان_الحياني.pdf");
         }
 
         function showNotify(msg) {
             const n = document.getElementById('sys-notify');
-            n.innerText = `SYSTEM_ALERT: ${msg}`;
+            n.innerText = msg;
             n.classList.remove('hidden');
             setTimeout(() => n.classList.add('hidden'), 3000);
+        }
+
+        function viewProfile(id) {
+            const ind = db.individuals.find(i => i.id === id);
+            alert(`عرض ملف الفرد: ${ind.name}\nالحالة: ${ind.isVerified ? 'موثق' : 'غير موثق'}\nالمعرف الرقمي: ${ind.id}`);
         }
     </script>
 </body>
