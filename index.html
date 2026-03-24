@@ -267,31 +267,12 @@
 
             <!-- View: Admin -->
             <section id="view-admin" class="view">
-                <div id="admin-login" class="max-w-md mx-auto mt-24 p-12 card-panel gold-border rounded-xl">
-                    <div class="text-center mb-10">
-                        <div class="w-20 h-20 bg-emerald-900 text-white flex items-center justify-center rounded-full mx-auto mb-4 amiri text-3xl border-4 border-amber-500 shadow-xl">ق</div>
-                        <h2 class="text-2xl font-bold text-emerald-900">دخول المشرف المصرح</h2>
-                    </div>
-                    <div class="space-y-8">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">كلمة مرور النظام الآمنة</label>
-                            <input type="password" id="adminPass" class="w-full bg-gray-50 border border-gray-200 p-5 rounded text-center text-2xl tracking-[0.5em] focus:border-emerald-800 transition-colors" placeholder="••••">
-                        </div>
-                        <button onclick="simulateLogin()" class="w-full btn-primary text-xl py-5 shadow-lg">تسجيل الدخول</button>
-                        <div class="flex justify-between items-center text-[10px] font-bold text-emerald-800 opacity-50 px-2">
-                            <span>التحقق الحيوي: جاهز</span>
-                            <span>التشفير: AES-256</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="admin-dashboard" class="hidden">
+                <div id="admin-dashboard">
                     <div class="flex justify-between items-center mb-16 border-b pb-8 border-gray-100">
                         <div>
                             <h2 class="text-4xl font-bold text-emerald-900">مركز التحكم بالديوان</h2>
                             <p class="text-xs text-amber-700 font-bold mt-1 uppercase">Sovereign_Admin_Interface</p>
                         </div>
-                        <button onclick="logout()" class="text-sm font-bold text-red-700 bg-red-50 px-6 py-2 rounded-full hover:bg-red-100 transition-all">إنهاء الجلسة</button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
@@ -377,9 +358,6 @@
         }
 
         async function apiFetch(endpoint, options = {}) {
-            if (authToken) {
-                options.headers = { ...options.headers, 'Authorization': `Bearer ${authToken}` };
-            }
             const response = await fetch(`${API_BASE}${endpoint}`, options);
             if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
             return response.status === 204 ? null : response.json();
@@ -602,32 +580,6 @@
             if (filtered.length === 0) results.innerHTML = '<p class="col-span-full text-center text-gray-400 py-20 font-bold">لم يتم العثور على نتائج تطابق بحثك</p>';
         }
 
-        async function simulateLogin() {
-            const password = document.getElementById('adminPass').value;
-            try {
-                const res = await apiFetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
-                });
-                if (res.success) {
-                    authToken = res.token;
-                    localStorage.setItem('hayyani_token', authToken);
-                    document.getElementById('admin-login').classList.add('hidden');
-                    document.getElementById('admin-dashboard').classList.remove('hidden');
-                    showNotify("تم الدخول بنجاح - مرحباً بك يا مشرف النظام");
-                }
-            } catch (err) {
-                alert("خطأ: كلمة المرور غير صحيحة");
-            }
-        }
-
-        function logout() {
-            authToken = null;
-            localStorage.removeItem('hayyani_token');
-            document.getElementById('admin-login').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
-        }
 
         function showAdminSection(section) {
             const container = document.getElementById('admin-section-content');

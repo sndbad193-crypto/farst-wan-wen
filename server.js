@@ -51,29 +51,9 @@ let db = {
     ]
 };
 
-// Auth Middleware
-const authenticate = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (authHeader === 'Bearer mock-jwt-token') {
-        next();
-    } else {
-        res.status(403).json({ success: false, message: 'غير مصرح لك بالوصول' });
-    }
-};
-
-// Auth
-app.post('/api/login', (req, res) => {
-    const { password } = req.body;
-    if (password === '1234') {
-        res.json({ success: true, token: 'mock-jwt-token' });
-    } else {
-        res.status(401).json({ success: false, message: 'كلمة مرور خاطئة' });
-    }
-});
-
 // Individuals
 app.get('/api/individuals', (req, res) => res.json(db.individuals));
-app.post('/api/individuals', authenticate, (req, res) => {
+app.post('/api/individuals', (req, res) => {
     const newInd = {
         name: req.body.name,
         familyId: req.body.familyId,
@@ -86,14 +66,14 @@ app.post('/api/individuals', authenticate, (req, res) => {
     db.individuals.push(newInd);
     res.status(201).json(newInd);
 });
-app.delete('/api/individuals/:id', authenticate, (req, res) => {
+app.delete('/api/individuals/:id', (req, res) => {
     db.individuals = db.individuals.filter(i => i.id !== req.params.id);
     res.status(204).send();
 });
 
 // Families
 app.get('/api/families', (req, res) => res.json(db.families));
-app.post('/api/families', authenticate, (req, res) => {
+app.post('/api/families', (req, res) => {
     const newFam = {
         name: req.body.name,
         branch: req.body.branch || 'عام',
