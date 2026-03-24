@@ -142,6 +142,11 @@
         </div>
 
         <div class="flex items-center gap-6">
+            <button onclick="toggleSidebar()" class="p-3 hover:bg-gray-100 rounded-full transition-colors text-emerald-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
             <div class="text-right border-r-2 border-emerald-800 pr-6">
                 <p class="text-[10px] text-gray-400 uppercase">حالة النظام</p>
                 <p class="text-sm font-bold text-emerald-700 flex items-center gap-2">
@@ -161,8 +166,8 @@
     </div>
 
     <div class="flex flex-1 overflow-hidden">
-        <!-- Sidebar Nav -->
-        <aside class="w-80 bg-white border-l border-gray-100 flex flex-col py-10 shadow-lg">
+        <!-- Sidebar Nav (Hidden by Default) -->
+        <aside id="main-sidebar" class="w-80 bg-white border-l border-gray-100 flex flex-col py-10 shadow-lg hidden">
             <nav class="space-y-1">
                 <button onclick="switchView('home')" class="nav-btn active w-full text-right px-10 py-5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between">
                     <span>الرئيسية</span>
@@ -180,17 +185,9 @@
                     <span>الأحداث والمناسبات</span>
                     <span class="text-emerald-800 opacity-20">●</span>
                 </button>
-                <button onclick="switchView('search')" class="nav-btn w-full text-right px-10 py-5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between">
-                    <span>البحث في السجلات</span>
-                    <span class="text-emerald-800 opacity-20">●</span>
-                </button>
             </nav>
 
             <div class="mt-auto px-10 pt-10 border-t border-gray-50 space-y-6">
-                <div class="p-6 bg-emerald-900 rounded-lg shadow-inner">
-                    <p class="text-[10px] text-amber-500 font-bold mb-3">إحصائيات القبيلة</p>
-                    <canvas id="miniStatsChart" height="120"></canvas>
-                </div>
                 <div class="flex flex-col gap-2">
                     <button onclick="exportToExcel()" class="text-[10px] text-gray-500 hover:text-emerald-800 text-right font-bold transition-colors">تحميل السجل (Excel)</button>
                     <button onclick="exportToPDF()" class="text-[10px] text-gray-500 hover:text-emerald-800 text-right font-bold transition-colors">إصدار تقرير (PDF)</button>
@@ -203,26 +200,58 @@
         <main class="flex-1 relative overflow-hidden">
 
             <!-- View: Home -->
-            <section id="view-home" class="view active">
-                <div class="max-w-5xl">
-                    <h2 class="text-7xl font-bold mb-10 text-emerald-900 leading-tight">مرحباً بكم في ديوان الحياني الرقمي</h2>
-                    <p class="text-2xl text-gray-600 mb-16 leading-relaxed text-justify">
-                        منصة رقمية متكاملة تهدف إلى صون وتوثيق أنساب قبيلة الحياني. نجمع بين أصالة التراث العربي العريق وأحدث تقنيات التشفير لضمان خصوصية ودقة البيانات عبر الأجيال.
-                    </p>
+            <section id="view-home" class="view active flex flex-col items-center justify-center">
+                <div class="w-full max-w-4xl text-center">
+                    <!-- Central Search Engine -->
+                    <div class="mb-12">
+                        <h2 class="amiri text-6xl font-bold text-emerald-900 mb-8">ابحث في تاريخ ونسب العائلة</h2>
+                        <div class="relative group">
+                            <div class="absolute inset-0 bg-emerald-900/5 blur-xl group-hover:bg-emerald-900/10 transition-all rounded-full"></div>
+                            <div class="relative flex items-center bg-white border-2 border-amber-500/30 p-2 rounded-2xl shadow-2xl focus-within:border-emerald-800 transition-all overflow-hidden">
+                                <div class="px-6 text-emerald-800 opacity-40">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <input type="text" id="homeSearchInput" onkeyup="if(event.key==='Enter') executeHomeSearch()" class="flex-1 py-8 text-3xl font-bold outline-none bg-transparent placeholder-gray-300" placeholder="أدخل اسم الفرد أو لقب العائلة...">
+                                <button onclick="executeHomeSearch()" class="bg-emerald-900 text-white px-12 py-6 rounded-xl font-bold text-2xl hover:bg-emerald-950 transition-all shadow-lg ml-2">
+                                    بـحث
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div class="grid grid-cols-3 gap-8">
-                        <div class="p-10 card-panel border-t-4 border-emerald-800 rounded-lg text-center">
-                            <h3 class="text-amber-700 text-sm font-bold mb-4 uppercase">إجمالي عدد الأفراد</h3>
-                            <p class="text-5xl font-black text-emerald-950" id="count-members">0</p>
-                        </div>
-                        <div class="p-10 card-panel border-t-4 border-amber-600 rounded-lg text-center">
-                            <h3 class="text-amber-700 text-sm font-bold mb-4 uppercase">عدد الأفخاذ والعائلات</h3>
-                            <p class="text-5xl font-black text-emerald-950" id="count-families">0</p>
-                        </div>
-                        <div class="p-10 card-panel border-t-4 border-emerald-400 rounded-lg text-center">
-                            <h3 class="text-amber-700 text-sm font-bold mb-4 uppercase">الوثائق المؤرشفة</h3>
-                            <p class="text-5xl font-black text-emerald-950" id="count-docs">0</p>
-                        </div>
+                    <div id="home-search-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 opacity-0 transform translate-y-4 transition-all duration-500">
+                        <!-- Results will fade in here -->
+                    </div>
+
+                    <!-- Quick Navigation Links -->
+                    <div class="flex justify-center gap-12 mt-20 border-t border-gray-100 pt-12">
+                        <button onclick="switchView('lineage')" class="group flex flex-col items-center gap-3">
+                            <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-800 group-hover:bg-emerald-900 group-hover:text-white transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-bold text-gray-500 group-hover:text-emerald-900 transition-colors">شجرة النسب</span>
+                        </button>
+                        <button onclick="switchView('map')" class="group flex flex-col items-center gap-3">
+                            <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-800 group-hover:bg-emerald-900 group-hover:text-white transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-bold text-gray-500 group-hover:text-emerald-900 transition-colors">خارطة التوزيع</span>
+                        </button>
+                        <button onclick="switchView('events')" class="group flex flex-col items-center gap-3">
+                            <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-800 group-hover:bg-emerald-900 group-hover:text-white transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-bold text-gray-500 group-hover:text-emerald-900 transition-colors">المناسبات</span>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -343,7 +372,7 @@
 
     <script>
         // API Configuration
-        const API_BASE = 'http://localhost:3000/api';
+        const API_BASE = window.location.origin === 'null' ? 'http://localhost:3000/api' : '/api';
         let db = { individuals: [], families: [], documents: [], events: [] };
         let authToken = localStorage.getItem('hayyani_token');
 
@@ -358,9 +387,14 @@
         }
 
         async function apiFetch(endpoint, options = {}) {
-            const response = await fetch(`${API_BASE}${endpoint}`, options);
-            if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
-            return response.status === 204 ? null : response.json();
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                return response.status === 204 ? null : response.json();
+            } catch (err) {
+                console.warn(`Fetch failed for ${endpoint}:`, err);
+                return []; // Return empty array as fallback for mock db consistency
+            }
         }
 
         async function loadAllData() {
@@ -375,6 +409,11 @@
             } catch (err) {
                 console.error("Failed to load data from API", err);
             }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            sidebar.classList.toggle('hidden');
         }
 
         async function switchView(viewId) {
@@ -394,35 +433,18 @@
                 await loadAllData(); // Refresh data for tree
                 setTimeout(init3DTree, 100);
             }
-            if (viewId === 'home') updateStats();
+            if (viewId === 'home') {
+                updateStats();
+                document.getElementById('main-sidebar').classList.add('hidden');
+            }
         }
 
         function updateStats() {
-            document.getElementById('count-members').innerText = db.individuals.length;
-            document.getElementById('count-families').innerText = db.families.length;
-            document.getElementById('count-docs').innerText = db.documents.length;
+            // Stats are hidden in new home layout but kept in logic
         }
 
         function initMiniChart() {
-            const ctx = document.getElementById('miniStatsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['محرم', 'صفر', 'ربيع', 'جمادى', 'رجب', 'رمضان'],
-                    datasets: [{
-                        label: 'نشاط السجلات',
-                        data: [5, 12, 8, 15, 10, 20],
-                        borderColor: '#c5a059',
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    plugins: { legend: { display: false } },
-                    scales: { x: { display: false }, y: { display: false } }
-                }
-            });
+            // Mini chart removed from new sidebar layout
         }
 
         function initMap() {
@@ -539,14 +561,30 @@
         function executeSearch() {
             const term = document.getElementById('globalSearch').value.toLowerCase();
             const results = document.getElementById('search-results');
-            results.innerHTML = '';
+            renderSearchResults(term, results);
+        }
 
+        function executeHomeSearch() {
+            const term = document.getElementById('homeSearchInput').value.toLowerCase();
+            const results = document.getElementById('home-search-results');
+
+            if (!term) {
+                results.classList.add('opacity-0', 'translate-y-4');
+                return;
+            }
+
+            renderSearchResults(term, results);
+            results.classList.remove('opacity-0', 'translate-y-4');
+        }
+
+        function renderSearchResults(term, container) {
+            container.innerHTML = '';
             const filtered = db.individuals.filter(i => i.name.includes(term) || i.id.includes(term));
 
             filtered.forEach(ind => {
                 const family = db.families.find(f => f.id === ind.familyId);
                 const card = document.createElement('div');
-                card.className = "p-6 card-panel rounded-lg hover:border-emerald-800 transition-all border-2 border-transparent";
+                card.className = "p-6 card-panel rounded-lg hover:border-emerald-800 transition-all border-2 border-transparent text-right";
 
                 const idTag = document.createElement('p');
                 idTag.className = "text-[9px] font-bold text-amber-600 mb-2";
@@ -574,12 +612,11 @@
 
                 footer.append(status, btn);
                 card.append(idTag, name, fam, footer);
-                results.appendChild(card);
+                container.appendChild(card);
             });
 
-            if (filtered.length === 0) results.innerHTML = '<p class="col-span-full text-center text-gray-400 py-20 font-bold">لم يتم العثور على نتائج تطابق بحثك</p>';
+            if (filtered.length === 0) container.innerHTML = '<p class="col-span-full text-center text-gray-400 py-20 font-bold">لم يتم العثور على نتائج تطابق بحثك</p>';
         }
-
 
         function showAdminSection(section) {
             const container = document.getElementById('admin-section-content');
