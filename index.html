@@ -160,19 +160,13 @@
             filter: blur(1px);
         }
 
-        .scanline {
-            width: 100%;
-            height: 2px;
-            background: rgba(0, 242, 255, 0.1);
+        .sparkle {
             position: absolute;
-            top: 0;
-            left: 0;
+            background: radial-gradient(circle, #d4af37 0%, rgba(212, 175, 55, 0) 70%);
+            border-radius: 50%;
             pointer-events: none;
-            animation: scan 4s linear infinite;
-        }
-        @keyframes scan {
-            from { top: 0; }
-            to { top: 100%; }
+            opacity: 0;
+            filter: blur(1px);
         }
 
         .node-label {
@@ -205,7 +199,7 @@
     <div id="neon-portal" class="fixed inset-0 z-[500] flex flex-col items-center justify-center transition-opacity duration-1000">
         <div id="star-field" class="animated-stars"></div>
         <div id="particle-container" class="absolute inset-0 pointer-events-none"></div>
-        <div class="scanline"></div>
+        <div id="sparkle-container" class="absolute inset-0 pointer-events-none"></div>
 
         <!-- DNA Tree SVG Placeholder (Stylized) -->
         <div class="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
@@ -235,12 +229,27 @@
             <!-- Detailed Tribal Seal SVG -->
             <div class="relative mb-12 flex justify-center group">
                 <div class="absolute inset-0 bg-heritage-neonBlue blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <div id="main-seal" class="relative w-64 h-64 flex items-center justify-center cursor-pointer transition-transform duration-1000 hover:rotate-[360deg]">
+                <div id="main-seal" class="relative w-64 h-64 flex items-center justify-center cursor-pointer transition-transform duration-1000">
                     <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_50px_rgba(0,242,255,0.6)]">
+                        <!-- Outer Rotating Rings -->
                         <circle cx="100" cy="100" r="95" fill="none" stroke="#00f2ff" stroke-width="1.5" stroke-dasharray="10 5" class="animate-[spin_20s_linear_infinite]" />
-                        <circle cx="100" cy="100" r="85" fill="none" stroke="#ff007f" stroke-width="1" opacity="0.3" />
-                        <path d="M100 20 L120 70 L180 70 L135 110 L155 165 L100 135 L45 165 L65 110 L20 70 L80 70 Z" fill="rgba(0,242,255,0.1)" stroke="#00f2ff" stroke-width="2" />
-                        <text x="50%" y="55%" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="30" fill="#00f2ff" style="text-shadow: 0 0 10px #00f2ff;">الحياني</text>
+                        <circle cx="100" cy="100" r="88" fill="none" stroke="#ff007f" stroke-width="1" opacity="0.3" stroke-dasharray="2 2" />
+
+                        <!-- Crossed Red Swords -->
+                        <g id="swords" class="drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]">
+                            <!-- Sword 1 -->
+                            <path d="M60 140 L140 60 M135 65 L145 55 L150 60 L140 70" stroke="#ef4444" stroke-width="4" stroke-linecap="round" />
+                            <path d="M65 135 L55 145" stroke="#ef4444" stroke-width="8" stroke-linecap="round" />
+
+                            <!-- Sword 2 -->
+                            <path d="M140 140 L60 60 M65 65 L55 55 L50 60 L60 70" stroke="#ef4444" stroke-width="4" stroke-linecap="round" />
+                            <path d="M135 135 L145 145" stroke="#ef4444" stroke-width="8" stroke-linecap="round" />
+                        </g>
+
+                        <!-- Central Text -->
+                        <rect x="50" y="85" width="100" height="30" fill="rgba(1, 12, 10, 0.8)" rx="5" />
+                        <text x="50%" y="107" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="24" fill="#00f2ff" style="text-shadow: 0 0 10px #00f2ff;">الحياني</text>
+
                         <circle cx="100" cy="100" r="40" fill="none" stroke="#00f2ff" stroke-width="0.5" opacity="0.5" />
                     </svg>
                 </div>
@@ -251,7 +260,13 @@
                 <p id="sub-welcome" class="text-heritage-neonPink font-bold text-lg md:text-xl uppercase tracking-[0.3em] opacity-80">سجل دخولك لتوثيق انتمائك</p>
             </div>
 
-            <div class="flex flex-col items-center gap-8">
+            <div id="auth-gate" class="flex flex-col items-center gap-8 w-full max-w-md mx-auto">
+                <div class="relative w-full group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-heritage-neonBlue to-heritage-neonPink rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
+                    <input type="email" id="auth-email" placeholder="أدخل بريدك الإلكتروني للتوثيق..."
+                        class="relative w-full px-8 py-6 bg-black/80 text-heritage-cream border border-heritage-neonBlue/30 rounded-2xl outline-none focus:border-heritage-neonBlue text-center font-bold text-xl placeholder:text-white/20">
+                </div>
+
                 <div class="relative group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-heritage-neonBlue to-heritage-neonPink rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000"></div>
                     <button onclick="enterSovereignSystem()" class="group relative px-24 py-8 bg-black text-heritage-neonBlue border border-heritage-neonBlue/50 font-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.1)] transition-all hover:scale-110 active:scale-95 flex items-center gap-4">
@@ -424,8 +439,8 @@
             </button>
 
             <div class="flex flex-col items-center mb-12 text-center">
-                <div class="w-24 h-24 bg-transparent rounded-full flex items-center justify-center text-heritage-neonBlue text-4xl font-black border-4 border-heritage-neonBlue/30 mb-4 shadow-[0_0_50px_rgba(0,242,255,0.2)] animate-pulse">
-                    حي
+                <div class="w-24 h-24 bg-transparent rounded-full flex items-center justify-center text-heritage-neonBlue text-2xl font-black border-4 border-heritage-neonBlue/30 mb-4 shadow-[0_0_50px_rgba(0,242,255,0.2)] animate-pulse">
+                    الحياني
                 </div>
                 <h2 class="text-3xl font-black text-heritage-neonBlue">لوحة التحكم الإدارية</h2>
                 <div class="w-20 h-1.5 bg-heritage-neonBlue/50 rounded-full mt-4"></div>
@@ -524,8 +539,8 @@
             <!-- Logo Area -->
             <div class="mb-10 relative group">
                 <div class="absolute inset-0 bg-heritage-neonBlue blur-3xl opacity-30 group-hover:opacity-60 transition-opacity animate-pulse"></div>
-                <div class="relative w-32 h-32 bg-transparent rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(0,242,255,0.4)] text-heritage-neonBlue text-5xl font-black border-4 border-heritage-neonBlue/50 backdrop-blur-xl">
-                   حي
+                <div class="relative w-32 h-32 bg-transparent rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(0,242,255,0.4)] text-heritage-neonBlue text-3xl font-black border-4 border-heritage-neonBlue/50 backdrop-blur-xl">
+                   الحياني
                 </div>
             </div>
 
@@ -1075,6 +1090,36 @@
             }
         }
 
+        function createSparkles() {
+            const container = document.getElementById('sparkle-container');
+            if (!container) return;
+            const count = 30;
+            for(let i=0; i<count; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const size = Math.random() * 12 + 4;
+                s.style.width = `${size}px`;
+                s.style.height = `${size}px`;
+                s.style.left = `${Math.random() * 100}%`;
+                s.style.top = `-30px`;
+
+                container.appendChild(s);
+
+                gsap.to(s, {
+                    y: window.innerHeight + 100,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    scale: Math.random() * 1.5,
+                    duration: 5 + Math.random() * 7,
+                    repeat: -1,
+                    delay: Math.random() * 5,
+                    ease: "power1.inOut",
+                    onRepeat: () => {
+                        s.style.left = `${Math.random() * 100}%`;
+                    }
+                });
+            }
+        }
+
         function createParticles(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1105,6 +1150,7 @@
 
         function initSystem() {
             createStars();
+            createSparkles();
             createParticles('particle-container');
             createParticles('main-particle-container');
             vault = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
@@ -2127,6 +2173,18 @@
 
 
         function enterSovereignSystem() {
+            const emailInput = document.getElementById('auth-email');
+            const email = emailInput.value.trim();
+
+            if (!email || !email.includes('@')) {
+                emailInput.classList.add('border-red-500', 'animate-shake');
+                hyHud('يرجى إدخال بريد إلكتروني صالح للتوثيق 🛡️');
+                setTimeout(() => emailInput.classList.remove('border-red-500', 'animate-shake'), 1000);
+                return;
+            }
+
+            localStorage.setItem('HY_USER_EMAIL', email);
+
             gsap.to("#portal-content", { scale: 1.5, opacity: 0, duration: 0.8, ease: "power4.in" });
             gsap.to("#neon-portal", { opacity: 0, duration: 1.5, delay: 0.5, onComplete: () => {
                 document.getElementById('neon-portal').classList.add('hidden');
