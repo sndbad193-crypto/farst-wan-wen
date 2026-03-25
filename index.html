@@ -78,67 +78,30 @@
         ::-webkit-scrollbar-track { background: #fdfbf7; }
         ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #064e3b; }
+
+        .sensitive-blur {
+            filter: blur(8px);
+            background: rgba(212, 175, 55, 0.1);
+            user-select: none;
+            pointer-events: none;
+            transition: filter 0.5s ease;
+        }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
 
-    <!-- Left Sidebar (Informational) -->
-    <div id="infoSidebar" class="fixed top-0 left-0 h-full w-72 bg-[var(--sidebar-bg)] text-heritage-cream sidebar-transition sidebar-left z-50 shadow-2xl border-r border-heritage-gold/30">
+    <!-- Left Sidebar (Admin Dashboard - Per User Request) -->
+    <div id="adminSidebar" class="fixed top-0 left-0 h-full w-[450px] bg-[var(--admin-sidebar-bg)] text-heritage-cream sidebar-transition sidebar-left z-50 shadow-2xl border-r border-heritage-gold/30">
         <div class="p-6 h-full flex flex-col">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-xl font-black text-heritage-gold">القائمة</h2>
-                <button onclick="closePanels()" class="text-heritage-cream hover:text-heritage-gold transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+            <!-- Tribal Logo in Sidebar -->
+            <div class="flex flex-col items-center mb-8 border-b border-heritage-gold/20 pb-6">
+                <div class="w-16 h-16 bg-heritage-gold rounded-full flex items-center justify-center text-heritage-emerald text-2xl font-black border-2 border-heritage-cream mb-3 shadow-lg">
+                    حي
+                </div>
+                <h2 class="text-sm font-black text-heritage-gold uppercase tracking-widest">ديوان قبيلة الحياني</h2>
+                <p class="text-[8px] opacity-50 font-bold">نظام التوثيق الرقمي الموحد</p>
             </div>
 
-            <nav class="space-y-4 flex-grow overflow-y-auto pr-2">
-                <div class="bg-white/5 p-5 rounded-2xl border border-white/10 mb-6">
-                    <p class="text-heritage-gold font-black mb-2">عن المنصة</p>
-                    <p class="text-xs opacity-70 leading-relaxed font-bold">منصة رقمية مخصصة لتوثيق أنساب وأفراد قبيلة الحياني في الوطن العربي والعالم، لضمان حفظ التاريخ والترابط الأخوي.</p>
-                </div>
-
-                <div class="space-y-2">
-                    <button onclick="showInfo('about')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
-                        <span>🏛️</span> من نحن
-                    </button>
-                    <button onclick="showInfo('contact')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
-                        <span>📞</span> اتصل بنا
-                    </button>
-                    <button onclick="showInfo('support')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
-                        <span>🤝</span> دعم القبيلة
-                    </button>
-                    <button onclick="showInfo('honor')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
-                        <span>📜</span> ميثاق الشرف
-                    </button>
-                </div>
-
-                <div class="pt-6 border-t border-white/10 mt-6">
-                    <p class="text-[10px] text-heritage-gold/50 font-black mb-4 uppercase tracking-widest">إحصائيات البحث</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <p class="text-[10px] opacity-50">عمليات البحث</p>
-                            <p id="searchStats" class="text-lg font-black text-heritage-gold">٠</p>
-                        </div>
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <p class="text-[10px] opacity-50">سجلات موثقة</p>
-                            <p id="vaultStats" class="text-lg font-black text-heritage-gold">٠</p>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <div class="mt-auto pt-6 border-t border-white/10 text-center">
-                <p class="text-[10px] text-heritage-gold/40 font-bold">منصة ديوان قبيلة الحياني © 2024</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Sidebar (Admin Control Panel) -->
-    <div id="adminSidebar" class="fixed top-0 right-0 h-full w-[450px] bg-[var(--admin-sidebar-bg)] text-heritage-cream sidebar-transition sidebar-right z-50 shadow-2xl border-l border-heritage-gold/30">
-        <div class="p-6 h-full flex flex-col">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-black text-heritage-gold">لوحة التحكم</h2>
                 <button onclick="closePanels()" class="text-heritage-cream hover:text-heritage-gold transition-colors">
@@ -237,22 +200,62 @@
     <!-- Overlay -->
     <div id="overlay" onclick="closePanels()" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-40 transition-opacity"></div>
 
+    <!-- Right Sidebar (Informational) -->
+    <div id="infoSidebar" class="fixed top-0 right-0 h-full w-72 bg-[var(--sidebar-bg)] text-heritage-cream sidebar-transition sidebar-right z-50 shadow-2xl border-l border-heritage-gold/30">
+        <div class="p-6 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-xl font-black text-heritage-gold">القائمة</h2>
+                <button onclick="closePanels()" class="text-heritage-cream hover:text-heritage-gold transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="space-y-4 flex-grow overflow-y-auto pr-2">
+                <div class="bg-white/5 p-5 rounded-2xl border border-white/10 mb-6">
+                    <p class="text-heritage-gold font-black mb-2">عن المنصة</p>
+                    <p class="text-xs opacity-70 leading-relaxed font-bold">منصة رقمية مخصصة لتوثيق أنساب وأفراد قبيلة الحياني في الوطن العربي والعالم، لضمان حفظ التاريخ والترابط الأخوي.</p>
+                </div>
+
+                <div class="space-y-2">
+                    <button onclick="showInfo('about')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
+                        <span>🏛️</span> من نحن
+                    </button>
+                    <button onclick="showInfo('contact')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
+                        <span>📞</span> اتصل بنا
+                    </button>
+                    <button onclick="showInfo('support')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
+                        <span>🤝</span> دعم القبيلة
+                    </button>
+                    <button onclick="showInfo('honor')" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-right">
+                        <span>📜</span> ميثاق الشرف
+                    </button>
+                </div>
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-white/10 text-center">
+                <p class="text-[10px] text-heritage-gold/40 font-bold">منصة ديوان قبيلة الحياني © 2024</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-30 flex justify-between items-center p-6 bg-transparent pointer-events-none">
-        <!-- Dashboard Button (Right) -->
+        <!-- Sidebar Toggle (Left - Per User Request) -->
+        <div class="pointer-events-auto">
+            <button onclick="toggleAdmin()" class="p-3.5 bg-heritage-emerald text-heritage-gold rounded-2xl shadow-2xl hover:bg-heritage-dark hover:scale-110 transition-all border border-heritage-gold/30 active:rotate-90 group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16m-16 6h16" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Dashboard Shortcut Button (Right) -->
         <div class="pointer-events-auto">
             <button onclick="toggleAdmin()" class="px-8 py-3 bg-heritage-gold text-heritage-emerald font-black rounded-full shadow-[0_10px_30px_rgba(212,175,55,0.4)] hover:bg-heritage-cream hover:scale-105 transition-all border-2 border-heritage-gold active:scale-95 flex items-center gap-2">
                 <span>لوحة التحكم</span>
                 <span class="text-xs opacity-50">✦</span>
-            </button>
-        </div>
-
-        <!-- Info Sidebar Toggle (Left) -->
-        <div class="pointer-events-auto">
-            <button onclick="toggleInfo()" class="p-3.5 bg-heritage-emerald text-heritage-gold rounded-2xl shadow-2xl hover:bg-heritage-dark hover:scale-110 transition-all border border-heritage-gold/30 active:rotate-90 group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16m-16 6h16" />
-                </svg>
             </button>
         </div>
     </header>
@@ -419,6 +422,27 @@
         </div>
     </div>
 
+    <!-- OTP Modal -->
+    <div id="otpModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-md z-[110] hidden items-center justify-center p-6">
+        <div class="max-w-md w-full glass-effect rounded-[3rem] p-10 border-2 border-heritage-gold/50 shadow-2xl text-center">
+            <div class="w-20 h-20 bg-heritage-gold rounded-full flex items-center justify-center mx-auto mb-6 text-heritage-emerald text-3xl">
+                📱
+            </div>
+            <h2 class="text-2xl font-black mb-2 text-heritage-emerald">التحقق من الهوية</h2>
+            <p class="text-sm font-bold opacity-60 mb-8 text-heritage-emerald">يرجى إدخال الرمز المرسل إلى هاتفك المسجل (٤ أرقام)</p>
+
+            <div class="flex justify-center gap-3 mb-8" dir="ltr">
+                <input type="text" maxlength="1" class="otp-input w-12 h-16 bg-heritage-emerald/5 border-2 border-heritage-emerald/20 rounded-xl text-center text-2xl font-black text-heritage-emerald focus:border-heritage-gold outline-none">
+                <input type="text" maxlength="1" class="otp-input w-12 h-16 bg-heritage-emerald/5 border-2 border-heritage-emerald/20 rounded-xl text-center text-2xl font-black text-heritage-emerald focus:border-heritage-gold outline-none">
+                <input type="text" maxlength="1" class="otp-input w-12 h-16 bg-heritage-emerald/5 border-2 border-heritage-emerald/20 rounded-xl text-center text-2xl font-black text-heritage-emerald focus:border-heritage-gold outline-none">
+                <input type="text" maxlength="1" class="otp-input w-12 h-16 bg-heritage-emerald/5 border-2 border-heritage-emerald/20 rounded-xl text-center text-2xl font-black text-heritage-emerald focus:border-heritage-gold outline-none">
+            </div>
+
+            <button onclick="verifyOTP()" class="w-full py-4 bg-heritage-emerald text-heritage-gold font-black rounded-xl hover:bg-heritage-dark transition-all mb-4">تأكيد الرمز</button>
+            <button onclick="closeOTPModal()" class="text-xs font-bold text-heritage-emerald/40 hover:text-heritage-emerald">إلغاء العملية</button>
+        </div>
+    </div>
+
     <!-- Info Modal -->
     <div id="infoModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-md z-[100] hidden items-center justify-center p-6 overflow-y-auto">
         <div class="max-w-2xl w-full glass-effect rounded-[3rem] p-8 md:p-12 border-2 border-heritage-gold/50 shadow-2xl relative text-heritage-emerald">
@@ -503,15 +527,27 @@
         }
 
         function logAudit(action, details) {
+            const prevHash = auditLog.length > 0 ? auditLog[0].hash : '00000000';
+            const raw = `${Date.now()}-${action}-${details}-${prevHash}`;
+            // Simple hash simulation
+            let hash = 0;
+            for (let i = 0; i < raw.length; i++) {
+                hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+                hash |= 0;
+            }
+            const hashHex = Math.abs(hash).toString(16).padStart(8, '0');
+
             const entry = {
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
-                user: 'مدير النظام', // Mock user
+                user: 'مدير النظام',
                 action: action,
-                details: details
+                details: details,
+                hash: hashHex,
+                prev: prevHash
             };
             auditLog.unshift(entry);
-            if(auditLog.length > 100) auditLog.pop(); // Keep last 100
+            if(auditLog.length > 100) auditLog.pop();
             localStorage.setItem(AUDIT_KEY, JSON.stringify(auditLog));
         }
 
@@ -562,8 +598,12 @@
             const list = document.getElementById('auditList');
             if(!list) return;
             list.innerHTML = auditLog.map(l => `
-                <div class="py-1 border-b border-white/5">
-                    <span class="text-heritage-gold">[${l.timestamp.slice(11,19)}]</span> ${l.action}: ${l.details}
+                <div class="py-2 border-b border-white/5 group">
+                    <div class="flex justify-between items-center">
+                        <span class="text-heritage-gold">[${l.timestamp.slice(11,19)}]</span>
+                        <span class="text-[8px] opacity-20 font-mono group-hover:opacity-100 transition-opacity">#${l.hash}</span>
+                    </div>
+                    <div class="mt-1">${l.action}: ${l.details}</div>
                 </div>
             `).join('');
         }
@@ -656,6 +696,104 @@
             const member = vault.find(v => v.id === id);
             logAudit('رسالة SMS', `إرسال تنبيه إلى ${member.name}`);
             hyHud(`جاري إرسال SMS إلى ${member.name}...`);
+        }
+
+        async function verifyBiometrics(memberId) {
+            if (window.PublicKeyCredential) {
+                try {
+                    hyHud("يرجى وضع إصبعك على الحساس للتحقق...");
+
+                    // Simulate processing
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    unlockData(memberId);
+                    logAudit('التحقق الحيوي', `تم عرض بيانات الفرد ${memberId} عبر البصمة`);
+                    hyHud("✅ تم التحقق بنجاح");
+                } catch (err) {
+                    alert("فشل التحقق الحيوي: " + err);
+                }
+            } else {
+                alert("جهازك لا يدعم البصمة أو المتصفح لا يدعم WebAuthn. استخدم كود الهاتف.");
+            }
+        }
+
+        let currentVerifyingMemberId = null;
+
+        function sendOTP(memberId) {
+            currentVerifyingMemberId = memberId;
+            const member = vault.find(v => v.id === memberId);
+            hyHud(`جاري إرسال رمز التحقق إلى هاتف ${member.name}...`);
+
+            setTimeout(() => {
+                document.getElementById('otpModal').classList.remove('hidden');
+                document.getElementById('otpModal').classList.add('flex');
+
+                // Clear inputs
+                const inputs = document.querySelectorAll('.otp-input');
+                inputs.forEach(input => input.value = '');
+                inputs[0].focus();
+
+                // Setup auto-focus for OTP inputs
+                inputs.forEach((input, index) => {
+                    input.oninput = (e) => {
+                        if (e.target.value.length === 1 && index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    };
+                    input.onkeydown = (e) => {
+                        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                    };
+                });
+            }, 1000);
+        }
+
+        function verifyOTP() {
+            const inputs = document.querySelectorAll('.otp-input');
+            const code = Array.from(inputs).map(i => i.value).join('');
+
+            if (code.length === 4) {
+                // In a real app, verify against backend. Here we simulate success.
+                hyHud("جاري التحقق من الرمز...");
+
+                setTimeout(() => {
+                    unlockData(currentVerifyingMemberId);
+                    logAudit('التحقق عبر SMS', `تم عرض بيانات الفرد ${currentVerifyingMemberId} عبر الرمز المرسل`);
+                    closeOTPModal();
+                    hyHud("✅ تم التحقق بنجاح");
+                }, 800);
+            } else {
+                alert("يرجى إدخال رمز التحقق المكون من ٤ أرقام");
+            }
+        }
+
+        function closeOTPModal() {
+            document.getElementById('otpModal').classList.add('hidden');
+            document.getElementById('otpModal').classList.remove('flex');
+            currentVerifyingMemberId = null;
+        }
+
+        function unlockData(memberId) {
+            // Find the specific card
+            const card = document.querySelector(`.registry-card:has(button[onclick*="${memberId}"])`);
+            if (card) {
+                const sensitive = card.querySelectorAll('.sensitive-blur');
+                sensitive.forEach(el => {
+                    el.classList.remove('sensitive-blur');
+                    el.style.filter = 'none';
+                    el.style.background = 'transparent';
+                });
+
+                const authSection = document.getElementById(`auth-section-${memberId}`);
+                if (authSection) {
+                    authSection.innerHTML = `
+                        <div class="col-span-2 py-2 bg-green-500/10 text-green-600 rounded-lg text-[10px] font-black flex items-center justify-center gap-2">
+                            <span>✅</span> تم التحقق وعرض البيانات
+                        </div>
+                    `;
+                }
+            }
         }
 
         function updateStats() {
@@ -821,16 +959,33 @@
                 <div class="registry-card bg-[var(--card-bg)] p-8 rounded-[2rem] border-b-8 border-heritage-gold shadow-2xl flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300">
                     <div class="flex justify-between w-full items-start">
                         <span class="text-[10px] bg-heritage-emerald text-heritage-gold px-3 py-1 rounded-full font-black tracking-widest">${m.id}</span>
-                        <div class="flex flex-col items-end">
+                        <div class="flex flex-col items-end text-left">
                             <span class="text-heritage-emerald/40 text-[10px] font-black">${m.date}</span>
                             <span class="text-[10px] ${m.status === 'active' ? 'text-green-600' : 'text-red-600'} font-black">${m.status === 'active' ? 'موثق ✓' : 'غير نشط'}</span>
                         </div>
                     </div>
                     <h3 class="text-2xl font-black text-heritage-emerald leading-tight">${m.name}</h3>
-                    <div class="w-full flex justify-between items-center text-[10px] font-bold opacity-60">
-                        <p>العمر: ${calculateAge(m.birthDate)}</p>
-                        <p>اكتمال البيانات: ${getProfileCompleteness(m)}٪</p>
+
+                    <div class="w-full space-y-2 mt-2">
+                        <div class="flex justify-between items-center text-[10px] font-bold opacity-60">
+                            <p>العمر: ${calculateAge(m.birthDate)}</p>
+                            <p>اكتمال البيانات: ${getProfileCompleteness(m)}٪</p>
+                        </div>
+                        <div class="bg-heritage-gold/5 p-3 rounded-xl border border-heritage-gold/10 space-y-1">
+                            <p class="text-[8px] font-black opacity-40">رقم الهوية (محمي)</p>
+                            <p class="text-sm font-black text-heritage-emerald sensitive-blur">${m.nationalID}</p>
+                        </div>
                     </div>
+
+                    <div id="auth-section-${m.id}" class="w-full grid grid-cols-2 gap-2 mt-4">
+                        <button onclick="verifyBiometrics('${m.id}')" class="py-2 bg-heritage-emerald text-heritage-gold text-[10px] font-black rounded-lg flex items-center justify-center gap-2 hover:bg-heritage-dark transition-all">
+                            <span>☝️</span> بصمة
+                        </button>
+                        <button onclick="sendOTP('${m.id}')" class="py-2 bg-heritage-gold/20 text-heritage-emerald text-[10px] font-black rounded-lg flex items-center justify-center gap-2 hover:bg-heritage-gold/30 transition-all">
+                            <span>📱</span> رمز هاتف
+                        </button>
+                    </div>
+
                     <div class="mt-auto w-full pt-4 border-t border-heritage-emerald/10 flex flex-col gap-3">
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-heritage-emerald font-black">📍 ${m.gov} | ${m.subTribe || 'عشيرة الحياني'}</span>
