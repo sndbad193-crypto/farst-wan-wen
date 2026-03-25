@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -151,6 +152,23 @@
         @keyframes scan {
             from { top: 0; }
             to { top: 100%; }
+        }
+
+        .node-label {
+            position: absolute;
+            color: #00f2ff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 10px;
+            font-weight: 900;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            white-space: nowrap;
+            transform: translate(-50%, -150%);
+            display: none;
+            z-index: 10;
         }
     </style>
 </head>
@@ -850,17 +868,18 @@
 
     <!-- 3D Tree Modal -->
     <div id="treeModal" class="fixed inset-0 bg-black z-[120] hidden flex-col">
-        <div class="p-6 bg-heritage-emerald flex justify-between items-center border-b border-heritage-gold/30">
-            <h2 class="text-heritage-gold font-black text-2xl">شجرة النسب التفاعلية 3D</h2>
-            <button onclick="closeTree()" class="text-heritage-cream hover:text-heritage-gold transition-colors">
+        <div class="p-6 bg-black/80 backdrop-blur-xl flex justify-between items-center border-b border-heritage-neonBlue/30">
+            <h2 class="text-heritage-neonBlue font-black text-2xl">شجرة النسب التفاعلية 3D</h2>
+            <button onclick="closeTree()" class="text-heritage-cream hover:text-heritage-neonBlue transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <div id="tree-container" class="flex-grow relative cursor-move overflow-hidden">
-            <div id="tree-instructions" class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full text-[10px] text-white/50 pointer-events-none">
-                استخدم الماوس للتدوير والتقريب • اضغط على العقد لفتح الملفات
+        <div id="tree-container" class="flex-grow relative cursor-crosshair overflow-hidden">
+            <div id="node-labels-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+            <div id="tree-instructions" class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full text-[10px] text-white/50 pointer-events-none border border-white/10">
+                استخدم الماوس للتدوير والتقريب • مرر الماوس فوق العقد لرؤية الأسماء
             </div>
         </div>
     </div>
@@ -1475,6 +1494,32 @@
             };
         }
 
+        function focusOnMember(id) {
+            const member = vault.find(m => m.id === id);
+            if (!member || !treeRenderer) return;
+
+            const node = treeNodes.find(n => n.userData.id === id);
+            if (!node) return;
+
+            open3DTree();
+
+            const targetPos = node.position.clone().applyMatrix4(treeScene.children.find(c => c instanceof THREE.Group).matrixWorld);
+
+            gsap.to(treeCamera.position, {
+                x: targetPos.x + 10,
+                y: targetPos.y + 5,
+                z: targetPos.z + 20,
+                duration: 2,
+                ease: "power3.inOut",
+                onUpdate: () => {
+                    treeCamera.lookAt(targetPos);
+                    treeControls.target.copy(targetPos);
+                }
+            });
+
+            hyHud(`جاري التركيز على ملف: ${member.name}`);
+        }
+
         function updateFinalPreview() {
             const name = `${document.getElementById('name_first').value} ${document.getElementById('name_father').value} ${document.getElementById('name_grand').value} ${document.getElementById('name_great').value} ${document.getElementById('name_family').value}`;
             const nid = document.getElementById('national_id_secure').value;
@@ -1802,7 +1847,7 @@
             resultsGrid.innerHTML = results.map(m => `
                 <div class="registry-card glass-effect p-8 rounded-[2.5rem] border-b-4 border-heritage-neonBlue flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300 shadow-[0_0_30px_rgba(0,242,255,0.1)] hover:shadow-[0_0_50px_rgba(0,242,255,0.2)]">
                     <div class="flex justify-between w-full items-start">
-                        <span class="text-[10px] bg-heritage-neonBlue/20 text-heritage-neonBlue border border-heritage-neonBlue/30 px-3 py-1 rounded-full font-black tracking-widest">${m.id}</span>
+                        <button onclick="focusOnMember('${m.id}')" class="text-[10px] bg-heritage-neonBlue/20 text-heritage-neonBlue border border-heritage-neonBlue/30 px-3 py-1 rounded-full font-black tracking-widest hover:bg-heritage-neonBlue hover:text-black transition-all">🧬 تتبع في الشجرة: ${m.id}</button>
                         <div class="flex flex-col items-end text-left">
                             <span class="text-heritage-emerald/40 text-[10px] font-black">${m.date}</span>
                             <span class="text-[10px] ${m.status === 'pending' ? 'text-orange-500' : (m.status === 'active' ? 'text-green-600' : 'text-red-600')} font-black">
@@ -1900,7 +1945,9 @@
             orb.style.boxShadow = `0 0 15px ${bg}`;
         }
 
-        let treeScene, treeCamera, treeRenderer;
+        let treeScene, treeCamera, treeRenderer, treeControls, treeNodes = [], treeLabels = [];
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
 
         function open3DTree() {
             document.getElementById('treeModal').classList.remove('hidden');
@@ -1911,10 +1958,19 @@
         function closeTree() {
             document.getElementById('treeModal').classList.add('hidden');
             document.getElementById('treeModal').classList.remove('flex');
+            if (treeRenderer) {
+                treeRenderer.dispose();
+                document.getElementById('tree-container').removeChild(treeRenderer.domElement);
+                treeRenderer = null;
+                treeNodes = [];
+                treeLabels = [];
+                document.getElementById('node-labels-container').innerHTML = '';
+            }
         }
 
         function init3DTree() {
             const container = document.getElementById('tree-container');
+            const labelsContainer = document.getElementById('node-labels-container');
             if(treeRenderer) return;
 
             treeScene = new THREE.Scene();
@@ -1923,6 +1979,10 @@
             treeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             treeRenderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(treeRenderer.domElement);
+
+            treeControls = new THREE.OrbitControls(treeCamera, treeRenderer.domElement);
+            treeControls.enableDamping = true;
+            treeControls.dampingFactor = 0.05;
 
             const light = new THREE.PointLight(0x00f2ff, 2, 100);
             light.position.set(10, 10, 10);
@@ -1934,62 +1994,163 @@
             // Create Helix DNA Trunk
             const helixPoints = [];
             const helixPoints2 = [];
-            for (let i = 0; i < 100; i++) {
-                const angle = i * 0.5;
+            const helixSegments = 120;
+            for (let i = 0; i < helixSegments; i++) {
+                const angle = i * 0.4;
                 const radius = 2;
-                helixPoints.push(new THREE.Vector3(Math.cos(angle) * radius, i * 0.4 - 20, Math.sin(angle) * radius));
-                helixPoints2.push(new THREE.Vector3(Math.cos(angle + Math.PI) * radius, i * 0.4 - 20, Math.sin(angle + Math.PI) * radius));
+                const y = i * 0.4 - 24;
+                helixPoints.push(new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius));
+                helixPoints2.push(new THREE.Vector3(Math.cos(angle + Math.PI) * radius, y, Math.sin(angle + Math.PI) * radius));
             }
 
             const helixGeo = new THREE.BufferGeometry().setFromPoints(helixPoints);
             const helixGeo2 = new THREE.BufferGeometry().setFromPoints(helixPoints2);
-            const helixMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.5 });
-            const helixMat2 = new THREE.LineBasicMaterial({ color: 0xff007f, transparent: true, opacity: 0.5 });
+            const helixMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.4 });
+            const helixMat2 = new THREE.LineBasicMaterial({ color: 0xff007f, transparent: true, opacity: 0.4 });
 
             group.add(new THREE.Line(helixGeo, helixMat));
             group.add(new THREE.Line(helixGeo2, helixMat2));
 
-            // Horizontal connections
-            for(let i=0; i<100; i+=2) {
-                const geo = new THREE.BufferGeometry().setFromPoints([helixPoints[i], helixPoints2[i]]);
-                const mat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
-                group.add(new THREE.Line(geo, mat));
-            }
+            // Origin (Root) Node - Tribal Patriarch
+            const rootGeo = new THREE.SphereGeometry(2.0, 32, 32); // Made it larger (2.0)
+            const rootMat = new THREE.MeshStandardMaterial({
+                color: 0x00f2ff,
+                emissive: 0x00f2ff,
+                emissiveIntensity: 2
+            });
+            const rootNode = new THREE.Mesh(rootGeo, rootMat);
+            rootNode.position.set(0, -25, 0);
+            rootNode.userData = { name: "الجد الجامع (الأصل)", isRoot: true };
+            group.add(rootNode);
+            treeNodes.push(rootNode);
+
+            // Origin Label
+            const rootLabel = document.createElement('div');
+            rootLabel.className = 'node-label';
+            rootLabel.innerText = rootNode.userData.name;
+            labelsContainer.appendChild(rootLabel);
+            treeLabels.push({ element: rootLabel, node: rootNode });
 
             // Create Neon Nodes for members
             vault.forEach((m, i) => {
-                const angle = Math.random() * Math.PI * 2;
-                const radius = 5 + Math.random() * 10;
-                const height = (i / Math.max(1, vault.length)) * 40 - 20;
+                const angle = (i / vault.length) * Math.PI * 8; // Spiral distribution
+                const radius = 6 + Math.random() * 8;
+                const height = (i / Math.max(1, vault.length)) * 48 - 24;
 
-                const geometry = new THREE.SphereGeometry(0.4, 16, 16);
+                const geometry = new THREE.SphereGeometry(0.5, 16, 16);
                 const material = new THREE.MeshStandardMaterial({
                     color: i % 2 === 0 ? 0x00f2ff : 0xff007f,
                     emissive: i % 2 === 0 ? 0x00f2ff : 0xff007f,
-                    emissiveIntensity: 1
+                    emissiveIntensity: 1.5
                 });
                 const node = new THREE.Mesh(geometry, material);
                 node.position.set(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
+                node.userData = { name: m.name, id: m.id };
                 group.add(node);
+                treeNodes.push(node);
+
+                // HTML Label
+                const label = document.createElement('div');
+                label.className = 'node-label';
+                label.innerText = m.name;
+                labelsContainer.appendChild(label);
+                treeLabels.push({ element: label, node: node });
 
                 // Branch to trunk
-                const branchGeo = new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(0, height, 0),
-                    node.position
-                ]);
-                const branchMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 });
+                const trunkPoint = new THREE.Vector3(Math.cos(angle) * 2, height, Math.sin(angle) * 2);
+                const branchGeo = new THREE.BufferGeometry().setFromPoints([trunkPoint, node.position]);
+                const branchMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
                 group.add(new THREE.Line(branchGeo, branchMat));
             });
 
             treeScene.add(group);
-            treeCamera.position.z = 40;
+            treeCamera.position.set(30, 10, 50);
+            treeControls.update();
+
+            // Hover effects
+            container.addEventListener('mousemove', (event) => {
+                const rect = container.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+            });
+
+            function updateLabels() {
+                treeLabels.forEach(l => {
+                    const pos = l.node.position.clone().applyMatrix4(group.matrixWorld);
+                    pos.project(treeCamera);
+
+                    const x = (pos.x * 0.5 + 0.5) * container.clientWidth;
+                    const y = (pos.y * -0.5 + 0.5) * container.clientHeight;
+
+                    l.element.style.left = `${x}px`;
+                    l.element.style.top = `${y}px`;
+
+                    // Hide if behind camera
+                    if (pos.z > 1) {
+                        l.element.style.display = 'none';
+                    }
+                });
+            }
+
+            let lastHovered = null;
 
             function animate() {
                 requestAnimationFrame(animate);
-                group.rotation.y += 0.003;
+                treeControls.update();
+
+                // Pulsing animation
+                const time = Date.now() * 0.002;
+                group.rotation.y += 0.002;
+
+                treeNodes.forEach((node, i) => {
+                    const pulse = (node.userData.isRoot ? 1.0 : 1.0) + Math.sin(time + i) * 0.1;
+                    if (node !== lastHovered) {
+                        node.scale.set(pulse, pulse, pulse);
+                        node.material.emissiveIntensity = (node.userData.isRoot ? 2.0 : 1.5) + Math.sin(time + i) * 0.5;
+                    }
+                });
+
+                // Raycasting for labels
+                raycaster.setFromCamera(mouse, treeCamera);
+                const intersects = raycaster.intersectObjects(treeNodes);
+
+                treeLabels.forEach(l => l.element.style.display = 'none');
+
+                if (intersects.length > 0) {
+                    const intersected = intersects[0].object;
+                    if (lastHovered !== intersected) {
+                        if (lastHovered) {
+                            gsap.to(lastHovered.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
+                        }
+                        lastHovered = intersected;
+                        const targetScale = intersected.userData.isRoot ? 3.0 : 2.5;
+                        gsap.to(intersected.scale, { x: targetScale, y: targetScale, z: targetScale, duration: 0.3, ease: "back.out" });
+                    }
+                    const label = treeLabels.find(l => l.node === intersected);
+                    if (label) {
+                        label.element.style.display = 'block';
+                        label.element.style.border = '2px solid #00f2ff';
+                        label.element.style.boxShadow = '0 0 15px #00f2ff';
+                    }
+                } else {
+                    if (lastHovered) {
+                        gsap.to(lastHovered.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
+                        lastHovered = null;
+                    }
+                }
+
+                updateLabels();
                 treeRenderer.render(treeScene, treeCamera);
             }
             animate();
+
+            // Resize handling
+            window.addEventListener('resize', () => {
+                if (!treeRenderer) return;
+                treeCamera.aspect = container.clientWidth / container.clientHeight;
+                treeCamera.updateProjectionMatrix();
+                treeRenderer.setSize(container.clientWidth, container.clientHeight);
+            });
         }
 
         window.onload = () => {
