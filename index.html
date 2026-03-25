@@ -20,7 +20,10 @@
                             emerald: '#064e3b', // Deep Emerald
                             gold: '#d4af37',    // Metallic Gold
                             cream: '#fdfbf7',   // Soft Cream
-                            dark: '#022c22'     // Darker Emerald
+                            dark: '#022c22',    // Darker Emerald
+                            neonBlue: '#00f2ff',
+                            neonPink: '#ff007f',
+                            neonPurple: '#bc13fe'
                         }
                     },
                     fontFamily: {
@@ -32,11 +35,13 @@
     </script>
     <style>
         :root {
-            --bg-primary: #022c22; /* Darker default */
+            --bg-primary: #010c0a; /* Ultra Dark */
             --text-primary: #fdfbf7;
-            --card-bg: rgba(6, 78, 59, 0.9);
+            --card-bg: rgba(6, 78, 59, 0.7);
             --sidebar-bg: #064e3b;
-            --admin-sidebar-bg: #022c22;
+            --admin-sidebar-bg: #010c0a;
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff007f;
         }
         .dark {
             --bg-primary: #022c22;
@@ -68,11 +73,11 @@
             transform: translateX(0);
         }
         .glass-effect {
-            background: rgba(2, 44, 34, 0.85); /* Darker base for contrast */
-            backdrop-filter: blur(30px) saturate(160%);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
-            color: #fdfbf7; /* Force cream text */
+            background: rgba(1, 12, 10, 0.8);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+            color: #fdfbf7;
         }
         .glass-effect input, .glass-effect select, .glass-effect textarea {
             background: rgba(255, 255, 255, 0.05);
@@ -102,8 +107,8 @@
         }
 
         /* Neon & Sovereign Styles */
-        .neon-glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); border-color: rgba(59, 130, 246, 0.5); }
-        .neon-glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); border-color: rgba(34, 197, 94, 0.5); }
+        .neon-glow-blue { box-shadow: 0 0 20px rgba(0, 242, 255, 0.5); border-color: rgba(0, 242, 255, 0.5); }
+        .neon-glow-pink { box-shadow: 0 0 20px rgba(255, 0, 127, 0.5); border-color: rgba(255, 0, 127, 0.5); }
         .neon-glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 0.5); animation: pulse-red 2s infinite; }
 
         @keyframes pulse-red {
@@ -113,19 +118,30 @@
         }
 
         .glass-sovereign {
-            background: rgba(2, 44, 34, 0.9);
+            background: rgba(1, 12, 10, 0.9);
             backdrop-filter: blur(45px) saturate(200%);
-            border: 1px solid rgba(212, 175, 55, 0.4);
+            border: 1px solid rgba(0, 242, 255, 0.3);
         }
 
         #neon-portal {
-            background: radial-gradient(circle at center, #064e3b 0%, #022c22 100%);
+            background: radial-gradient(circle at center, #012a24 0%, #010c0a 100%);
+            overflow: hidden;
+        }
+
+        /* Particle System */
+        .particle {
+            position: absolute;
+            background: #ff007f;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            filter: blur(1px);
         }
 
         .scanline {
             width: 100%;
             height: 2px;
-            background: rgba(212, 175, 55, 0.2);
+            background: rgba(0, 242, 255, 0.1);
             position: absolute;
             top: 0;
             left: 0;
@@ -142,16 +158,45 @@
 
     <!-- Neon Portal (Splash Screen) -->
     <div id="neon-portal" class="fixed inset-0 z-[200] flex flex-col items-center justify-center transition-opacity duration-1000">
+        <div id="particle-container" class="absolute inset-0 pointer-events-none"></div>
         <div class="scanline"></div>
-        <div id="portal-content" class="relative text-center scale-90 opacity-0">
-            <div class="w-48 h-48 bg-heritage-gold rounded-full flex items-center justify-center text-heritage-emerald text-7xl font-black border-8 border-heritage-cream mb-8 shadow-[0_0_80px_rgba(212,175,55,0.6)] animate-pulse">
-                حي
+
+        <!-- DNA Tree SVG Placeholder (Stylized) -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+            <svg width="600" height="600" viewBox="0 0 200 200" class="animate-pulse">
+                <defs>
+                    <linearGradient id="treeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00f2ff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff007f;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path d="M100,180 Q100,100 100,20" stroke="url(#treeGrad)" stroke-width="2" fill="none" filter="url(#glow)" />
+                <path d="M100,160 Q120,120 160,100" stroke="#00f2ff" stroke-width="1" fill="none" filter="url(#glow)" />
+                <path d="M100,160 Q80,120 40,100" stroke="#ff007f" stroke-width="1" fill="none" filter="url(#glow)" />
+                <circle cx="100" cy="20" r="5" fill="#00f2ff" filter="url(#glow)" />
+                <circle cx="160" cy="100" r="3" fill="#00f2ff" filter="url(#glow)" />
+                <circle cx="40" cy="100" r="3" fill="#ff007f" filter="url(#glow)" />
+            </svg>
+        </div>
+
+        <div id="portal-content" class="relative text-center scale-90 opacity-0 z-10">
+            <div class="relative mb-12 flex justify-center">
+                <div class="absolute inset-0 bg-heritage-neonBlue blur-3xl opacity-40 animate-pulse"></div>
+                <div class="relative w-48 h-48 bg-black/40 backdrop-blur-3xl rounded-full flex items-center justify-center text-heritage-neonBlue text-7xl font-black border-4 border-heritage-neonBlue/30 shadow-[0_0_80px_rgba(0,242,255,0.3)]">
+                    حي
+                </div>
             </div>
-            <h1 class="text-6xl md:text-8xl font-black text-heritage-cream tracking-tighter mb-4 drop-shadow-2xl">بوابة السيادة</h1>
-            <p class="text-heritage-gold font-bold text-xl uppercase tracking-[0.5em] mb-12">قبيلة الحياني - النظام الموحد</p>
+            <h1 class="text-6xl md:text-8xl font-black text-heritage-cream tracking-tighter mb-4 drop-shadow-[0_0_30px_rgba(0,242,255,0.3)]">بوابة السيادة</h1>
+            <p class="text-heritage-neonPink font-bold text-xl uppercase tracking-[0.5em] mb-12 opacity-80">قبيلة الحياني - النظام الموحد</p>
 
             <div class="flex flex-col items-center gap-6">
-                <button onclick="enterSovereignSystem()" class="group relative px-20 py-6 bg-heritage-gold text-heritage-emerald font-black rounded-2xl overflow-hidden shadow-2xl transition-all hover:scale-110 active:scale-95">
+                <button onclick="enterSovereignSystem()" class="group relative px-20 py-6 bg-heritage-neonBlue/10 text-heritage-neonBlue border-2 border-heritage-neonBlue/50 font-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.2)] transition-all hover:bg-heritage-neonBlue hover:text-black hover:scale-110 active:scale-95">
                     <span class="relative z-10 text-2xl">الدخول للنظام</span>
                     <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
                 </button>
@@ -165,25 +210,106 @@
         .vertical-text { writing-mode: vertical-rl; transform: rotate(180deg); }
     </style>
 
-    <!-- Control Panel Modal (Replaces Sidebar per User Request) -->
-    <div id="adminPanel" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6">
-        <div class="max-w-4xl w-full glass-effect rounded-[4rem] p-10 md:p-16 border-2 border-heritage-gold/30 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative text-heritage-cream">
-            <button onclick="closePanels()" class="absolute top-10 left-10 text-heritage-emerald/30 hover:text-heritage-emerald transition-all">
+    <!-- Sidebar (Hidden by default, slides from left) -->
+    <div id="leftSidebar" class="fixed inset-y-0 left-0 w-80 bg-black/95 backdrop-blur-3xl z-[150] -translate-x-full transition-transform duration-500 border-r border-heritage-neonBlue/20 p-8 flex flex-col items-center overflow-y-auto">
+        <button onclick="toggleSidebar()" class="absolute top-8 right-8 text-heritage-neonBlue/40 hover:text-heritage-neonBlue">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <div class="mt-12 mb-12 flex flex-col items-center">
+            <div class="w-24 h-24 bg-transparent rounded-full flex items-center justify-center text-heritage-neonBlue text-4xl font-black border-2 border-heritage-neonBlue/30 mb-4 shadow-[0_0_30px_rgba(0,242,255,0.2)] animate-pulse">
+                حي
+            </div>
+            <h3 class="text-heritage-neonBlue font-black text-xl">ديوان الحياني</h3>
+            <p class="text-white/30 text-[10px] uppercase tracking-widest mt-2">لوحة التحكم السيادية</p>
+        </div>
+
+        <div class="w-full space-y-4">
+            <div class="text-[10px] font-black text-heritage-neonPink uppercase tracking-widest mb-4 opacity-60">الإدارة المركزية</div>
+
+            <button onclick="openBulkModal(); toggleSidebar()" class="w-full py-5 px-6 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-2xl border border-heritage-neonBlue/20 font-black text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all group">
+                <div>
+                    <p class="text-sm">إضافة فرد جديد</p>
+                    <p class="text-[8px] opacity-40">توثيق عضوية جديدة</p>
+                </div>
+                <span class="text-2xl group-hover:scale-125 transition-transform">⚡</span>
+            </button>
+
+            <button onclick="openGroupModal(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonPink hover:text-heritage-neonPink transition-all group">
+                <div>
+                    <p class="text-sm">إدخال جماعي</p>
+                    <p class="text-[8px] opacity-40">توثيق عدة أسماء</p>
+                </div>
+                <span class="text-2xl group-hover:rotate-12 transition-transform">📋</span>
+            </button>
+
+            <button onclick="openWalletModal(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
+                <div>
+                    <p class="text-sm">المحفظة الرقمية</p>
+                    <p class="text-[8px] opacity-40">الماليات والتبرعات</p>
+                </div>
+                <span class="text-2xl group-hover:scale-125 transition-transform">💰</span>
+            </button>
+
+            <button onclick="open3DTree(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
+                <div>
+                    <p class="text-sm">شجرة النسب 3D</p>
+                    <p class="text-[8px] opacity-40">الواقع الرقمي</p>
+                </div>
+                <span class="text-2xl group-hover:scale-125 transition-transform">🧬</span>
+            </button>
+
+            <button onclick="openFullRegistry(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
+                <div>
+                    <p class="text-sm">سجل الأفراد</p>
+                    <p class="text-[8px] opacity-40">كافة الأسماء الموثقة</p>
+                </div>
+                <span class="text-2xl group-hover:-translate-y-1 transition-transform">📜</span>
+            </button>
+
+            <button onclick="openSovereigntyGate(); toggleSidebar()" class="w-full py-5 px-6 bg-red-600/10 text-red-600 rounded-2xl border border-red-600/20 font-black text-right flex items-center justify-between hover:bg-red-600 hover:text-white transition-all group">
+                <div>
+                    <p class="text-sm">السيادة المطلقة</p>
+                    <p class="text-[8px] opacity-40">بوابة التحكم العليا</p>
+                </div>
+                <span class="text-2xl group-hover:animate-ping">🔴</span>
+            </button>
+
+            <div class="pt-8 space-y-4">
+                <div class="text-[10px] font-black text-heritage-neonPink uppercase tracking-widest mb-4 opacity-60">النظام</div>
+                <button onclick="toggleTheme(); toggleSidebar()" class="w-full py-4 px-6 bg-white/5 text-white/60 rounded-xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonPink hover:text-heritage-neonPink transition-all">
+                    <span>تغيير المظهر</span>
+                    <span>🌓</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-white/5 w-full text-center">
+            <p class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em]">HAYYANI OS v2.0</p>
+        </div>
+    </div>
+
+    <!-- Control Panel Modal (Legacy, being integrated into sidebar) -->
+    <div id="adminPanel" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6">
+        <div class="max-w-4xl w-full glass-effect rounded-[4rem] p-10 md:p-16 border border-heritage-neonBlue/30 shadow-[0_0_100px_rgba(0,242,255,0.1)] relative text-heritage-cream">
+            <button onclick="closePanels()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
 
             <div class="flex flex-col items-center mb-12 text-center">
-                <div class="w-24 h-24 bg-heritage-gold rounded-full flex items-center justify-center text-heritage-emerald text-4xl font-black border-4 border-heritage-cream mb-4 shadow-2xl animate-pulse">
+                <div class="w-24 h-24 bg-transparent rounded-full flex items-center justify-center text-heritage-neonBlue text-4xl font-black border-4 border-heritage-neonBlue/30 mb-4 shadow-[0_0_50px_rgba(0,242,255,0.2)] animate-pulse">
                     حي
                 </div>
-                <h2 class="text-3xl font-black text-heritage-gold">لوحة التحكم الإدارية</h2>
-                <div class="w-20 h-1.5 bg-heritage-gold rounded-full mt-4"></div>
+                <h2 class="text-3xl font-black text-heritage-neonBlue">لوحة التحكم الإدارية</h2>
+                <div class="w-20 h-1.5 bg-heritage-neonBlue/50 rounded-full mt-4"></div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <button onclick="openBulkModal()" class="group p-8 bg-heritage-emerald text-heritage-gold rounded-[2.5rem] shadow-xl hover:bg-heritage-dark hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
+                <button onclick="openBulkModal()" class="group p-8 bg-heritage-neonBlue/10 text-heritage-neonBlue border border-heritage-neonBlue/30 rounded-[2.5rem] shadow-xl hover:bg-heritage-neonBlue hover:text-black hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
                     <span class="text-5xl group-hover:scale-110 transition-transform">⚡</span>
                     <div>
                         <p class="text-2xl font-black">إضافة فرد جديد</p>
@@ -191,26 +317,34 @@
                     </div>
                 </button>
 
-                <button onclick="openGroupModal()" class="group p-8 bg-white/5 border-2 border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-gold hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
+                <button onclick="openGroupModal()" class="group p-8 bg-white/5 border border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-neonPink hover:text-heritage-neonPink hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
                     <span class="text-5xl group-hover:rotate-12 transition-transform">📋</span>
                     <div>
-                        <p class="text-2xl font-black text-heritage-gold">إدخال جماعي</p>
+                        <p class="text-2xl font-black">إدخال جماعي</p>
                         <p class="text-xs opacity-40 font-bold">توثيق عدة أسماء دفعة واحدة</p>
                     </div>
                 </button>
 
-                <button onclick="openWalletModal()" class="group p-8 bg-white/5 border-2 border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-gold hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
+                <button onclick="openWalletModal()" class="group p-8 bg-white/5 border border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-neonBlue hover:text-heritage-neonBlue hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
                     <span class="text-5xl group-hover:scale-125 transition-transform">💰</span>
                     <div>
-                        <p class="text-2xl font-black text-heritage-gold">المحفظة</p>
+                        <p class="text-2xl font-black">المحفظة</p>
                         <p class="text-xs opacity-40 font-bold">إدارة الماليات والتبرعات</p>
                     </div>
                 </button>
 
-                <button onclick="openFullRegistry()" class="group p-8 bg-white/5 border-2 border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-gold hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
+                <button onclick="open3DTree()" class="group p-8 bg-white/5 border border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-neonBlue hover:text-heritage-neonBlue hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
+                    <span class="text-5xl group-hover:scale-125 transition-transform">🧬</span>
+                    <div>
+                        <p class="text-2xl font-black">شجرة النسب 3D</p>
+                        <p class="text-xs opacity-40 font-bold">استعراض السلالة بالواقع الرقمي</p>
+                    </div>
+                </button>
+
+                <button onclick="openFullRegistry()" class="group p-8 bg-white/5 border border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-neonBlue hover:text-heritage-neonBlue hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
                     <span class="text-5xl group-hover:-translate-y-2 transition-transform">📜</span>
                     <div>
-                        <p class="text-2xl font-black text-heritage-gold">سجل الأفراد</p>
+                        <p class="text-2xl font-black">سجل الأفراد</p>
                         <p class="text-xs opacity-40 font-bold">استعراض كافة الأسماء الموثقة</p>
                     </div>
                 </button>
@@ -233,25 +367,26 @@
 
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-30 flex justify-end items-center p-10 bg-transparent pointer-events-none">
-        <!-- Control Panel Button (The Only One) -->
+        <!-- Sidebar Toggle (Premium Neon Header Button) -->
         <div class="pointer-events-auto">
-            <button onclick="toggleAdmin()" class="group relative px-12 py-5 bg-heritage-emerald/40 backdrop-blur-xl text-heritage-gold font-black rounded-2xl border-2 border-heritage-gold/30 shadow-[0_0_40px_rgba(212,175,55,0.2)] hover:bg-heritage-gold hover:text-heritage-emerald transition-all active:scale-95 flex items-center gap-4">
-                <span class="text-xl">لوحة التحكم</span>
-                <div id="status-orb-main" class="w-3 h-3 bg-heritage-gold rounded-full animate-pulse shadow-[0_0_15px_rgba(212,175,55,0.8)]"></div>
+            <button onclick="toggleSidebar()" class="group relative px-10 py-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
+                <span class="text-xl">بوابة التحكم</span>
+                <div id="status-orb-main" class="w-3 h-3 bg-heritage-neonBlue rounded-full animate-pulse shadow-[0_0_20px_rgba(0,242,255,1)]"></div>
             </button>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="min-h-screen hero-pattern flex flex-col items-center pt-32 pb-20 px-6 relative">
+    <main class="min-h-screen flex flex-col items-center pt-32 pb-20 px-6 relative overflow-hidden">
         <!-- Background Overlay -->
-        <div class="absolute inset-0 bg-black/60 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-[#010c0a] pointer-events-none"></div>
+        <div id="main-particle-container" class="absolute inset-0 pointer-events-none opacity-30"></div>
 
         <div class="relative z-10 w-full max-w-5xl flex flex-col items-center">
             <!-- Logo Area -->
             <div class="mb-10 relative group">
-                <div class="absolute inset-0 bg-heritage-gold blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <div class="relative w-32 h-32 bg-heritage-gold rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(212,175,55,0.4)] text-heritage-emerald text-5xl font-black border-4 border-heritage-cream">
+                <div class="absolute inset-0 bg-heritage-neonBlue blur-3xl opacity-30 group-hover:opacity-60 transition-opacity animate-pulse"></div>
+                <div class="relative w-32 h-32 bg-transparent rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(0,242,255,0.4)] text-heritage-neonBlue text-5xl font-black border-4 border-heritage-neonBlue/50 backdrop-blur-xl">
                    حي
                 </div>
             </div>
@@ -264,26 +399,26 @@
             <!-- Sovereign Search Container -->
             <div class="w-full max-w-4xl mb-20 relative px-4">
                 <div class="relative group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-heritage-gold via-heritage-emerald to-heritage-gold rounded-3xl blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                    <div class="relative bg-heritage-emerald/40 backdrop-blur-3xl rounded-[2.5rem] border-2 border-heritage-gold/30 p-2 flex items-center shadow-2xl overflow-hidden">
-                        <button onclick="searchName()" class="p-6 text-heritage-gold hover:scale-110 transition-all active:rotate-12">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-heritage-neonBlue via-heritage-neonPurple to-heritage-neonPink rounded-[2.5rem] blur opacity-30 group-hover:opacity-100 transition duration-1000"></div>
+                    <div class="relative bg-black/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 p-2 flex items-center shadow-2xl overflow-hidden">
+                        <button onclick="searchName()" class="p-6 text-heritage-neonBlue hover:scale-110 transition-all active:rotate-12">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
                         <input type="text" id="searchInput" onkeyup="searchName()" placeholder="ابحث في السجل الرقمي الموحد..."
-                            class="flex-grow bg-transparent text-heritage-cream text-3xl font-black py-6 px-4 outline-none placeholder:text-heritage-gold/20 selection:bg-heritage-gold/30">
+                            class="flex-grow bg-transparent text-heritage-cream text-3xl font-black py-6 px-4 outline-none placeholder:text-white/20 selection:bg-heritage-neonBlue/30">
 
                         <div class="flex gap-2 px-6 border-r border-white/10">
-                            <button onclick="openGroupModal()" class="p-4 hover:bg-white/10 rounded-2xl transition-all" title="رفع ملف">📁</button>
-                            <button onclick="toggleVoiceRecordSearch()" id="searchVoiceBtn" class="p-4 hover:bg-white/10 rounded-2xl transition-all" title="تسجيل صوت">🎙️</button>
+                            <button onclick="openGroupModal()" class="p-4 hover:bg-white/10 rounded-2xl transition-all text-heritage-neonPink" title="رفع ملف">📁</button>
+                            <button onclick="toggleVoiceRecordSearch()" id="searchVoiceBtn" class="p-4 hover:bg-white/10 rounded-2xl transition-all text-heritage-neonBlue" title="تسجيل صوت">🎙️</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Stats Badge -->
                 <div id="stats-container" class="mt-8 flex justify-center">
-                    <div id="stats-badge" class="px-8 py-3 bg-heritage-gold/90 text-heritage-emerald rounded-full font-black shadow-xl border-2 border-heritage-cream flex items-center gap-3 scale-0 transition-transform duration-500">
+                    <div id="stats-badge" class="px-8 py-3 bg-heritage-neonBlue/10 backdrop-blur-md text-heritage-neonBlue rounded-full font-black shadow-[0_0_20px_rgba(0,242,255,0.2)] border border-heritage-neonBlue/30 flex items-center gap-3 scale-0 transition-transform duration-500">
                         <span class="text-xs uppercase tracking-widest opacity-70">تم توثيق</span>
                         <span id="memberCount" class="text-2xl">0</span>
                         <span class="text-sm">من أفراد القبيلة</span>
@@ -309,26 +444,26 @@
     </main>
 
     <!-- Success Hud -->
-    <div id="hy-hud" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-heritage-emerald text-heritage-gold px-10 py-5 rounded-2xl font-black shadow-[0_20px_40px_rgba(0,0,0,0.4)] border-2 border-heritage-gold z-[100] transform translate-y-32 transition-transform duration-500 flex items-center gap-4">
+    <div id="hy-hud" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl text-heritage-neonBlue px-10 py-5 rounded-2xl font-black shadow-[0_0_50px_rgba(0,242,255,0.2)] border border-heritage-neonBlue/30 z-[100] transform translate-y-32 transition-transform duration-500 flex items-center gap-4">
         <span class="text-2xl">🛡️</span>
         <span id="hud-text">تمت العملية بنجاح</span>
     </div>
 
     <!-- Digital Gift Animation -->
-    <div id="gift-box" class="fixed inset-0 z-[150] hidden items-center justify-center bg-black/80 backdrop-blur-md">
+    <div id="gift-box" class="fixed inset-0 z-[150] hidden items-center justify-center bg-black/90 backdrop-blur-2xl">
         <div class="text-center">
-            <div id="box-icon" class="text-9xl mb-8 animate-bounce">🎁</div>
-            <h3 class="text-4xl font-black text-heritage-gold mb-2">هدية ترحيبية</h3>
+            <div id="box-icon" class="text-9xl mb-8 animate-bounce drop-shadow-[0_0_50px_rgba(0,242,255,0.5)]">🎁</div>
+            <h3 class="text-4xl font-black text-heritage-neonBlue mb-2">هدية ترحيبية</h3>
             <p class="text-white opacity-60 mb-8">لقد حصلت على "وسام الولاء الرقمي" لانضمامك للديوان</p>
-            <button onclick="closeGift()" class="px-10 py-4 bg-heritage-gold text-heritage-emerald font-black rounded-xl">استلام الهدية</button>
+            <button onclick="closeGift()" class="px-10 py-4 bg-heritage-neonBlue text-black font-black rounded-xl shadow-[0_0_30px_rgba(0,242,255,0.3)] hover:scale-110 transition-all">استلام الهدية</button>
         </div>
     </div>
 
     <!-- Registry Member Modal (Multi-Step Wizard) -->
-    <div id="bulkModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
-        <div class="max-w-6xl w-full glass-effect rounded-[3.5rem] p-6 md:p-14 border-2 border-heritage-gold/40 shadow-[0_0_100px_rgba(0,0,0,0.8)] relative text-heritage-emerald">
+    <div id="bulkModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
+        <div class="max-w-6xl w-full glass-effect rounded-[3.5rem] p-6 md:p-14 border border-heritage-neonBlue/30 shadow-[0_0_100px_rgba(0,242,255,0.1)] relative text-heritage-cream">
             <!-- Close Button -->
-            <button onclick="closeBulkModal()" class="absolute top-10 left-10 text-heritage-emerald/40 hover:text-heritage-emerald transition-all z-10">
+            <button onclick="closeBulkModal()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all z-10">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -336,15 +471,15 @@
 
             <!-- Wizard Progress Header -->
             <div class="mb-12">
-                <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tighter">التوثيق الرقمي الشامل</h2>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tighter text-heritage-neonBlue">التوثيق الرقمي الشامل</h2>
                 <div class="flex gap-2 mb-4">
-                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-gold rounded-full" data-step="1"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="2"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="3"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="4"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="5"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-neonBlue rounded-full" data-step="1"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="2"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="3"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="4"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="5"></div>
                 </div>
-                <p id="stepDescription" class="text-heritage-gold font-black text-xs uppercase tracking-widest">الخطوة ١: البيانات الأساسية والنسب (Core Data)</p>
+                <p id="stepDescription" class="text-heritage-neonPink font-black text-xs uppercase tracking-widest">الخطوة ١: البيانات الأساسية والنسب (Core Data)</p>
             </div>
 
             <div id="wizardForm" class="min-h-[500px]">
@@ -352,49 +487,49 @@
                 <div class="wizard-step space-y-8" data-step="1">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="md:col-span-3 grid grid-cols-2 md:grid-cols-5 gap-4">
-                            <div class="col-span-full mb-2"><p class="text-[10px] font-black text-heritage-gold uppercase tracking-widest">الاسم الخماسي المنفصل</p></div>
-                            <input type="text" id="name_first" placeholder="الاسم" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
-                            <input type="text" id="name_father" placeholder="الأب" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
-                            <input type="text" id="name_grand" placeholder="الجد" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
-                            <input type="text" id="name_great" placeholder="جد الجد" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
-                            <input type="text" id="name_family" placeholder="اللقب" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <div class="col-span-full mb-2"><p class="text-[10px] font-black text-heritage-neonBlue uppercase tracking-widest">الاسم الخماسي المنفصل</p></div>
+                            <input type="text" id="name_first" placeholder="الاسم" class="wizard-input p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
+                            <input type="text" id="name_father" placeholder="الأب" class="wizard-input p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
+                            <input type="text" id="name_grand" placeholder="الجد" class="wizard-input p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
+                            <input type="text" id="name_great" placeholder="جد الجد" class="wizard-input p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
+                            <input type="text" id="name_family" placeholder="اللقب" class="wizard-input p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
                         </div>
 
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">الرقم الوطني الموحد (AES-256)</label>
-                            <input type="text" id="national_id_secure" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <input type="text" id="national_id_secure" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
                         </div>
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">بيانات جواز السفر (Passport)</label>
                             <div class="grid grid-cols-2 gap-2">
-                                <input type="text" id="passport_no" placeholder="رقم الجواز" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
-                                <select id="passport_type" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                                <input type="text" id="passport_no" placeholder="رقم الجواز" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-heritage-neonBlue font-black text-xs">
+                                <select id="passport_type" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-heritage-neonBlue font-black text-xs">
                                     <option value="A">عادي (A)</option><option value="G">دبلوماسي (G)</option><option value="P">خدمة (P)</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-2 gap-2 mt-2">
-                                <input type="date" id="pass_expiry" title="تاريخ الانتهاء" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-[10px]">
-                                <input type="text" id="birth_cert_no" placeholder="رقم شهادة الميلاد" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                                <input type="date" id="pass_expiry" title="تاريخ الانتهاء" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-heritage-neonBlue font-black text-[10px]">
+                                <input type="text" id="birth_cert_no" placeholder="رقم شهادة الميلاد" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-heritage-neonBlue font-black text-xs">
                             </div>
                         </div>
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">تاريخ الميلاد (ميلادي)</label>
-                            <input type="date" id="dob_gregorian" onchange="syncDates('g')" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <input type="date" id="dob_gregorian" onchange="syncDates('g')" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
                         </div>
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">تاريخ الميلاد (هجري)</label>
-                            <input type="text" id="dob_hijri" placeholder="14xx/xx/xx" onchange="syncDates('h')" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all text-center">
+                            <input type="text" id="dob_hijri" placeholder="14xx/xx/xx" onchange="syncDates('h')" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all text-center">
                         </div>
                         <div class="space-y-4 md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="col-span-full mb-2"><p class="text-[10px] font-black text-heritage-gold uppercase tracking-widest">بيانات التواصل (Multi-Channel)</p></div>
-                            <input type="email" id="reg_email" placeholder="البريد الإلكتروني" class="p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black">
-                            <input type="tel" id="reg_phone" placeholder="رقم الهاتف" class="p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black">
-                            <input type="tel" id="reg_whatsapp" placeholder="رقم الواتساب" class="p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black">
+                            <div class="col-span-full mb-2"><p class="text-[10px] font-black text-heritage-neonBlue uppercase tracking-widest">بيانات التواصل (Multi-Channel)</p></div>
+                            <input type="email" id="reg_email" placeholder="البريد الإلكتروني" class="p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black">
+                            <input type="tel" id="reg_phone" placeholder="رقم الهاتف" class="p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black">
+                            <input type="tel" id="reg_whatsapp" placeholder="رقم الواتساب" class="p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black">
                         </div>
 
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">فصيلة الدم</label>
-                            <select id="blood_type" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <select id="blood_type" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
                                 <option value="A+">A+</option><option value="A-">A-</option>
                                 <option value="B+">B+</option><option value="B-">B-</option>
                                 <option value="O+">O+</option><option value="O-">O-</option>
@@ -403,7 +538,7 @@
                         </div>
                         <div class="space-y-4 md:col-span-2">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">الحالة الصحية / الملاحظات الحيوية</label>
-                            <input type="text" id="health_notes" placeholder="لا يوجد" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <input type="text" id="health_notes" placeholder="لا يوجد" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black transition-all">
                         </div>
                     </div>
                 </div>
@@ -619,10 +754,10 @@
             </div>
 
             <!-- Wizard Controls -->
-            <div class="mt-14 pt-8 border-t border-heritage-emerald/10 flex justify-between items-center">
-                <button id="btnPrev" onclick="moveStep(-1)" class="px-10 py-5 bg-heritage-emerald/5 font-black rounded-3xl hover:bg-heritage-emerald/10 transition-all opacity-0 pointer-events-none">السابق</button>
-                <div class="text-xs font-black opacity-30 uppercase tracking-[0.3em]">ديوان قبيلة الحياني</div>
-                <button id="btnNext" onclick="moveStep(1)" class="px-12 py-5 bg-heritage-emerald text-heritage-gold font-black rounded-3xl shadow-xl hover:bg-heritage-dark transition-all scale-110">التالي</button>
+            <div class="mt-14 pt-8 border-t border-white/10 flex justify-between items-center">
+                <button id="btnPrev" onclick="moveStep(-1)" class="px-10 py-5 bg-white/5 font-black rounded-3xl hover:bg-white/10 transition-all opacity-0 pointer-events-none">السابق</button>
+                <div class="text-xs font-black opacity-30 uppercase tracking-[0.3em] text-heritage-neonBlue">ديوان قبيلة الحياني</div>
+                <button id="btnNext" onclick="moveStep(1)" class="px-12 py-5 bg-heritage-neonBlue text-black font-black rounded-3xl shadow-[0_0_30px_rgba(0,242,255,0.3)] hover:scale-110 transition-all">التالي</button>
             </div>
         </div>
     </div>
@@ -731,22 +866,22 @@
     </div>
 
     <!-- Bulk Entry (Group) Modal -->
-    <div id="groupModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-xl z-[110] hidden items-center justify-center p-6">
-        <div class="max-w-2xl w-full glass-effect rounded-[3.5rem] p-10 border-2 border-heritage-gold/40 shadow-2xl relative text-heritage-emerald text-center">
-            <button onclick="closeGroupModal()" class="absolute top-10 left-10 text-heritage-emerald/40 hover:text-heritage-emerald transition-all">
+    <div id="groupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[110] hidden items-center justify-center p-6">
+        <div class="max-w-2xl w-full glass-effect rounded-[3.5rem] p-10 border border-heritage-neonBlue/30 shadow-2xl relative text-heritage-cream text-center">
+            <button onclick="closeGroupModal()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <div class="w-20 h-20 bg-heritage-gold rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-xl">⚡</div>
-            <h2 class="text-3xl font-black mb-2">إضافة مجموعة (إدخال جماعي)</h2>
+            <div class="w-20 h-20 bg-heritage-neonBlue/20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-[0_0_30px_rgba(0,242,255,0.3)] text-heritage-neonBlue">⚡</div>
+            <h2 class="text-3xl font-black mb-2 text-heritage-neonBlue">إضافة مجموعة (إدخال جماعي)</h2>
             <p class="text-xs font-bold opacity-40 mb-8 uppercase">قم بلصق قائمة الأسماء أدناه، اسم واحد في كل سطر</p>
 
             <div class="space-y-4">
-                <textarea id="bulkNamesArea" placeholder="مثال:&#10;أحمد حسين الحياني&#10;محمد علي الحياني&#10;زياد فهد الحياني" class="w-full p-8 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-3xl font-black outline-none focus:border-heritage-gold transition-all h-80 text-right leading-relaxed" dir="rtl"></textarea>
+                <textarea id="bulkNamesArea" placeholder="مثال:&#10;أحمد حسين الحياني&#10;محمد علي الحياني&#10;زياد فهد الحياني" class="w-full p-8 bg-white/5 border border-white/10 rounded-3xl font-black outline-none focus:border-heritage-neonBlue transition-all h-80 text-right leading-relaxed text-heritage-cream" dir="rtl"></textarea>
             </div>
 
-            <button onclick="bulkAddMembers()" class="w-full mt-8 py-5 bg-heritage-emerald text-heritage-gold font-black rounded-2xl shadow-xl hover:bg-heritage-dark transition-all text-xl">بدء التوثيق الجماعي</button>
+            <button onclick="bulkAddMembers()" class="w-full mt-8 py-5 bg-heritage-neonBlue text-black font-black rounded-2xl shadow-xl hover:scale-105 transition-all text-xl">بدء التوثيق الجماعي</button>
             <p class="mt-4 text-[10px] font-bold opacity-30">سيتم إنشاء سجلات "قيد المراجعة" لكافة الأسماء المذكورة أعلاه آلياً</p>
         </div>
     </div>
@@ -785,7 +920,37 @@
         let auditLog = [];
 
         let growthChart;
+        function createParticles(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const count = 50;
+            for(let i=0; i<count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.opacity = Math.random() * 0.5 + 0.2;
+
+                container.appendChild(p);
+
+                gsap.to(p, {
+                    y: -100 - Math.random() * 200,
+                    x: (Math.random() - 0.5) * 50,
+                    opacity: 0,
+                    duration: 5 + Math.random() * 5,
+                    repeat: -1,
+                    delay: Math.random() * 5,
+                    ease: "power1.out"
+                });
+            }
+        }
+
         function initSystem() {
+            createParticles('particle-container');
+            createParticles('main-particle-container');
             vault = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             financeLog = JSON.parse(localStorage.getItem(FINANCE_KEY) || '[]');
             auditLog = JSON.parse(localStorage.getItem(AUDIT_KEY) || '[]');
@@ -990,6 +1155,7 @@
         function updateStats() {
             const badge = document.getElementById('stats-badge');
             const countEl = document.getElementById('memberCount');
+            if(!countEl) return;
             const vStats = document.getElementById('vaultStats');
             const sStats = document.getElementById('searchStats');
 
@@ -1017,10 +1183,27 @@
             updateStatusGlow('blue');
         }
 
+        function toggleSidebar() {
+            const sb = document.getElementById('leftSidebar');
+            const overlay = document.getElementById('overlay');
+            if(sb.classList.contains('-translate-x-full')) {
+                sb.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                updateStatusGlow('blue');
+            } else {
+                sb.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
         function closePanels() {
             document.getElementById('adminPanel').classList.add('hidden');
             document.getElementById('adminPanel').classList.remove('flex');
+            document.getElementById('leftSidebar').classList.add('-translate-x-full');
             document.getElementById('overlay').classList.add('hidden');
+            document.getElementById('bulkModal').classList.add('hidden');
+            document.getElementById('walletModal').classList.add('hidden');
+            document.getElementById('groupModal').classList.add('hidden');
         }
 
         function hyHud(m) {
@@ -1069,9 +1252,9 @@
             // Indicators
             document.querySelectorAll('.wizard-step-indicator').forEach(i => {
                 const s = parseInt(i.dataset.step);
-                if(s < step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-emerald rounded-full";
-                else if(s === step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-gold rounded-full";
-                else i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full";
+                if(s < step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-neonBlue rounded-full";
+                else if(s === step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-neonPink rounded-full shadow-[0_0_15px_rgba(255,0,127,0.5)]";
+                else i.className = "wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full";
             });
 
             // Descriptions
@@ -1299,11 +1482,11 @@
             const p = document.getElementById('finalPreview');
             p.innerHTML = `
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2 flex items-center gap-4 border-b border-heritage-emerald/10 pb-4">
-                        <img src="${document.getElementById('face_capture').src || 'https://via.placeholder.com/60'}" class="w-16 h-16 rounded-full border-2 border-heritage-gold object-cover">
+                    <div class="col-span-2 flex items-center gap-4 border-b border-white/10 pb-4">
+                        <img src="${document.getElementById('face_capture').src || 'https://via.placeholder.com/60'}" class="w-16 h-16 rounded-full border-2 border-heritage-neonBlue object-cover shadow-[0_0_20px_rgba(0,242,255,0.3)]">
                         <div>
-                           <p class="text-xs opacity-50">الاسم الموثق:</p>
-                           <p class="text-lg">${name}</p>
+                           <p class="text-xs opacity-50 text-heritage-neonBlue">الاسم الموثق:</p>
+                           <p class="text-lg font-black">${name}</p>
                         </div>
                     </div>
                     <div><p class="opacity-40 text-[10px]">الرقم الوطني:</p><p>${nid}</p></div>
@@ -1433,7 +1616,7 @@
 
             // AI-Smart Bulk logic (Detect job, location, name)
             const lines = text.split('\n').map(n => n.trim()).filter(n => n.length > 2);
-            if(names.length === 0) return alert("لم يتم العثور على أسماء صالحة");
+            if(lines.length === 0) return alert("لم يتم العثور على أسماء صالحة");
 
             const newMembers = lines.map(line => {
                 let name = line;
@@ -1559,11 +1742,13 @@
         }
 
         function openFullRegistry() {
-            document.getElementById('searchInput').value = ' '; // Space to trigger all or many
-            searchName();
+            document.getElementById('searchInput').value = '';
+            searchName(true);
             closePanels();
             // Scroll to results
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
         }
 
         function openSovereigntyGate() {
@@ -1580,7 +1765,7 @@
         }
 
 
-        function searchName() {
+        function searchName(showAll = false) {
             let sCount = parseInt(localStorage.getItem('HY_SEARCH_COUNT') || '0');
             localStorage.setItem('HY_SEARCH_COUNT', sCount + 1);
             updateStats();
@@ -1590,12 +1775,12 @@
             const resultsGrid = document.getElementById('resultsGrid');
             const resultsCountEl = document.getElementById('resultsCount');
 
-            if (query.length < 2) {
+            if (!showAll && query.length < 2) {
                 resultsSection.classList.add('hidden');
                 return;
             }
 
-            const results = vault.filter(m =>
+        const results = showAll ? vault : vault.filter(m =>
                 (m.name && m.name.includes(query)) ||
                 (m.id && m.id.includes(query)) ||
                 (m.nationalID && m.nationalID.toString().includes(query))
@@ -1615,9 +1800,9 @@
             }
 
             resultsGrid.innerHTML = results.map(m => `
-                <div class="registry-card glass-effect p-8 rounded-[2.5rem] border-b-8 border-heritage-gold flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300">
+                <div class="registry-card glass-effect p-8 rounded-[2.5rem] border-b-4 border-heritage-neonBlue flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300 shadow-[0_0_30px_rgba(0,242,255,0.1)] hover:shadow-[0_0_50px_rgba(0,242,255,0.2)]">
                     <div class="flex justify-between w-full items-start">
-                        <span class="text-[10px] bg-heritage-emerald text-heritage-gold px-3 py-1 rounded-full font-black tracking-widest">${m.id}</span>
+                        <span class="text-[10px] bg-heritage-neonBlue/20 text-heritage-neonBlue border border-heritage-neonBlue/30 px-3 py-1 rounded-full font-black tracking-widest">${m.id}</span>
                         <div class="flex flex-col items-end text-left">
                             <span class="text-heritage-emerald/40 text-[10px] font-black">${m.date}</span>
                             <span class="text-[10px] ${m.status === 'pending' ? 'text-orange-500' : (m.status === 'active' ? 'text-green-600' : 'text-red-600')} font-black">
@@ -1627,40 +1812,43 @@
                     </div>
 
                     <div class="flex items-center gap-4 w-full">
-                        <img src="${m.photo || 'https://ui-avatars.com/api/?name=' + m.name + '&background=064e3b&color=d4af37'}" class="w-16 h-16 rounded-2xl border-2 border-heritage-gold object-cover shadow-lg">
-                        <h3 class="text-xl font-black text-heritage-emerald leading-tight flex-grow">${m.name}</h3>
+                        <div class="relative">
+                            <div class="absolute -inset-1 bg-heritage-neonBlue blur-md opacity-0 group-hover:opacity-40 transition-opacity"></div>
+                            <img src="${m.photo || 'https://ui-avatars.com/api/?name=' + m.name + '&background=010c0a&color=00f2ff'}" class="relative w-16 h-16 rounded-2xl border border-heritage-neonBlue/30 object-cover shadow-lg">
+                        </div>
+                        <h3 class="text-xl font-black text-heritage-cream leading-tight flex-grow">${m.name}</h3>
                     </div>
 
                     <div class="w-full space-y-2 mt-2">
-                        <div class="grid grid-cols-2 gap-2 text-[8px] font-bold opacity-60 bg-heritage-emerald/5 p-2 rounded-lg">
+                        <div class="grid grid-cols-2 gap-2 text-[8px] font-bold opacity-60 bg-white/5 p-2 rounded-lg text-white">
                             <p>العمر: ${calculateAge(m.birthDate)}</p>
                             <p>الرتبة: ${m.meta?.rank || 'فرد'}</p>
                             <p>الجواز: ${m.passport ? '✅ متوفر' : '❌ نقص'}</p>
                             <p>فصيلة الدم: ${m.meta?.blood || 'غير مدرج'}</p>
                         </div>
-                        <div class="bg-heritage-gold/5 p-3 rounded-xl border border-heritage-gold/10 space-y-1">
-                            <p class="text-[8px] font-black opacity-40">رقم الهوية (محمي)</p>
-                            <p class="text-sm font-black text-heritage-emerald sensitive-blur">${m.nationalID}</p>
+                        <div class="bg-heritage-neonBlue/5 p-3 rounded-xl border border-heritage-neonBlue/10 space-y-1">
+                            <p class="text-[8px] font-black opacity-40 text-heritage-neonBlue">رقم الهوية (محمي)</p>
+                            <p class="text-sm font-black text-heritage-cream sensitive-blur">${m.nationalID}</p>
                         </div>
                     </div>
 
                     <div id="auth-section-${m.id}" class="w-full grid grid-cols-2 gap-2 mt-4">
-                        <button onclick="verifyBiometrics('${m.id}')" class="py-2 bg-heritage-emerald text-heritage-gold text-[10px] font-black rounded-lg flex items-center justify-center gap-2 hover:bg-heritage-dark transition-all">
+                        <button onclick="verifyBiometrics('${m.id}')" class="py-2 bg-heritage-neonBlue/20 text-heritage-neonBlue text-[10px] font-black rounded-lg flex items-center justify-center gap-2 hover:bg-heritage-neonBlue/30 border border-heritage-neonBlue/30 transition-all">
                             <span>☝️</span> بصمة
                         </button>
-                        <button onclick="sendOTP('${m.id}')" class="py-2 bg-heritage-gold/20 text-heritage-emerald text-[10px] font-black rounded-lg flex items-center justify-center gap-2 hover:bg-heritage-gold/30 transition-all">
+                        <button onclick="sendOTP('${m.id}')" class="py-2 bg-heritage-neonPink/20 text-heritage-neonPink text-[10px] font-black rounded-lg flex items-center justify-center gap-2 hover:bg-heritage-neonPink/30 border border-heritage-neonPink/30 transition-all">
                             <span>📱</span> رمز هاتف
                         </button>
                     </div>
 
-                    <div class="mt-auto w-full pt-4 border-t border-heritage-emerald/10 flex flex-col gap-3">
+                    <div class="mt-auto w-full pt-4 border-t border-white/10 flex flex-col gap-3">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-heritage-emerald font-black">📍 ${m.gov} | ${m.subTribe || 'عشيرة الحياني'}</span>
+                            <span class="text-sm text-heritage-neonBlue font-black opacity-80">📍 ${m.gov} | ${m.subTribe || 'عشيرة الحياني'}</span>
                             <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-bold text-heritage-gold bg-heritage-emerald px-2 py-0.5 rounded">نسب موثق</span>
+                                <span class="text-[10px] font-bold text-heritage-neonPink bg-heritage-neonPink/10 border border-heritage-neonPink/30 px-2 py-0.5 rounded">نسب موثق</span>
                             </div>
                         </div>
-                        <button onclick="window.print()" class="w-full py-2 bg-heritage-gold/10 hover:bg-heritage-gold hover:text-heritage-emerald text-heritage-gold text-xs font-black rounded-lg transition-all flex items-center justify-center gap-2">
+                        <button onclick="window.print()" class="w-full py-2 bg-white/5 hover:bg-heritage-neonBlue hover:text-black text-heritage-neonBlue text-xs font-black rounded-lg transition-all border border-heritage-neonBlue/20 flex items-center justify-center gap-2">
                             <span>تحميل شهادة التوثيق</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -1707,7 +1895,7 @@
         function updateStatusGlow(color) {
             const orb = document.getElementById('status-orb-main');
             if(!orb) return;
-            const bg = color === 'blue' ? '#3b82f6' : (color === 'green' ? '#22c55e' : '#ef4444');
+            const bg = color === 'blue' ? '#00f2ff' : (color === 'green' ? '#22c55e' : '#ff007f');
             orb.style.backgroundColor = bg;
             orb.style.boxShadow = `0 0 15px ${bg}`;
         }
@@ -1730,37 +1918,75 @@
             if(treeRenderer) return;
 
             treeScene = new THREE.Scene();
-            treeScene.background = new THREE.Color(0x022c22);
+            treeScene.background = new THREE.Color(0x010c0a);
             treeCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            treeRenderer = new THREE.WebGLRenderer({ antialias: true });
+            treeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             treeRenderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(treeRenderer.domElement);
 
-            const light = new THREE.PointLight(0xd4af37, 1, 100);
+            const light = new THREE.PointLight(0x00f2ff, 2, 100);
             light.position.set(10, 10, 10);
             treeScene.add(light);
-            treeScene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            treeScene.add(new THREE.AmbientLight(0xbc13fe, 0.3));
 
-            // Create Neon Nodes for vault members
             const group = new THREE.Group();
+
+            // Create Helix DNA Trunk
+            const helixPoints = [];
+            const helixPoints2 = [];
+            for (let i = 0; i < 100; i++) {
+                const angle = i * 0.5;
+                const radius = 2;
+                helixPoints.push(new THREE.Vector3(Math.cos(angle) * radius, i * 0.4 - 20, Math.sin(angle) * radius));
+                helixPoints2.push(new THREE.Vector3(Math.cos(angle + Math.PI) * radius, i * 0.4 - 20, Math.sin(angle + Math.PI) * radius));
+            }
+
+            const helixGeo = new THREE.BufferGeometry().setFromPoints(helixPoints);
+            const helixGeo2 = new THREE.BufferGeometry().setFromPoints(helixPoints2);
+            const helixMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.5 });
+            const helixMat2 = new THREE.LineBasicMaterial({ color: 0xff007f, transparent: true, opacity: 0.5 });
+
+            group.add(new THREE.Line(helixGeo, helixMat));
+            group.add(new THREE.Line(helixGeo2, helixMat2));
+
+            // Horizontal connections
+            for(let i=0; i<100; i+=2) {
+                const geo = new THREE.BufferGeometry().setFromPoints([helixPoints[i], helixPoints2[i]]);
+                const mat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
+                group.add(new THREE.Line(geo, mat));
+            }
+
+            // Create Neon Nodes for members
             vault.forEach((m, i) => {
-                const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 5 + Math.random() * 10;
+                const height = (i / Math.max(1, vault.length)) * 40 - 20;
+
+                const geometry = new THREE.SphereGeometry(0.4, 16, 16);
                 const material = new THREE.MeshStandardMaterial({
-                    color: 0xd4af37,
-                    emissive: 0xd4af37,
-                    emissiveIntensity: 0.5
+                    color: i % 2 === 0 ? 0x00f2ff : 0xff007f,
+                    emissive: i % 2 === 0 ? 0x00f2ff : 0xff007f,
+                    emissiveIntensity: 1
                 });
                 const node = new THREE.Mesh(geometry, material);
-                node.position.set(Math.random() * 20 - 10, i * 2, Math.random() * 20 - 10);
+                node.position.set(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
                 group.add(node);
-            });
-            treeScene.add(group);
 
-            treeCamera.position.z = 25;
+                // Branch to trunk
+                const branchGeo = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, height, 0),
+                    node.position
+                ]);
+                const branchMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 });
+                group.add(new THREE.Line(branchGeo, branchMat));
+            });
+
+            treeScene.add(group);
+            treeCamera.position.z = 40;
 
             function animate() {
                 requestAnimationFrame(animate);
-                group.rotation.y += 0.005;
+                group.rotation.y += 0.003;
                 treeRenderer.render(treeScene, treeCamera);
             }
             animate();
