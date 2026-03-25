@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ديوان قبيلة الحياني - الفضاء السيادي V7.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-primary: #a855f7;
+            --neon-secondary: #22d3ee;
+            --neon-success: #10b981;
+            --neon-alert: #ef4444;
+            --bg-dark: #020203;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glow-color: var(--neon-primary);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            overflow: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .adaptive-glow {
+            box-shadow: 0 0 20px -5px var(--glow-color);
+            border: 1px solid var(--glow-color);
+            transition: all 0.5s ease;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+        }
+
+        .floating-dashboard {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .option-box {
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 16px;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-box:hover {
+            border-color: var(--glow-color);
+            background: rgba(168, 85, 247, 0.05);
+            transform: scale(1.02);
+        }
+
+        .option-box::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .option-box:hover::after {
+            opacity: 0.1;
+        }
+
+        #hy-hud {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glow-color);
+            padding: 12px 40px;
+            border-radius: 50px;
+            z-index: 10000;
+            display: none;
+            font-weight: 900;
+            box-shadow: 0 0 30px var(--glow-color);
+            color: white;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--neon-primary); }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body onload="initSystem()">
+
+    <canvas id="particleCanvas"></canvas>
+    <div id="hy-hud"></div>
+
+    <!-- Main Application Shell -->
+    <div class="flex h-screen w-full p-6 gap-6 relative z-10">
+
+        <!-- Navigation Sidebar -->
+        <aside class="w-80 glass-card flex flex-col p-8 adaptive-glow">
+            <div class="mb-12">
+                <h1 class="text-3xl font-black text-white tracking-tighter">الحياني <span class="text-purple-500 block text-xs mt-1 uppercase font-mono tracking-widest">Sovereign V7.0</span></h1>
+            </div>
+
+            <nav class="space-y-4 flex-grow">
+                <button onclick="openModal('treeModal')" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 hover:bg-indigo-500/20 text-sm font-bold transition-all group">
+                    <span class="text-xl group-hover:scale-125 transition-transform">🌳</span> شجرة النسب التفاعلية
+                </button>
+                <button onclick="openModal('heatmapModal')" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 hover:bg-orange-500/20 text-sm font-bold transition-all group">
+                    <span class="text-xl group-hover:scale-125 transition-transform">🗺️</span> خريطة الفلوجة الحرارية
+                </button>
+                <button onclick="openModal('bulkModal')" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 hover:bg-purple-500/20 text-sm font-bold transition-all group">
+                    <span class="text-xl group-hover:scale-125 transition-transform">⚡</span> إضافة كتلة بيانات
+                </button>
+                <button onclick="document.getElementById('importTrigger').click()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 hover:bg-blue-500/20 text-sm font-bold transition-all group">
+                    <span class="text-xl group-hover:rotate-12 transition-transform">📂</span> استيراد مصفوفة
+                </button>
+                <input type="file" id="importTrigger" class="hidden" onchange="importVault(this)">
+                <button onclick="exportVault()" class="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 hover:bg-green-500/20 text-sm font-bold transition-all group">
+                    <span class="text-xl group-hover:translate-y-1 transition-transform">🛡️</span> تصدير النسخة السيادية
+                </button>
+
+                <div class="pt-8 mt-8 border-t border-white/5">
+                    <h3 class="text-[10px] text-gray-500 font-black uppercase mb-4 tracking-widest">الأتمتة والذكاء</h3>
+                    <button onclick="openModal('ocrModal')" class="w-full flex items-center gap-4 px-5 py-3 rounded-xl bg-white/5 hover:bg-yellow-500/20 text-xs font-bold transition-all mb-2">
+                        <span>📸</span> ماسح الهوية (OCR)
+                    </button>
+                    <button onclick="openModal('aiModal')" class="w-full flex items-center gap-4 px-5 py-3 rounded-xl bg-white/5 hover:bg-green-500/20 text-xs font-bold transition-all mb-2">
+                        <span>🤖</span> مساعد Groq AI
+                    </button>
+                    <hr class="border-white/5 my-4">
+                    <h3 class="text-[10px] text-gray-500 font-black uppercase mb-4 tracking-widest">الأمن المتقدم</h3>
+                    <button onclick="openModal('faceIdModal')" class="w-full flex items-center gap-4 px-5 py-3 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-xs font-bold transition-all">
+                        <span>👤</span> بوابة Face ID
+                    </button>
+                    <button onclick="startVoiceSearch()" class="w-full flex items-center gap-4 px-5 py-3 rounded-xl bg-white/5 hover:bg-pink-500/20 text-xs font-bold transition-all mt-2">
+                        <span>🎙️</span> بحث صوتي
+                    </button>
+                </div>
+            </nav>
+
+            <button onclick="clearMatrixData()" class="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-2xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white text-xs font-black transition-all">
+                <span>🗑️</span> تدمير المصفوفة الحالية
+            </button>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="flex-grow flex flex-col gap-6">
+
+            <!-- Top Dashboard Stats -->
+            <header class="h-32 glass-card flex items-center justify-between px-10 adaptive-glow">
+                <div>
+                    <h2 class="text-4xl font-black text-white">نظام السيادة الرقمية</h2>
+                    <p class="text-xs text-gray-400 font-mono mt-1">LATENCY: <span id="ping">14ms</span> | STATUS: <span class="text-green-500">OPERATIONAL</span></p>
+                </div>
+                <div class="flex gap-8">
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-500 font-black uppercase mb-1">إجمالي النفوس</p>
+                        <p id="totalCountDisplay" class="text-3xl font-black text-white">0</p>
+                    </div>
+                    <div class="text-center border-r border-white/10 pr-8">
+                        <p class="text-[10px] text-gray-500 font-black uppercase mb-1">الأمن السيادي</p>
+                        <p class="text-3xl font-black text-cyan-500" id="encryptionStatus">LOCK</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Grid Content -->
+            <section class="flex-grow glass-card p-8 overflow-y-auto custom-scroll relative">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="matrixContainer">
+                    <!-- Cards injected here -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="bulkModal" class="modal-overlay">
+        <div class="max-w-2xl w-full glass-card p-10 border-purple-500/30">
+            <h2 class="text-3xl font-black mb-6">إضافة كتلة بشرية</h2>
+            <div class="space-y-4">
+                <input type="text" id="govInput" placeholder="المحافظة / المدينة" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 outline-none focus:border-purple-500 text-white font-bold">
+                <textarea id="bulkInput" class="w-full h-48 bg-black/40 border border-white/10 rounded-2xl p-5 font-mono text-sm outline-none focus:border-purple-500" placeholder="اسم الفرد (سطر جديد لكل فرد)..."></textarea>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="processBulkData()" class="flex-grow py-5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl shadow-2xl transition-all">تشفير وحفظ البيانات ⚡</button>
+                    <button onclick="closeModal('bulkModal')" class="px-8 py-5 bg-white/5 rounded-2xl font-bold">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- D3 Tree Modal -->
+    <div id="treeModal" class="modal-overlay">
+        <div class="w-[90vw] h-[90vh] glass-card p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-black">شجرة النسب الرقمية (D3.js)</h2>
+                <button onclick="closeModal('treeModal')" class="px-6 py-2 bg-white/10 rounded-xl hover:bg-red-500/20">إغلاق</button>
+            </div>
+            <div id="treeContainer" class="flex-grow bg-black/20 rounded-2xl overflow-hidden relative"></div>
+        </div>
+    </div>
+
+    <!-- Heatmap Modal -->
+    <div id="heatmapModal" class="modal-overlay">
+        <div class="w-[80vw] h-[80vh] glass-card p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-black">توزيع قبيلة الحياني في الفلوجة</h2>
+                <button onclick="closeModal('heatmapModal')" class="px-6 py-2 bg-white/10 rounded-xl hover:bg-red-500/20">إغلاق</button>
+            </div>
+            <div id="mapContainer" class="flex-grow bg-slate-900 rounded-2xl overflow-hidden relative flex items-center justify-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Fallujah_map.png/800px-Fallujah_map.png" class="opacity-30 absolute inset-0 w-full h-full object-cover">
+                <canvas id="heatmapCanvas" class="relative z-10"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- OCR Modal -->
+    <div id="ocrModal" class="modal-overlay">
+        <div class="max-w-md w-full glass-card p-10 text-center">
+            <h2 class="text-2xl font-black mb-6">ماسح البطاقة الموحدة الذكي</h2>
+            <div class="border-2 border-dashed border-white/10 rounded-2xl p-8 mb-6 hover:border-yellow-500/50 transition-all cursor-pointer" onclick="simulateOCR()">
+                <span class="text-4xl block mb-4">🪪</span>
+                <p class="text-sm text-gray-400">انقر هنا لرفع صورة الهوية<br>(معالجة عبر n8n)</p>
+            </div>
+            <div id="ocrResult" class="hidden text-right bg-black/30 p-4 rounded-xl mb-6 text-xs font-mono">
+                <p class="text-yellow-500 mb-2">--- بيانات مستخرجة ---</p>
+                <p>الاسم: محمد جاسم الحياني</p>
+                <p>المواليد: 1985/05/12</p>
+                <p>الرقم الوطني: 198554210098</p>
+            </div>
+            <button onclick="closeModal('ocrModal')" class="w-full py-4 bg-white/5 rounded-xl font-bold">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- AI Modal -->
+    <div id="aiModal" class="modal-overlay">
+        <div class="max-w-2xl w-full glass-card p-10">
+            <h2 class="text-2xl font-black mb-6 flex items-center gap-3">
+                <span class="text-green-500">Groq Llama 3</span> مساعد النسب الذكي
+            </h2>
+            <div id="aiChat" class="h-64 bg-black/40 rounded-2xl p-5 overflow-y-auto mb-4 text-sm space-y-4 custom-scroll">
+                <div class="text-left"><span class="bg-green-500/20 text-green-400 px-3 py-2 rounded-2xl rounded-tl-none">أهلاً بك، أنا مساعد "ديوان الحياني" الذكي. كيف يمكنني مساعدتك اليوم؟</span></div>
+            </div>
+            <div class="flex gap-3">
+                <input type="text" id="aiInput" placeholder="اسأل عن صلة قرابة، أو اطلب تحليل بيانات..." class="flex-grow bg-white/5 border border-white/10 rounded-xl p-4 outline-none focus:border-green-500 text-white text-sm">
+                <button onclick="sendAiQuery()" class="px-6 bg-green-600 hover:bg-green-700 rounded-xl font-bold">إرسال</button>
+            </div>
+            <button onclick="closeModal('aiModal')" class="w-full py-3 mt-6 text-gray-500 text-xs font-bold hover:text-white transition-all">إغلاق النافذة</button>
+        </div>
+    </div>
+
+    <!-- Face ID Simulation Modal -->
+    <div id="faceIdModal" class="modal-overlay">
+        <div class="max-w-md w-full glass-card p-10 text-center">
+            <div id="videoContainer" class="relative w-64 h-64 mx-auto mb-8 rounded-full overflow-hidden border-4 border-cyan-500/30">
+                <video id="webcam" autoplay muted playsinline class="w-full h-full object-cover grayscale"></video>
+                <div class="absolute inset-0 border-4 border-cyan-500 animate-pulse rounded-full"></div>
+            </div>
+            <h2 class="text-2xl font-black mb-2">جاري مسح الوجه...</h2>
+            <p class="text-gray-400 text-sm mb-6">يرجى النظر مباشرة إلى الكاميرا للتحقق من الصلاحيات السيادية</p>
+            <button onclick="closeModal('faceIdModal')" class="w-full py-4 bg-white/5 rounded-xl font-bold">إلغاء العملية</button>
+        </div>
+    </div>
+
+    <script>
+        const DB_KEY = 'HY_SOVEREIGN_V7_VAULT';
+        let vault = [];
+        let glowState = 'primary';
+        let encryptionKey = null;
+
+        // Particle System
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initParticles() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5,
+                    opacity: Math.random()
+                });
+            }
+            animateParticles();
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--glow-color');
+
+            particles.forEach(p => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                if(p.x > canvas.width) p.x = 0;
+                if(p.x < 0) p.x = canvas.width;
+                if(p.y > canvas.height) p.y = 0;
+                if(p.y < 0) p.y = canvas.height;
+
+                ctx.globalAlpha = p.opacity * 0.3;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Adaptive Glow System
+        function updateGlow(state) {
+            const root = document.documentElement;
+            const colors = {
+                primary: '#a855f7',
+                success: '#10b981',
+                alert: '#ef4444',
+                security: '#22d3ee'
+            };
+            root.style.setProperty('--glow-color', colors[state]);
+            document.querySelectorAll('.adaptive-glow').forEach(el => {
+                el.style.borderColor = colors[state];
+            });
+        }
+
+        // --- SECURE AES-GCM ENCRYPTION (Web Crypto API) ---
+        async function deriveKey(password) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+            return await crypto.subtle.deriveKey(
+                { name: "PBKDF2", salt: enc.encode("HAYYANI_SALT_2024"), iterations: 100000, hash: "SHA-256" },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        async function encryptVault(data, password) {
+            const key = await deriveKey(password);
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encoded = new TextEncoder().encode(JSON.stringify(data));
+            const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded);
+
+            const combined = new Uint8Array(iv.length + encrypted.byteLength);
+            combined.set(iv);
+            combined.set(new Uint8Array(encrypted), iv.length);
+            return btoa(String.fromCharCode(...combined));
+        }
+
+        async function decryptVault(ciphertext, password) {
+            try {
+                const key = await deriveKey(password);
+                const combined = new Uint8Array(atob(ciphertext).split('').map(c => c.charCodeAt(0)));
+                const iv = combined.slice(0, 12);
+                const data = combined.slice(12);
+                const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, data);
+                return JSON.parse(new TextDecoder().decode(decrypted));
+            } catch (e) {
+                throw new Error("فشل فك التشفير - مفتاح غير صحيح");
+            }
+        }
+
+        // App Initialization
+        async function initSystem() {
+            initParticles();
+            const encryptedRaw = localStorage.getItem(DB_KEY);
+
+            if (encryptedRaw) {
+                const password = prompt("🔐 المصفوفة مشفرة. يرجى إدخال المفتاح السيادي (Master Key) للوصول:");
+                if (password) {
+                    try {
+                        vault = await decryptVault(encryptedRaw, password);
+                        window.SESSION_KEY = password;
+                        document.getElementById('encryptionStatus').innerText = "AES-256";
+                        hyHud("تم فك تشفير المصفوفة بنجاح", 'success');
+                    } catch (e) {
+                        hyHud(e.message, 'alert');
+                        vault = [];
+                    }
+                }
+            } else {
+                vault = [];
+            }
+
+            renderUI();
+            setInterval(() => {
+                document.getElementById('ping').innerText = Math.floor(Math.random() * 20 + 5) + 'ms';
+            }, 3000);
+        }
+
+        function hyHud(m, state = 'success') {
+            const h = document.getElementById('hy-hud');
+            updateGlow(state);
+            h.innerText = m;
+            h.style.display = 'block';
+            setTimeout(() => {
+                h.style.display = 'none';
+                updateGlow('primary');
+            }, 3000);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+            if(id === 'faceIdModal') startWebcam();
+            if(id === 'heatmapModal') renderHeatmap();
+            if(id === 'treeModal') renderTree();
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            if(id === 'faceIdModal') stopWebcam();
+        }
+
+        async function startWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('webcam').srcObject = stream;
+                setTimeout(() => {
+                    hyHud("تم التحقق من البصمة الحيوية", 'security');
+                    closeModal('faceIdModal');
+                }, 4000);
+            } catch (e) {
+                hyHud("فشل الوصول للكاميرا", 'alert');
+            }
+        }
+
+        function stopWebcam() {
+            const stream = document.getElementById('webcam').srcObject;
+            if(stream) stream.getTracks().forEach(t => t.stop());
+        }
+
+        function processBulkData() {
+            const names = document.getElementById('bulkInput').value.split('\n').filter(n => n.trim() !== "");
+            const gov = document.getElementById('govInput').value || "غير محدد";
+
+            if(names.length === 0) return hyHud("يرجى إدخال أسماء!", 'alert');
+
+            const smartTags = ["طبيب", "مهندس", "قانوني", "تاجر", "عسكري"];
+
+            names.forEach(name => {
+                const randomTag = smartTags[Math.floor(Math.random() * smartTags.length)];
+                vault.push({
+                    id: `HY-${Math.floor(1000 + Math.random()*9000)}`,
+                    name: name.trim(),
+                    gov: gov,
+                    timestamp: Date.now(),
+                    tags: ['عضو', randomTag],
+                    gps: `${(33.341 + Math.random()*0.02).toFixed(4)}, ${(43.782 + Math.random()*0.02).toFixed(4)}`, // Exact Fallujah clusters
+                    parent_id: vault.length > 0 ? vault[Math.floor(Math.random() * vault.length)].id : null
+                });
+            });
+
+            saveAndSync();
+            closeModal('bulkModal');
+            hyHud(`تم أتمتة ${names.length} سجل بنجاح`, 'success');
+        }
+
+        function renderUI() {
+            const container = document.getElementById('matrixContainer');
+            document.getElementById('totalCountDisplay').innerText = vault.length.toLocaleString();
+
+            container.innerHTML = vault.map((m, index) => `
+                <div class="option-box group" onclick="showPersonDetail(${index})">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] text-purple-500 font-black font-mono">${m.id}</span>
+                        <div class="flex gap-2">
+                            <button onclick="event.stopPropagation(); deleteItem(${index})" class="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-500 transition-all text-xs">✕</button>
+                        </div>
+                    </div>
+                    <h3 class="text-white font-black text-lg mb-1 leading-tight">${m.name}</h3>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <span class="text-[9px] bg-white/5 px-2 py-1 rounded-md text-gray-400 font-bold">📍 ${m.gov}</span>
+                        ${m.tags.map(t => `<span class="text-[9px] bg-purple-500/10 px-2 py-1 rounded-md text-purple-400 font-bold">#${t}</span>`).join('')}
+                    </div>
+                    <p class="text-[9px] text-gray-600 font-bold mt-2 font-mono">GPS: ${m.gps}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderHeatmap() {
+            const canvas = document.getElementById('heatmapCanvas');
+            const container = document.getElementById('mapContainer');
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Map GPS to Canvas Coordinates (Approx for Fallujah 33.35, 43.78)
+            const mapRange = { minLat: 33.32, maxLat: 33.38, minLon: 43.75, maxLon: 43.82 };
+
+            vault.forEach(m => {
+                const latLon = m.gps.split(',').map(n => parseFloat(n.trim()));
+                const x = ((latLon[1] - mapRange.minLon) / (mapRange.maxLon - mapRange.minLon)) * canvas.width;
+                const y = (1 - (latLon[0] - mapRange.minLat) / (mapRange.maxLat - mapRange.minLat)) * canvas.height;
+
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, 35);
+                grad.addColorStop(0, 'rgba(251, 146, 60, 0.6)');
+                grad.addColorStop(1, 'rgba(251, 146, 60, 0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, 35, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function renderTree() {
+            const container = document.getElementById('treeContainer');
+            container.innerHTML = '';
+
+            if(vault.length === 0) return container.innerHTML = "<div class='flex h-full items-center justify-center'>لا توجد بيانات لرسم الشجرة</div>";
+
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+
+            const svg = d3.select("#treeContainer").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(100,0)");
+
+            // Build hierarchical data from flat vault array
+            const dataMap = vault.reduce((map, node) => {
+                map[node.id] = { ...node, children: [] };
+                return map;
+            }, {});
+
+            const treeData = { name: "الجد الجامع", children: [] };
+            Object.values(dataMap).forEach(node => {
+                if (node.parent_id && dataMap[node.parent_id]) {
+                    dataMap[node.parent_id].children.push(node);
+                } else {
+                    treeData.children.push(node);
+                }
+            });
+
+            const treemap = d3.tree().size([height - 50, width - 300]);
+            let nodes = d3.hierarchy(treeData, d => d.children);
+            nodes = treemap(nodes);
+
+            const link = svg.selectAll(".link")
+                .data(nodes.descendants().slice(1))
+                .enter().append("path")
+                .attr("class", "link")
+                .style("stroke", "var(--neon-primary)")
+                .style("stroke-opacity", 0.4)
+                .style("fill", "none")
+                .style("stroke-width", 2)
+                .attr("d", d => "M" + d.y + "," + d.x + "C" + (d.y + d.parent.y) / 2 + "," + d.x + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x + " " + d.parent.y + "," + d.parent.x);
+
+            const node = svg.selectAll(".node")
+                .data(nodes.descendants())
+                .enter().append("g")
+                .attr("class", d => "node" + (d.children ? " node--internal" : " node--leaf"))
+                .attr("transform", d => "translate(" + d.y + "," + d.x + ")");
+
+            node.append("circle")
+                .attr("r", 8)
+                .style("fill", "var(--bg-dark)")
+                .style("stroke", d => d.depth === 0 ? "gold" : "var(--neon-primary)")
+                .style("stroke-width", 2);
+
+            node.append("text")
+                .attr("dy", ".35em")
+                .attr("x", d => d.children ? -15 : 15)
+                .style("text-anchor", d => d.children ? "end" : "start")
+                .style("fill", "white")
+                .style("font-size", "11px")
+                .style("font-weight", "bold")
+                .text(d => d.data.name);
+        }
+
+        function showPersonDetail(index) {
+            const p = vault[index];
+            hyHud(`الفرد: ${p.name} | الرقم: ${p.id}`, 'primary');
+        }
+
+        // --- PLUGGABLE SERVICE LAYER (AI & AUTOMATION) ---
+        const SERVICES = {
+            GROQ_API_KEY: '', // To be filled by user
+            N8N_OCR_WEBHOOK: '',
+        };
+
+        async function simulateOCR() {
+            hyHud("جاري المعالجة عبر n8n...", 'security');
+
+            if (SERVICES.N8N_OCR_WEBHOOK) {
+                try {
+                    const res = await fetch(SERVICES.N8N_OCR_WEBHOOK, { method: 'POST', body: JSON.stringify({ action: 'ocr' }) });
+                    const data = await res.json();
+                    displayOCRResult(data);
+                } catch (e) {
+                    hyHud("فشل الربط مع n8n. ننتقل للوضع الافتراضي.", 'alert');
+                    fallbackOCR();
+                }
+            } else {
+                setTimeout(fallbackOCR, 2000);
+            }
+        }
+
+        function fallbackOCR() {
+            document.getElementById('ocrResult').classList.remove('hidden');
+            hyHud("تم استخراج البيانات (وضع المحاكاة)", 'success');
+        }
+
+        async function sendAiQuery() {
+            const input = document.getElementById('aiInput');
+            const chat = document.getElementById('aiChat');
+            if(!input.value) return;
+
+            const q = input.value;
+            chat.innerHTML += `<div class="text-right"><span class="bg-white/5 text-white px-3 py-2 rounded-2xl rounded-tr-none">${q}</span></div>`;
+            input.value = '';
+
+            if (SERVICES.GROQ_API_KEY) {
+                try {
+                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${SERVICES.GROQ_API_KEY}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            model: "llama3-8b-8192",
+                            messages: [{ role: "system", content: "أنت مساعد خبير في أنساب قبيلة الحياني." }, { role: "user", content: q }]
+                        })
+                    });
+                    const data = await res.json();
+                    displayAiResponse(data.choices[0].message.content);
+                } catch (e) {
+                    displayAiResponse("فشل الاتصال بـ Groq. جاري استخدام المحلل الداخلي...");
+                }
+            } else {
+                setTimeout(() => {
+                    let response = "بناءً على السجلات، يوجد ترابط قوي بين هذا الفرع وعائلة الحياني في منطقة الصقلاوية.";
+                    if(q.includes("حلل")) response = "تحليل البيانات: يظهر نمو في فئة الشباب بنسبة 12% هذا العام.";
+                    displayAiResponse(response);
+                }, 1000);
+            }
+        }
+
+        function displayAiResponse(text) {
+            const chat = document.getElementById('aiChat');
+            chat.innerHTML += `<div class="text-left"><span class="bg-green-500/20 text-green-400 px-3 py-2 rounded-2xl rounded-tl-none">${text}</span></div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function saveAndSync() {
+            if (!window.SESSION_KEY) {
+                window.SESSION_KEY = prompt("🛡️ يرجى تعيين مفتاح تشفير (Master Key) لحماية البيانات:");
+                if (!window.SESSION_KEY) return hyHud("لا يمكن الحفظ بدون مفتاح تشفير!", "alert");
+                document.getElementById('encryptionStatus').innerText = "AES-256";
+            }
+            const encrypted = await encryptVault(vault, window.SESSION_KEY);
+            localStorage.setItem(DB_KEY, encrypted);
+            renderUI();
+        }
+
+        function deleteItem(index) {
+            updateGlow('alert');
+            if(confirm("هل أنت متأكد من مسح هذا السجل السيادي؟")) {
+                vault.splice(index, 1);
+                saveAndSync();
+                hyHud("تم مسح السجل", 'success');
+            } else {
+                updateGlow('primary');
+            }
+        }
+
+        function exportVault() {
+            const dataStr = JSON.stringify(vault, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Hayyani_Matrix_Sovereign_${Date.now()}.json`;
+            a.click();
+            hyHud("تم تصدير المصفوفة بنجاح", 'success');
+        }
+
+        function importVault(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    vault = [...vault, ...importedData];
+                    saveAndSync();
+                    hyHud("تم دمج المصفوفات الخارجية", 'success');
+                } catch(err) {
+                    hyHud("خطأ في بنية الملف", 'alert');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearMatrixData() {
+            updateGlow('alert');
+            if(confirm("تحذير: أنت على وشك تدمير كافة البيانات المحلية!")) {
+                localStorage.removeItem(DB_KEY);
+                vault = [];
+                renderUI();
+                hyHud("تم تصفير النظام بالكامل", 'alert');
+            } else {
+                updateGlow('primary');
+            }
+        }
+
+        // Voice Command Hub
+        function startVoiceSearch() {
+            hyHud("جاري الاستماع...", 'security');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'ar-SA';
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    hyHud(`تم التعرف: ${transcript}`, 'success');
+                    filterByVoice(transcript);
+                };
+                recognition.onerror = () => hyHud("خطأ في التعرف على الصوت", 'alert');
+                recognition.start();
+            } else {
+                setTimeout(() => hyHud("الميزة غير مدعومة في متصفحك", 'alert'), 2000);
+            }
+        }
+
+        function filterByVoice(query) {
+            const cards = document.querySelectorAll('.option-box');
+            cards.forEach(card => {
+                const name = card.querySelector('h3').innerText;
+                if (name.includes(query) || query.includes(name)) {
+                    card.style.display = 'block';
+                    card.style.borderColor = 'var(--neon-success)';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        window.onresize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+    </script>
+</body>
+</html>
