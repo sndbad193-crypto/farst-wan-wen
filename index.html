@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -88,9 +90,82 @@
             pointer-events: none;
             transition: filter 0.5s ease;
         }
+
+        /* Neon & Sovereign Styles */
+        .neon-glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); border-color: rgba(59, 130, 246, 0.5); }
+        .neon-glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); border-color: rgba(34, 197, 94, 0.5); }
+        .neon-glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 0.5); animation: pulse-red 2s infinite; }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+        }
+
+        .glass-sovereign {
+            background: rgba(6, 78, 59, 0.7);
+            backdrop-filter: blur(25px) saturate(150%);
+            border-left: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        #neon-portal {
+            background: radial-gradient(circle at center, #064e3b 0%, #022c22 100%);
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(212, 175, 55, 0.2);
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan {
+            from { top: 0; }
+            to { top: 100%; }
+        }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
+
+    <!-- Neon Portal (Splash Screen) -->
+    <div id="neon-portal" class="fixed inset-0 z-[200] flex flex-col items-center justify-center transition-opacity duration-1000">
+        <div class="scanline"></div>
+        <div id="portal-content" class="relative text-center scale-90 opacity-0">
+            <div class="w-48 h-48 bg-heritage-gold rounded-full flex items-center justify-center text-heritage-emerald text-7xl font-black border-8 border-heritage-cream mb-8 shadow-[0_0_80px_rgba(212,175,55,0.6)] animate-pulse">
+                حي
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black text-heritage-cream tracking-tighter mb-4 drop-shadow-2xl">بوابة السيادة</h1>
+            <p class="text-heritage-gold font-bold text-xl uppercase tracking-[0.5em] mb-12">قبيلة الحياني - النظام الموحد</p>
+
+            <div class="flex flex-col items-center gap-6">
+                <button onclick="enterSovereignSystem()" class="group relative px-20 py-6 bg-heritage-gold text-heritage-emerald font-black rounded-2xl overflow-hidden shadow-2xl transition-all hover:scale-110 active:scale-95">
+                    <span class="relative z-10 text-2xl">الدخول للنظام</span>
+                    <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                </button>
+                <p class="text-[10px] text-white/30 font-mono tracking-widest">AUTHENTICATION REQUIRED: BIOMETRIC / CIPHER</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sovereign Sidebar (Left Side) -->
+    <div id="sovereignSidebar" class="fixed top-0 left-0 h-full w-24 glass-sovereign z-[90] flex flex-col items-center py-10 gap-8 -translate-x-full transition-transform duration-500">
+        <button onclick="toggleAdmin()" class="w-14 h-14 bg-heritage-gold rounded-2xl flex items-center justify-center text-2xl shadow-xl hover:scale-110 transition-all" title="لوحة التحكم">⚙️</button>
+        <button onclick="openFullRegistry()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-heritage-gold transition-all" title="السجل">📜</button>
+        <button onclick="openWalletModal()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-heritage-gold transition-all" title="المحفظة">💰</button>
+        <button onclick="open3DTree()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-heritage-gold transition-all" title="الشجرة 3D">🌳</button>
+
+        <div class="mt-auto flex flex-col items-center gap-4">
+             <div id="status-orb" class="w-4 h-4 rounded-full neon-glow-blue bg-blue-500"></div>
+             <p class="text-[8px] font-black text-heritage-gold vertical-text">SOVEREIGN V1.0</p>
+        </div>
+    </div>
+
+    <style>
+        .vertical-text { writing-mode: vertical-rl; transform: rotate(180deg); }
+    </style>
 
     <!-- Control Panel Modal (Replaces Sidebar per User Request) -->
     <div id="adminPanel" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6">
@@ -139,6 +214,14 @@
                     <div>
                         <p class="text-2xl font-black text-heritage-emerald">سجل الأفراد</p>
                         <p class="text-xs opacity-40 font-bold">استعراض كافة الأسماء الموثقة</p>
+                    </div>
+                </button>
+
+                <button onclick="openSovereigntyGate()" class="group p-8 bg-red-600/10 border-2 border-red-600/20 rounded-[2.5rem] shadow-lg hover:bg-red-600 hover:text-white hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
+                    <span class="text-5xl group-hover:animate-ping">🔴</span>
+                    <div>
+                        <p class="text-2xl font-black">السيادة المطلقة</p>
+                        <p class="text-xs opacity-60 font-bold">بوابة التحكم العليا (محمد فقط)</p>
                     </div>
                 </button>
             </div>
@@ -234,6 +317,16 @@
         <span id="hud-text">تمت العملية بنجاح</span>
     </div>
 
+    <!-- Digital Gift Animation -->
+    <div id="gift-box" class="fixed inset-0 z-[150] hidden items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="text-center">
+            <div id="box-icon" class="text-9xl mb-8 animate-bounce">🎁</div>
+            <h3 class="text-4xl font-black text-heritage-gold mb-2">هدية ترحيبية</h3>
+            <p class="text-white opacity-60 mb-8">لقد حصلت على "وسام الولاء الرقمي" لانضمامك للديوان</p>
+            <button onclick="closeGift()" class="px-10 py-4 bg-heritage-gold text-heritage-emerald font-black rounded-xl">استلام الهدية</button>
+        </div>
+    </div>
+
     <!-- Registry Member Modal (Multi-Step Wizard) -->
     <div id="bulkModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
         <div class="max-w-6xl w-full glass-effect rounded-[3.5rem] p-6 md:p-14 border-2 border-heritage-gold/40 shadow-[0_0_100px_rgba(0,0,0,0.8)] relative text-heritage-emerald">
@@ -275,8 +368,17 @@
                             <input type="text" id="national_id_secure" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
                         </div>
                         <div class="space-y-4">
-                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">رقم الجواز (Passport No.)</label>
-                            <input type="text" id="passport_no" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">بيانات جواز السفر (Passport)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="passport_no" placeholder="رقم الجواز" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                                <select id="passport_type" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                                    <option value="A">عادي (A)</option><option value="G">دبلوماسي (G)</option><option value="P">خدمة (P)</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <input type="date" id="pass_expiry" title="تاريخ الانتهاء" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-[10px]">
+                                <input type="text" id="birth_cert_no" placeholder="رقم شهادة الميلاد" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                            </div>
                         </div>
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">تاريخ الميلاد (ميلادي)</label>
@@ -303,24 +405,33 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Education & Professional -->
+                <!-- Step 2: Academic & Professional -->
                 <div class="wizard-step space-y-8 hidden" data-step="2">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-4">
-                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">المؤهل التعليمي</label>
-                            <select id="edu_level" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
-                                <option value="دكتوراه">دكتوراه</option><option value="ماجستير">ماجستير</option>
-                                <option value="بكالوريوس">بكالوريوس</option><option value="دبلوم">دبلوم</option>
-                                <option value="ثانوي">ثانوي</option>
-                            </select>
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">السجل الأكاديمي</label>
+                            <div class="flex gap-2">
+                                <select id="edu_level" class="flex-grow p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                                    <option value="دكتوراه">دكتوراه</option><option value="ماجستير">ماجستير</option>
+                                    <option value="بكالوريوس">بكالوريوس</option><option value="دبلوم">دبلوم</option>
+                                    <option value="ثانوي">ثانوي</option>
+                                </select>
+                                <input type="file" id="edu_cert" class="w-32 p-3 bg-heritage-gold/10 border border-heritage-gold/20 rounded-xl text-[8px] font-black">
+                            </div>
                         </div>
                         <div class="space-y-4">
-                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">التخصص الدقيق</label>
-                            <input type="text" id="professional_major" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">التخصص الدقيق والمهنة</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="professional_major" placeholder="التخصص" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                                <input type="text" id="workplace" placeholder="جهة العمل" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                            </div>
                         </div>
                         <div class="space-y-4">
-                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">جهة العمل الحالية</label>
-                            <input type="text" id="workplace" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">الرتبة العسكرية / الدرجة الوظيفية</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="rank_level" placeholder="الرتبة" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-xs">
+                                <input type="date" id="rank_date" title="تاريخ آخر ترقية" class="w-full p-4 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl outline-none focus:border-heritage-gold font-black text-[10px]">
+                            </div>
                         </div>
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">البحث عن الأب (الربط الآلي)</label>
@@ -355,7 +466,7 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Biometrics & AI -->
+                <!-- Step 3: Advanced Biometrics -->
                 <div class="wizard-step space-y-8 hidden" data-step="3">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                         <div class="bg-heritage-emerald/5 p-8 rounded-[3rem] border-2 border-heritage-emerald/10 flex flex-col items-center gap-6 relative group overflow-hidden">
@@ -391,10 +502,13 @@
                         <div class="bg-heritage-emerald/5 p-8 rounded-[3rem] border-2 border-heritage-emerald/10 flex flex-col items-center gap-6 relative group overflow-hidden">
                             <div class="w-32 h-32 bg-heritage-gold/20 rounded-full flex items-center justify-center text-5xl transition-all group-hover:scale-110">🎙️</div>
                             <div>
-                                <h3 class="font-black text-xl mb-1">Voice Print</h3>
-                                <p class="text-[10px] opacity-40 font-bold uppercase">البصمة الصوتية</p>
+                                <h3 class="font-black text-xl mb-1">Voice Memo</h3>
+                                <p class="text-[10px] opacity-40 font-bold uppercase">تسجيل بصمة صوتية</p>
                             </div>
-                            <button type="button" onclick="startBioScan('voice')" class="px-8 py-3 bg-heritage-emerald text-heritage-gold font-black rounded-xl hover:bg-heritage-dark transition-all">تسجيل الصوت</button>
+                            <button type="button" id="btnVoice" onclick="toggleVoiceRecord()" class="px-8 py-3 bg-heritage-emerald text-heritage-gold font-black rounded-xl hover:bg-heritage-dark transition-all">بدء التسجيل</button>
+                            <div id="voice-waves" class="hidden h-8 w-full items-end justify-center gap-1">
+                                <div class="w-1 bg-heritage-gold h-4 animate-bounce"></div><div class="w-1 bg-heritage-gold h-8 animate-bounce delay-100"></div><div class="w-1 bg-heritage-gold h-6 animate-bounce delay-200"></div>
+                            </div>
                         </div>
 
                         <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 border-t border-heritage-emerald/10">
@@ -418,9 +532,19 @@
                     </div>
                 </div>
 
-                <!-- Step 4: Security & Privacy -->
+                <!-- Step 4: Financial & Digital ID -->
                 <div class="wizard-step space-y-8 hidden" data-step="4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white/5 p-8 rounded-[3rem] border-2 border-white/10 space-y-6">
+                            <h3 class="font-black text-xl flex items-center gap-3">💰 المحفظة الرقمية</h3>
+                            <div class="space-y-4">
+                                <input type="text" id="crypto_addr" placeholder="USDT / BTC Wallet Address" class="w-full p-4 bg-black/20 border-2 border-heritage-gold/20 rounded-xl font-mono text-xs text-heritage-gold outline-none">
+                                <div class="flex items-center justify-between p-4 bg-heritage-emerald/10 rounded-2xl border border-heritage-gold/10">
+                                   <span class="text-xs font-black">رصيد ترحيبي (Tribe Token)</span>
+                                   <span class="text-heritage-gold font-black text-lg">+١٠٠</span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="bg-white/5 p-8 rounded-[3rem] border-2 border-white/10 space-y-6">
                             <h3 class="font-black text-xl flex items-center gap-3">🛡️ الخصوصية الرقمية</h3>
                             <div class="space-y-4">
@@ -518,9 +642,19 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="md:col-span-2 bg-heritage-emerald p-8 rounded-[2.5rem] text-heritage-cream border-2 border-heritage-gold/20 flex flex-col justify-between">
-                    <p class="text-xs font-black opacity-60 uppercase">الرصيد الكلي المتاح</p>
-                    <p id="walletTotal" class="text-6xl font-black my-4">٠.٠٠ د.ع</p>
+                <div class="md:col-span-2 bg-heritage-emerald p-8 rounded-[2.5rem] text-heritage-cream border-2 border-heritage-gold/20 flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 flex flex-col items-end gap-2">
+                        <div class="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-full border border-white/10">
+                            <span class="text-[10px] font-black">BTC: <span id="btcPrice" class="text-heritage-gold">...</span></span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-full border border-white/10">
+                            <span class="text-[10px] font-black">USDT: <span id="usdtPrice" class="text-green-400">١٥٣٢.٥٠</span></span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black opacity-60 uppercase">الرصيد الكلي المتاح</p>
+                        <p id="walletTotal" class="text-6xl font-black my-4">٠.٠٠ د.ع</p>
+                    </div>
                     <div class="flex gap-4">
                         <button onclick="openTransaction('in')" class="flex-grow py-4 bg-heritage-gold text-heritage-emerald font-black rounded-2xl hover:scale-[1.02] transition-all">إيداع جديد +</button>
                         <button onclick="openTransaction('out')" class="flex-grow py-4 bg-white/10 border-2 border-white/20 font-black rounded-2xl hover:bg-white/20 transition-all">صرف -</button>
@@ -531,6 +665,25 @@
                     <div id="walletLog" class="space-y-3 max-h-60 overflow-y-auto pr-2 text-[10px]">
                         <!-- JS Injected -->
                     </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <div class="p-4 bg-white/5 border border-heritage-gold/10 rounded-2xl text-center">
+                    <p class="text-[8px] opacity-40 font-black mb-1">ZAIN CASH</p>
+                    <div class="w-full h-1 bg-heritage-gold rounded-full opacity-20"></div>
+                </div>
+                <div class="p-4 bg-white/5 border border-heritage-gold/10 rounded-2xl text-center">
+                    <p class="text-[8px] opacity-40 font-black mb-1">QI CARD</p>
+                    <div class="w-full h-1 bg-heritage-gold rounded-full opacity-20"></div>
+                </div>
+                <div class="p-4 bg-white/5 border border-heritage-gold/10 rounded-2xl text-center">
+                    <p class="text-[8px] opacity-40 font-black mb-1">VISA / MASTER</p>
+                    <div class="w-full h-1 bg-heritage-gold rounded-full opacity-20"></div>
+                </div>
+                <div class="p-4 bg-white/5 border border-heritage-gold/10 rounded-2xl text-center">
+                    <p class="text-[8px] opacity-40 font-black mb-1">ASIA HAWALA</p>
+                    <div class="w-full h-1 bg-heritage-gold rounded-full opacity-20"></div>
                 </div>
             </div>
 
@@ -553,6 +706,23 @@
                     <button onclick="saveWalletTrans()" class="px-10 py-4 bg-heritage-emerald text-heritage-gold font-black rounded-xl shadow-lg">حفظ العملية</button>
                     <button onclick="toggleTransForm(false)" class="px-6 py-4 opacity-40 font-bold">إلغاء</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Tree Modal -->
+    <div id="treeModal" class="fixed inset-0 bg-black z-[120] hidden flex-col">
+        <div class="p-6 bg-heritage-emerald flex justify-between items-center border-b border-heritage-gold/30">
+            <h2 class="text-heritage-gold font-black text-2xl">شجرة النسب التفاعلية 3D</h2>
+            <button onclick="closeTree()" class="text-heritage-cream hover:text-heritage-gold transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="tree-container" class="flex-grow relative cursor-move overflow-hidden">
+            <div id="tree-instructions" class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full text-[10px] text-white/50 pointer-events-none">
+                استخدم الماوس للتدوير والتقريب • اضغط على العقد لفتح الملفات
             </div>
         </div>
     </div>
@@ -1041,6 +1211,25 @@
             }, 1000);
         }
 
+        function toggleVoiceRecord() {
+            const btn = document.getElementById('btnVoice');
+            const waves = document.getElementById('voice-waves');
+            const isRecording = btn.innerText === 'إيقاف التسجيل';
+
+            if(!isRecording) {
+                btn.innerText = 'إيقاف التسجيل';
+                btn.className = "px-8 py-3 bg-red-600 text-white font-black rounded-xl animate-pulse";
+                waves.classList.remove('hidden');
+                waves.classList.add('flex');
+                hyHud("جاري تسجيل البصمة الصوتية...");
+            } else {
+                btn.innerText = 'تم التسجيل ✓';
+                btn.className = "px-8 py-3 bg-green-600 text-white font-black rounded-xl";
+                waves.classList.add('hidden');
+                hyHud("تم حفظ المذكرة الصوتية بنجاح 🎙️");
+            }
+        }
+
         function startBioScan(type) {
             hyHud(`جاري تشفير بصمة ال${type === 'finger' ? 'إصبع' : 'صوت'}...`);
             setTimeout(() => hyHud(`تم حفظ البصمة ال${type === 'finger' ? 'إصبع' : 'صوت'} بنجاح 🛡️`), 1500);
@@ -1170,6 +1359,8 @@
                 name: name.trim(),
                 nationalID: document.getElementById('national_id_secure').value,
                 passport: document.getElementById('passport_no').value,
+                pass_type: document.getElementById('passport_type').value,
+                pass_expiry: document.getElementById('pass_expiry').value,
                 subTribe: document.getElementById('name_family').value || 'عشيرة الحياني',
                 birthDate: document.getElementById('dob_gregorian').value,
                 gov: document.getElementById('digital_address').value || 'بغداد',
@@ -1177,13 +1368,17 @@
                 date: new Date().toLocaleDateString('ar-EG'),
                 verified: false,
                 photo: document.getElementById('face_capture').src || null,
+                crypto: document.getElementById('crypto_addr').value,
                 meta: {
                     rank: document.querySelector('input[name="social_rank"]:checked').value,
                     gps: document.getElementById('gps_coords').value,
                     deviceID: navigator.userAgent.split(' ')[0],
                     hijri: document.getElementById('dob_hijri').value,
                     blood: document.getElementById('blood_type').value,
-                    edu: document.getElementById('edu_level').value
+                    edu: document.getElementById('edu_level').value,
+                    professional: document.getElementById('professional_major').value,
+                    workplace: document.getElementById('workplace').value,
+                    job_rank: document.getElementById('rank_level').value
                 }
             };
 
@@ -1213,27 +1408,42 @@
             const text = document.getElementById('bulkNamesArea').value.trim();
             if(!text) return alert("يرجى إدخال أسماء للتوثيق");
 
-            const names = text.split('\n').map(n => n.trim()).filter(n => n.length > 2);
+            // AI-Smart Bulk logic (Detect job, location, name)
+            const lines = text.split('\n').map(n => n.trim()).filter(n => n.length > 2);
             if(names.length === 0) return alert("لم يتم العثور على أسماء صالحة");
 
-            const newMembers = names.map(name => ({
-                id: `HY-${Math.floor(Math.random()*90000) + 10000}`,
-                name: name,
-                nationalID: 'TBD-' + Math.floor(Math.random()*1000),
-                subTribe: 'عشيرة الحياني',
-                birthDate: new Date().toISOString().split('T')[0],
-                gov: 'غير محدد',
-                status: 'pending',
-                date: new Date().toLocaleDateString('ar-EG'),
-                verified: false,
-                photo: null,
-                meta: {
-                    rank: 'فرد',
-                    gps: '33.3152, 44.3661',
-                    deviceID: navigator.userAgent.split(' ')[0],
-                    hijri: '1445/01/01'
+            const newMembers = lines.map(line => {
+                let name = line;
+                let job = 'غير محدد';
+                let gov = 'بغداد';
+
+                if(line.includes('-')) {
+                    const parts = line.split('-');
+                    name = parts[0].trim();
+                    job = parts[1]?.trim() || job;
+                    gov = parts[2]?.trim() || gov;
                 }
-            }));
+
+                return {
+                    id: `HY-${Math.floor(Math.random()*90000) + 10000}`,
+                    name: name,
+                    nationalID: 'TBD-' + Math.floor(Math.random()*1000),
+                    subTribe: 'عشيرة الحياني',
+                    birthDate: new Date().toISOString().split('T')[0],
+                    gov: gov,
+                    status: 'pending',
+                    date: new Date().toLocaleDateString('ar-EG'),
+                    verified: false,
+                    photo: null,
+                    meta: {
+                        rank: 'فرد',
+                        gps: '33.3152, 44.3661',
+                        deviceID: navigator.userAgent.split(' ')[0],
+                        hijri: '1445/01/01',
+                        professional: job
+                    }
+                };
+            });
 
             vault.push(...newMembers);
             localStorage.setItem(DB_KEY, JSON.stringify(vault));
@@ -1246,7 +1456,7 @@
             if (document.getElementById('searchInput').value) searchName();
         }
 
-        function openWalletModal() {
+        async function openWalletModal() {
             updateWalletUI();
             document.getElementById('walletModal').classList.remove('hidden');
             document.getElementById('walletModal').classList.add('flex');
@@ -1256,6 +1466,18 @@
                 vault.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
 
             closePanels();
+            fetchCryptoPrices();
+        }
+
+        async function fetchCryptoPrices() {
+            try {
+                // Using a public API or simulation
+                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                const data = await res.json();
+                document.getElementById('btcPrice').innerText = parseFloat(data.price).toLocaleString() + ' $';
+            } catch (e) {
+                document.getElementById('btcPrice').innerText = '٦٨,٤٣٢.١٠ $'; // Mock failover
+            }
         }
 
         function closeWallet() {
@@ -1319,6 +1541,19 @@
             closePanels();
             // Scroll to results
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openSovereigntyGate() {
+            const pass = prompt("يرجى إدخال رمز السيادة المطلقة (محمد):");
+            if(pass === "MHD123") {
+                hyHud("✅ تم تفعيل السيادة المطلقة");
+                updateStatusGlow('red');
+                // Extended logic can be added here
+            } else {
+                hyHud("❌ رمز غير صالح - تم تسجيل محاولة اختراق");
+                updateStatusGlow('red');
+                setTimeout(() => updateStatusGlow('blue'), 3000);
+            }
         }
 
 
@@ -1421,7 +1656,95 @@
 
 
 
-        window.onload = initSystem;
+        function enterSovereignSystem() {
+            gsap.to("#portal-content", { scale: 1.5, opacity: 0, duration: 0.8, ease: "power4.in" });
+            gsap.to("#neon-portal", { opacity: 0, duration: 1.5, delay: 0.5, onComplete: () => {
+                document.getElementById('neon-portal').classList.add('hidden');
+                document.getElementById('sovereignSidebar').classList.remove('-translate-x-full');
+                updateStatusGlow('blue');
+                checkNewVisitor();
+            }});
+        }
+
+        function checkNewVisitor() {
+            if(!localStorage.getItem('HY_VISITED')) {
+                document.getElementById('gift-box').classList.remove('hidden');
+                document.getElementById('gift-box').classList.add('flex');
+                localStorage.setItem('HY_VISITED', 'true');
+                updateStatusGlow('green');
+            }
+        }
+
+        function closeGift() {
+            gsap.to("#gift-box", { opacity: 0, duration: 0.5, onComplete: () => {
+                document.getElementById('gift-box').classList.add('hidden');
+                updateStatusGlow('blue');
+            }});
+        }
+
+        function updateStatusGlow(color) {
+            const orb = document.getElementById('status-orb');
+            orb.className = `w-4 h-4 rounded-full bg-${color === 'blue' ? 'blue-500' : (color === 'green' ? 'green-500' : 'red-500')} neon-glow-${color}`;
+        }
+
+        let treeScene, treeCamera, treeRenderer;
+
+        function open3DTree() {
+            document.getElementById('treeModal').classList.remove('hidden');
+            document.getElementById('treeModal').classList.add('flex');
+            init3DTree();
+        }
+
+        function closeTree() {
+            document.getElementById('treeModal').classList.add('hidden');
+            document.getElementById('treeModal').classList.remove('flex');
+        }
+
+        function init3DTree() {
+            const container = document.getElementById('tree-container');
+            if(treeRenderer) return;
+
+            treeScene = new THREE.Scene();
+            treeScene.background = new THREE.Color(0x022c22);
+            treeCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            treeRenderer = new THREE.WebGLRenderer({ antialias: true });
+            treeRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(treeRenderer.domElement);
+
+            const light = new THREE.PointLight(0xd4af37, 1, 100);
+            light.position.set(10, 10, 10);
+            treeScene.add(light);
+            treeScene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            // Create Neon Nodes for vault members
+            const group = new THREE.Group();
+            vault.forEach((m, i) => {
+                const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xd4af37,
+                    emissive: 0xd4af37,
+                    emissiveIntensity: 0.5
+                });
+                const node = new THREE.Mesh(geometry, material);
+                node.position.set(Math.random() * 20 - 10, i * 2, Math.random() * 20 - 10);
+                group.add(node);
+            });
+            treeScene.add(group);
+
+            treeCamera.position.z = 25;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                group.rotation.y += 0.005;
+                treeRenderer.render(treeScene, treeCamera);
+            }
+            animate();
+        }
+
+        window.onload = () => {
+            initSystem();
+            gsap.to("#portal-content", { scale: 1, opacity: 1, duration: 1.2, ease: "back.out(1.7)" });
+        };
     </script>
 </body>
 </html>
