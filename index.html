@@ -150,8 +150,8 @@
         </div>
     </div>
 
-    <!-- Sovereign Sidebar (Left Side) -->
-    <div id="sovereignSidebar" class="fixed top-0 left-0 h-full w-24 glass-sovereign z-[90] flex flex-col items-center py-10 gap-8 -translate-x-full transition-transform duration-500">
+    <!-- Sovereign Sidebar (Right Side - Per User Request) -->
+    <div id="sovereignSidebar" class="fixed top-0 right-0 h-full w-24 glass-sovereign z-[90] flex flex-col items-center py-10 gap-8 translate-x-full transition-transform duration-500">
         <button onclick="toggleAdmin()" class="w-14 h-14 bg-heritage-gold rounded-2xl flex items-center justify-center text-2xl shadow-xl hover:scale-110 transition-all" title="لوحة التحكم">⚙️</button>
         <button onclick="openFullRegistry()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-heritage-gold transition-all" title="السجل">📜</button>
         <button onclick="openWalletModal()" class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl hover:bg-heritage-gold transition-all" title="المحفظة">💰</button>
@@ -234,16 +234,7 @@
     <div id="overlay" onclick="closePanels()" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-40 transition-opacity"></div>
 
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-30 flex justify-between items-center p-6 bg-transparent pointer-events-none">
-        <!-- Toggle (Left) -->
-        <div class="pointer-events-auto">
-            <button onclick="toggleAdmin()" class="p-4 bg-heritage-emerald text-heritage-gold rounded-2xl shadow-2xl hover:bg-heritage-dark hover:scale-110 transition-all border border-heritage-gold/30 group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16m-16 6h16" />
-                </svg>
-            </button>
-        </div>
-
+    <header class="fixed top-0 left-0 right-0 z-30 flex justify-end items-center p-6 bg-transparent pointer-events-none">
         <!-- Dashboard Button (Right) -->
         <div class="pointer-events-auto">
             <button onclick="toggleAdmin()" class="px-10 py-4 bg-heritage-gold text-heritage-emerald font-black rounded-full shadow-[0_10px_30px_rgba(212,175,55,0.4)] hover:bg-heritage-cream hover:scale-105 transition-all border-2 border-heritage-gold active:scale-95 flex items-center gap-3">
@@ -272,15 +263,22 @@
                 <p class="text-heritage-gold text-xl md:text-3xl font-bold drop-shadow-md">المنصة الرقمية الموثقة لأبناء القبيلة</p>
             </div>
 
-            <!-- Search Container -->
-            <div class="w-full max-w-3xl mb-16 relative">
+            <!-- Sovereign Search Container -->
+            <div class="w-full max-w-4xl mb-20 relative px-4">
                 <div class="relative group">
-                    <input type="text" id="searchInput" onkeyup="searchName()" placeholder="ابحث عن اسمك في سجل القبيلة..."
-                        class="w-full py-7 px-10 pr-20 bg-heritage-cream text-heritage-emerald rounded-2xl text-2xl font-black shadow-[0_20px_50px_rgba(0,0,0,0.3)] focus:outline-none focus:ring-4 focus:ring-heritage-gold/50 transition-all placeholder:text-heritage-emerald/30">
-                    <div class="absolute right-7 top-1/2 -translate-y-1/2 text-heritage-gold">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                    <div class="absolute -inset-1 bg-gradient-to-r from-heritage-gold via-heritage-emerald to-heritage-gold rounded-3xl blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative bg-heritage-emerald/40 backdrop-blur-3xl rounded-[2.5rem] border-2 border-heritage-gold/30 p-2 flex items-center shadow-2xl overflow-hidden">
+                        <div class="p-6 text-heritage-gold animate-pulse">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="searchInput" onkeyup="searchName()" placeholder="ابحث في السجل الرقمي الموحد (الاسم، المهنة، السكن)..."
+                            class="flex-grow bg-transparent text-heritage-cream text-3xl font-black py-6 px-4 outline-none placeholder:text-heritage-gold/20 selection:bg-heritage-gold/30">
+
+                        <div class="flex gap-4 px-6 border-r border-white/10">
+                            <span class="text-[10px] text-heritage-gold font-black uppercase tracking-widest hidden md:block">Advanced<br>Search AI</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1545,7 +1543,7 @@
 
         function openSovereigntyGate() {
             const pass = prompt("يرجى إدخال رمز السيادة المطلقة (محمد):");
-            if(pass === "MHD123") {
+            if(pass === "1234") {
                 hyHud("✅ تم تفعيل السيادة المطلقة");
                 updateStatusGlow('red');
                 // Extended logic can be added here
@@ -1660,7 +1658,7 @@
             gsap.to("#portal-content", { scale: 1.5, opacity: 0, duration: 0.8, ease: "power4.in" });
             gsap.to("#neon-portal", { opacity: 0, duration: 1.5, delay: 0.5, onComplete: () => {
                 document.getElementById('neon-portal').classList.add('hidden');
-                document.getElementById('sovereignSidebar').classList.remove('-translate-x-full');
+                document.getElementById('sovereignSidebar').classList.remove('translate-x-full');
                 updateStatusGlow('blue');
                 checkNewVisitor();
             }});
