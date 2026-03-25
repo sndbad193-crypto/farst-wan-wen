@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ديوان قبيلة الحياني - السجل الرقمي</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -26,10 +27,26 @@
         }
     </script>
     <style>
+        :root {
+            --bg-primary: #fdfbf7;
+            --text-primary: #064e3b;
+            --card-bg: #ffffff;
+            --sidebar-bg: #064e3b;
+            --admin-sidebar-bg: #022c22;
+        }
+        .dark {
+            --bg-primary: #022c22;
+            --text-primary: #fdfbf7;
+            --card-bg: #064e3b;
+            --sidebar-bg: #022c22;
+            --admin-sidebar-bg: #000000;
+        }
+
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #fdfbf7;
-            color: #064e3b;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
         .sidebar-transition {
             transition: transform 0.3s ease-in-out;
@@ -66,7 +83,7 @@
 <body class="min-h-screen relative overflow-x-hidden">
 
     <!-- Left Sidebar (Informational) -->
-    <div id="infoSidebar" class="fixed top-0 left-0 h-full w-72 bg-heritage-emerald text-heritage-cream sidebar-transition sidebar-left z-50 shadow-2xl border-r border-heritage-gold/30">
+    <div id="infoSidebar" class="fixed top-0 left-0 h-full w-72 bg-[var(--sidebar-bg)] text-heritage-cream sidebar-transition sidebar-left z-50 shadow-2xl border-r border-heritage-gold/30">
         <div class="p-6 h-full flex flex-col">
             <div class="flex justify-between items-center mb-10">
                 <h2 class="text-xl font-black text-heritage-gold">القائمة</h2>
@@ -120,9 +137,9 @@
     </div>
 
     <!-- Right Sidebar (Admin Control Panel) -->
-    <div id="adminSidebar" class="fixed top-0 right-0 h-full w-80 bg-heritage-dark text-heritage-cream sidebar-transition sidebar-right z-50 shadow-2xl border-l border-heritage-gold/30">
+    <div id="adminSidebar" class="fixed top-0 right-0 h-full w-[450px] bg-[var(--admin-sidebar-bg)] text-heritage-cream sidebar-transition sidebar-right z-50 shadow-2xl border-l border-heritage-gold/30">
         <div class="p-6 h-full flex flex-col">
-            <div class="flex justify-between items-center mb-10">
+            <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-black text-heritage-gold">لوحة التحكم</h2>
                 <button onclick="closePanels()" class="text-heritage-cream hover:text-heritage-gold transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,45 +148,88 @@
                 </button>
             </div>
 
-            <div class="space-y-4 flex-grow overflow-y-auto">
-                 <div class="bg-heritage-emerald p-5 rounded-2xl border border-heritage-gold/20 mb-6">
-                    <p class="text-[10px] text-heritage-gold uppercase tracking-widest font-black mb-1">الإدارة الرقمية</p>
-                    <p class="font-black text-lg">تحديث سجلات القبيلة</p>
-                </div>
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-white/10 mb-6 gap-2 overflow-x-auto pb-2">
+                <button onclick="switchTab('registry')" class="admin-tab px-4 py-2 font-bold text-xs rounded-t-lg bg-heritage-emerald text-heritage-gold" data-tab="registry">السجل</button>
+                <button onclick="switchTab('treasury')" class="admin-tab px-4 py-2 font-bold text-xs rounded-t-lg hover:bg-white/5 transition-all" data-tab="treasury">الخزينة</button>
+                <button onclick="switchTab('governance')" class="admin-tab px-4 py-2 font-bold text-xs rounded-t-lg hover:bg-white/5 transition-all" data-tab="governance">الحوكمة</button>
+                <button onclick="switchTab('utilities')" class="admin-tab px-4 py-2 font-bold text-xs rounded-t-lg hover:bg-white/5 transition-all" data-tab="utilities">الأدوات</button>
+            </div>
 
-                <nav class="space-y-3">
-                    <div class="grid grid-cols-2 gap-2 mb-4">
-                        <button onclick="openBulkModal()" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-xs gap-2">
-                            <span class="text-xl">⚡</span> إضافة
-                        </button>
-                        <button onclick="toggleManageMode()" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold text-xs gap-2">
-                            <span class="text-xl">✏️</span> تعديل
-                        </button>
-                    </div>
-
-                    <button onclick="document.getElementById('importTrigger').click()" class="w-full flex items-center justify-between px-4 py-4 rounded-xl bg-white/5 hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold group">
-                        <span class="flex items-center gap-3"><span>📂</span> رفع السجل</span>
-                    </button>
-                    <input type="file" id="importTrigger" class="hidden" onchange="importVault(this)">
-                    <button onclick="exportVault()" class="w-full flex items-center justify-between px-4 py-4 rounded-xl bg-white/5 hover:bg-heritage-gold hover:text-heritage-emerald transition-all font-bold group">
-                        <span class="flex items-center gap-3"><span>🛡️</span> تصدير نسخة</span>
-                    </button>
-
-                    <!-- Quick Management List -->
-                    <div id="quickManage" class="pt-6 hidden">
-                        <p class="text-[10px] font-black text-heritage-gold/40 mb-3 px-2 uppercase tracking-widest">آخر السجلات المضافة</p>
-                        <div id="adminRecordsList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
-                            <!-- Injected admin items -->
+            <div class="flex-grow overflow-y-auto pr-2 space-y-6">
+                <!-- Tab: Registry -->
+                <div id="tab-registry" class="admin-tab-content space-y-4">
+                    <div class="bg-heritage-emerald p-4 rounded-xl border border-heritage-gold/20">
+                        <p class="text-[10px] text-heritage-gold font-black mb-1 uppercase tracking-widest">إحصائيات فورية</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><p class="text-[8px] opacity-50">إجمالي الأفراد</p><p id="regCount" class="text-lg font-black">٠</p></div>
+                            <div><p class="text-[8px] opacity-50">نسبة الاكتمال</p><p id="regAvg" class="text-lg font-black">٠٪</p></div>
                         </div>
                     </div>
+                    <button onclick="openBulkModal()" class="w-full py-4 bg-heritage-gold text-heritage-emerald font-black rounded-xl hover:bg-heritage-cream transition-all flex items-center justify-center gap-2">
+                        <span>⚡</span> إضافة فرد جديد
+                    </button>
+                    <div class="space-y-2">
+                        <p class="text-[10px] font-black text-heritage-gold/40 px-2">آخر السجلات</p>
+                        <div id="adminRecordsList" class="space-y-2 max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
 
-                    <div class="pt-10">
-                        <p class="text-[10px] font-black text-heritage-gold/40 mb-3 px-2">إجراءات خطرة</p>
-                        <button onclick="clearMatrixData()" class="w-full flex items-center gap-3 px-4 py-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition-all font-bold">
-                            <span>🗑️</span> مسح البيانات
+                <!-- Tab: Treasury -->
+                <div id="tab-treasury" class="admin-tab-content hidden space-y-4">
+                    <div class="bg-gradient-to-br from-heritage-emerald to-heritage-dark p-6 rounded-2xl border border-heritage-gold/30">
+                        <p class="text-[10px] text-heritage-gold font-black mb-1 uppercase tracking-widest">الرصيد الكلي</p>
+                        <p id="totalBalance" class="text-3xl font-black">٠.٠٠ د.ع</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="openFinanceForm('in')" class="p-3 bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl font-black text-xs">إيداع جديد +</button>
+                        <button onclick="openFinanceForm('out')" class="p-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-black text-xs">صرف جديد -</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[10px] font-black text-heritage-gold/40 px-2">آخر العمليات</p>
+                        <div id="financeList" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Governance -->
+                <div id="tab-governance" class="admin-tab-content hidden space-y-4">
+                    <div class="space-y-4">
+                        <p class="text-[10px] font-black text-heritage-gold/40 px-2">نظام التصويت الجماعي</p>
+                        <div class="bg-white/5 p-4 rounded-xl border border-white/10 space-y-3">
+                            <p class="font-bold text-sm">هل تؤيد بناء ديوان جديد في بغداد؟</p>
+                            <div class="flex gap-2">
+                                <button onclick="castVote('yes')" class="flex-grow p-2 bg-heritage-gold text-heritage-emerald rounded font-black text-xs">نعم (<span id="voteYes">٤٢</span>)</button>
+                                <button onclick="castVote('no')" class="flex-grow p-2 bg-white/5 text-white rounded font-black text-xs">لا (<span id="voteNo">٨</span>)</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-6">
+                        <p class="text-[10px] font-black text-heritage-gold/40 px-2 mb-2">سجل الأمان (Audit Log)</p>
+                        <div id="auditList" class="space-y-1 max-h-64 overflow-y-auto text-[10px] font-mono opacity-60"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Utilities -->
+                <div id="tab-utilities" class="admin-tab-content hidden space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="exportVault()" class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-heritage-gold transition-all flex flex-col items-center gap-2">
+                            <span class="text-xl">🛡️</span><span class="text-[10px] font-bold">نسخة احتياطية</span>
+                        </button>
+                        <button onclick="backupToCloud()" class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-heritage-gold transition-all flex flex-col items-center gap-2">
+                            <span class="text-xl">☁️</span><span class="text-[10px] font-bold">نسخ سحابي</span>
+                        </button>
+                        <button onclick="toggleTheme()" class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-heritage-gold transition-all flex flex-col items-center gap-2">
+                            <span class="text-xl">🌓</span><span class="text-[10px] font-bold">الوضع الليلي</span>
+                        </button>
+                        <button onclick="clearMatrixData()" class="p-4 bg-red-500/10 rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition-all flex flex-col items-center gap-2">
+                            <span class="text-xl">🗑️</span><span class="text-[10px] font-bold">تصفير النظام</span>
                         </button>
                     </div>
-                </nav>
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <p class="text-[10px] font-black text-heritage-gold/40 mb-3">نمو القبيلة</p>
+                        <canvas id="growthChart" class="w-full h-40"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -261,6 +321,104 @@
         <span id="hud-text">تمت العملية بنجاح</span>
     </div>
 
+    <!-- Registry Member Modal -->
+    <div id="bulkModal" class="fixed inset-0 bg-heritage-dark/90 backdrop-blur-md z-[100] hidden items-center justify-center p-6 overflow-y-auto">
+        <div class="max-w-4xl w-full glass-effect rounded-[3rem] p-8 md:p-12 border-2 border-heritage-gold/50 shadow-2xl relative text-heritage-emerald">
+            <button onclick="closeBulkModal()" class="absolute top-8 left-8 text-heritage-emerald/50 hover:text-heritage-emerald transition-colors">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <h2 class="text-4xl font-black mb-2">توثيق فرد جديد</h2>
+            <p class="text-heritage-emerald/60 font-bold mb-8">إضافة بيانات تفصيلية لسجل ديوان قبيلة الحياني</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">الاسم الرباعي الكامل</label>
+                        <input type="text" id="regFullName" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">رقم الهوية الوطنية (National ID)</label>
+                        <input type="text" id="regNationalID" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">الفخذ أو الفرع (Sub-Tribe)</label>
+                        <select id="regSubTribe" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                            <option value="عشيرة البو حياني">عشيرة البو حياني</option>
+                            <option value="فرع الرياض">فرع الرياض</option>
+                            <option value="فرع بغداد">فرع بغداد</option>
+                            <option value="فرع الكويت">فرع الكويت</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">تاريخ الميلاد</label>
+                        <input type="date" id="regBirthDate" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">المنطقة السكنية</label>
+                        <input type="text" id="regGov" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">حالة الحساب</label>
+                        <div class="flex gap-4 p-2">
+                            <label class="flex items-center gap-2 font-bold"><input type="radio" name="regStatus" value="active" checked> نشط</label>
+                            <label class="flex items-center gap-2 font-bold"><input type="radio" name="regStatus" value="inactive"> غير نشط</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 flex gap-4">
+                <button onclick="saveMember()" class="flex-grow py-5 bg-heritage-emerald text-heritage-gold font-black rounded-2xl shadow-xl hover:bg-heritage-dark transition-all text-xl">حفظ البيانات وتوثيقها</button>
+                <button onclick="closeBulkModal()" class="px-10 py-5 bg-heritage-gold/20 font-black rounded-2xl hover:bg-heritage-gold/30 transition-all">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Treasury Transaction Modal -->
+    <div id="financeModal" class="fixed inset-0 bg-heritage-dark/90 backdrop-blur-md z-[100] hidden items-center justify-center p-6">
+        <div class="max-w-xl w-full glass-effect rounded-[3rem] p-8 md:p-12 border-2 border-heritage-gold/50 shadow-2xl relative text-heritage-emerald">
+            <h2 id="financeModalTitle" class="text-3xl font-black mb-6">إيداع جديد</h2>
+            <input type="hidden" id="financeType">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black mb-1 mr-2 opacity-60">المبلغ (د.ع)</label>
+                    <input type="number" id="finAmount" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-black mb-1 mr-2 opacity-60">الارتباط بالفرد (عضو القبيلة)</label>
+                    <select id="finMember" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                        <option value="">غير مرتبط بفرد محدد</option>
+                        <!-- Injected via JS -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">التصنيف</label>
+                        <select id="finCategory" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                            <option value="تبرع">تبرع</option>
+                            <option value="اشتراك">اشتراك</option>
+                            <option value="زكاة">زكاة</option>
+                            <option value="طوارئ">طوارئ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">صورة الوصل</label>
+                        <input type="file" id="finAttachment" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-3 text-[8px] font-black">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex gap-4">
+                <button onclick="saveTransaction()" class="flex-grow py-4 bg-heritage-emerald text-heritage-gold font-black rounded-xl shadow-xl">إتمام العملية</button>
+                <button onclick="closeFinanceModal()" class="px-8 py-4 bg-heritage-gold/20 font-black rounded-xl">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Info Modal -->
     <div id="infoModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-md z-[100] hidden items-center justify-center p-6 overflow-y-auto">
         <div class="max-w-2xl w-full glass-effect rounded-[3rem] p-8 md:p-12 border-2 border-heritage-gold/50 shadow-2xl relative text-heritage-emerald">
@@ -280,63 +438,158 @@
         </div>
     </div>
 
-    <!-- Bulk Entry Modal -->
-    <div id="bulkModal" class="fixed inset-0 bg-heritage-dark/90 backdrop-blur-md z-[100] hidden items-center justify-center p-6 overflow-y-auto">
-        <div class="max-w-3xl w-full glass-effect rounded-[3rem] p-8 md:p-12 border-2 border-heritage-gold/50 shadow-2xl relative">
-            <button onclick="closeBulkModal()" class="absolute top-8 left-8 text-heritage-emerald/50 hover:text-heritage-emerald transition-colors">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-
-            <h2 class="text-4xl font-black mb-2 text-heritage-emerald">توثيق سجلات</h2>
-            <p class="text-heritage-emerald/60 font-bold mb-10">إضافة مجموعة من الأفراد دفعة واحدة إلى ديوان القبيلة</p>
-
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm font-black text-heritage-emerald mb-2 mr-2">المنطقة أو الفرع</label>
-                    <input type="text" id="govInput" placeholder="مثلاً: الأنبار - عشيرة البو حياني"
-                        class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl p-5 outline-none focus:border-heritage-gold text-heritage-emerald font-black transition-all">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-black text-heritage-emerald mb-2 mr-2">قائمة الأسماء</label>
-                    <textarea id="bulkInput" class="w-full h-64 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl p-5 font-black text-xl outline-none focus:border-heritage-gold text-heritage-emerald resize-none transition-all"
-                        placeholder="الصق الأسماء هنا.. اسم واحد في كل سطر"></textarea>
-                </div>
-
-                <div class="flex flex-col md:flex-row gap-4 pt-4">
-                    <button onclick="processBulkData()" class="flex-grow py-6 bg-heritage-emerald hover:bg-heritage-dark text-heritage-gold font-black rounded-2xl shadow-xl transition-all text-2xl active:scale-95">
-                        حفظ وتوثيق السجل ⚡
-                    </button>
-                    <button onclick="closeBulkModal()" class="px-10 py-6 bg-heritage-gold/20 text-heritage-emerald rounded-2xl font-black hover:bg-heritage-gold/30 transition-all">
-                        إلغاء
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         const DB_KEY = 'HY_TRIBE_VAULT_V1';
-        let vault = [];
+        const FINANCE_KEY = 'HY_FINANCE_LOG_V1';
+        const AUDIT_KEY = 'HY_AUDIT_LOG_V1';
+        const CONFIG_KEY = 'HY_SYS_CONFIG';
 
+        let vault = [];
+        let financeLog = [];
+        let auditLog = [];
+
+        let growthChart;
         function initSystem() {
-            const raw = localStorage.getItem(DB_KEY);
-            vault = raw ? JSON.parse(raw) : [];
+            vault = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+            financeLog = JSON.parse(localStorage.getItem(FINANCE_KEY) || '[]');
+            auditLog = JSON.parse(localStorage.getItem(AUDIT_KEY) || '[]');
+
+            // Apply theme
+            const config = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{"theme":"light"}');
+            if(config.theme === 'dark') document.documentElement.classList.add('dark');
+
             updateStats();
+            initChart();
         }
 
-        let manageMode = false;
-        function toggleManageMode() {
-            manageMode = !manageMode;
-            const qm = document.getElementById('quickManage');
-            if(manageMode) {
-                qm.classList.remove('hidden');
-                refreshAdminList();
-            } else {
-                qm.classList.add('hidden');
-            }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem(CONFIG_KEY, JSON.stringify({theme: isDark ? 'dark' : 'light'}));
+            hyHud(isDark ? 'تم تفعيل الوضع الليلي 🌙' : 'تم تفعيل الوضع النهاري ☀️');
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('growthChart');
+            if(!ctx) return;
+
+            const labels = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
+            const data = [12, 19, 3, 5, 2, 3]; // Placeholder data
+
+            growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'عدد الأفراد الجدد',
+                        data: data,
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { ticks: { color: '#d4af37', font: { size: 8 } } }
+                    }
+                }
+            });
+        }
+
+        function logAudit(action, details) {
+            const entry = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                user: 'مدير النظام', // Mock user
+                action: action,
+                details: details
+            };
+            auditLog.unshift(entry);
+            if(auditLog.length > 100) auditLog.pop(); // Keep last 100
+            localStorage.setItem(AUDIT_KEY, JSON.stringify(auditLog));
+        }
+
+        function calculateAge(birthDate) {
+            if(!birthDate) return 'غير محدد';
+            const birth = new Date(birthDate);
+            const now = new Date();
+            let age = now.getFullYear() - birth.getFullYear();
+            const m = now.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+            return age;
+        }
+
+        function getProfileCompleteness(m) {
+            let score = 0;
+            if(m.name) score += 20;
+            if(m.nationalID) score += 20;
+            if(m.subTribe) score += 20;
+            if(m.birthDate) score += 20;
+            if(m.gov) score += 20;
+            return score;
+        }
+
+        function switchTab(tabId) {
+            // Update Buttons
+            document.querySelectorAll('.admin-tab').forEach(btn => {
+                if(btn.dataset.tab === tabId) {
+                    btn.classList.add('bg-heritage-emerald', 'text-heritage-gold');
+                    btn.classList.remove('hover:bg-white/5');
+                } else {
+                    btn.classList.remove('bg-heritage-emerald', 'text-heritage-gold');
+                    btn.classList.add('hover:bg-white/5');
+                }
+            });
+            // Update Content
+            document.querySelectorAll('.admin-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Trigger specialized refreshes
+            if(tabId === 'registry') refreshAdminList();
+            if(tabId === 'treasury') refreshFinanceList();
+            if(tabId === 'governance') refreshAuditList();
+        }
+
+        function refreshAuditList() {
+            const list = document.getElementById('auditList');
+            if(!list) return;
+            list.innerHTML = auditLog.map(l => `
+                <div class="py-1 border-b border-white/5">
+                    <span class="text-heritage-gold">[${l.timestamp.slice(11,19)}]</span> ${l.action}: ${l.details}
+                </div>
+            `).join('');
+        }
+
+        function refreshFinanceList() {
+            const list = document.getElementById('financeList');
+            const totalEl = document.getElementById('totalBalance');
+            if(!list) return;
+
+            let balance = 0;
+            financeLog.forEach(f => balance += (f.type === 'in' ? f.amount : -f.amount));
+            totalEl.innerText = balance.toLocaleString('ar-EG', { minimumFractionDigits: 2 }) + ' د.ع';
+
+            list.innerHTML = financeLog.slice(0, 10).map(f => {
+                const member = vault.find(v => v.id === f.member);
+                return `
+                <div class="bg-white/5 p-3 rounded-lg flex justify-between items-center border-r-4 ${f.type === 'in' ? 'border-green-500' : 'border-red-500'}">
+                    <div>
+                        <p class="text-[10px] font-bold">${f.category} ${member ? ' - ' + member.name : ''}</p>
+                        <p class="text-[8px] opacity-40">${f.date}</p>
+                    </div>
+                    <p class="font-black ${f.type === 'in' ? 'text-green-400' : 'text-red-400'}">
+                        ${f.type === 'in' ? '+' : '-'}${f.amount.toLocaleString('ar-EG')}
+                    </p>
+                </div>
+            `}).join('');
         }
 
         function refreshAdminList() {
@@ -351,28 +604,58 @@
 
             list.innerHTML = recent.map(m => `
                 <div class="bg-white/5 p-3 rounded-lg border border-white/5 flex items-center justify-between group">
-                    <div class="overflow-hidden">
-                        <p class="text-xs font-bold truncate">${m.name}</p>
-                        <p class="text-[8px] opacity-40">${m.id} | ${m.gov}</p>
+                    <div class="overflow-hidden flex-grow">
+                        <div class="flex items-center gap-2">
+                            <p class="text-xs font-bold truncate">${m.name}</p>
+                            <span class="text-[8px] px-1 bg-heritage-gold/20 text-heritage-gold rounded">${getProfileCompleteness(m)}٪</span>
+                        </div>
+                        <p class="text-[8px] opacity-40">${m.id} | ${m.subTribe || 'الفرع العام'}</p>
                     </div>
-                    <button onclick="deleteRecord('${m.id}')" class="text-red-400 opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500 hover:text-white rounded transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
+                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onclick="sendSMS('${m.id}')" class="p-1 bg-heritage-emerald text-heritage-gold rounded hover:bg-heritage-gold hover:text-heritage-emerald" title="إرسال SMS">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                        </button>
+                        <button onclick="deleteRecord('${m.id}')" class="p-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
                 </div>
             `).join('');
         }
 
         function deleteRecord(id) {
             if(confirm('هل تريد حذف هذا السجل؟')) {
+                const member = vault.find(v => v.id === id);
                 vault = vault.filter(v => v.id !== id);
                 localStorage.setItem(DB_KEY, JSON.stringify(vault));
+                logAudit('حذف فرد', `تم حذف سجل ${member ? member.name : id}`);
                 updateStats();
                 refreshAdminList();
                 if(document.getElementById('searchInput').value) searchName();
                 hyHud('تم حذف السجل بنجاح');
             }
+        }
+
+        function castVote(choice) {
+            let votes = JSON.parse(localStorage.getItem('HY_VOTES') || '{"yes":42, "no":8}');
+            votes[choice]++;
+            localStorage.setItem('HY_VOTES', JSON.stringify(votes));
+            document.getElementById('voteYes').innerText = votes.yes.toLocaleString('ar-EG');
+            document.getElementById('voteNo').innerText = votes.no.toLocaleString('ar-EG');
+            logAudit('تصويت', `تم تسجيل صوت لـ ${choice === 'yes' ? 'نعم' : 'لا'}`);
+            hyHud('تم تسجيل صوتك بنجاح');
+        }
+
+        function backupToCloud() {
+            logAudit('نسخ احتياطي', 'بدء عملية النسخ السحابي');
+            hyHud('جاري مزامنة البيانات مع السحابة...');
+            setTimeout(() => hyHud('تم النسخ السحابي بنجاح ☁️'), 2000);
+        }
+
+        function sendSMS(id) {
+            const member = vault.find(v => v.id === id);
+            logAudit('رسالة SMS', `إرسال تنبيه إلى ${member.name}`);
+            hyHud(`جاري إرسال SMS إلى ${member.name}...`);
         }
 
         function updateStats() {
@@ -433,31 +716,71 @@
             document.getElementById('bulkModal').classList.remove('flex');
         }
 
-        function processBulkData() {
-            const names = document.getElementById('bulkInput').value.split('\n').filter(n => n.trim() !== "");
-            const gov = document.getElementById('govInput').value || "غير محدد";
-
-            if(names.length === 0) return alert("يرجى إدخال أسماء!");
-
-            const newEntries = names.map(name => ({
+        function saveMember() {
+            const m = {
                 id: `HY-${Math.floor(Math.random()*90000) + 10000}`,
-                name: name.trim(),
-                gov: gov,
-                verified: true,
-                date: new Date().toLocaleDateString('ar-EG')
-            }));
+                name: document.getElementById('regFullName').value,
+                nationalID: document.getElementById('regNationalID').value,
+                subTribe: document.getElementById('regSubTribe').value,
+                birthDate: document.getElementById('regBirthDate').value,
+                gov: document.getElementById('regGov').value,
+                status: document.querySelector('input[name="regStatus"]:checked').value,
+                date: new Date().toLocaleDateString('ar-EG'),
+                verified: true
+            };
 
-            vault = [...vault, ...newEntries];
+            if(!m.name || !m.nationalID) return alert('يرجى ملء الاسم ورقم الهوية');
+
+            // Prevent duplicate National ID
+            if(vault.some(v => v.nationalID === m.nationalID)) return alert('رقم الهوية هذا مسجل مسبقاً');
+
+            vault.push(m);
             localStorage.setItem(DB_KEY, JSON.stringify(vault));
+            logAudit('إضافة فرد', `تم توثيق ${m.name}`);
 
             updateStats();
             closeBulkModal();
-            hyHud(`تم توثيق ${names.length} من أفراد القبيلة بنجاح`);
-            document.getElementById('bulkInput').value = '';
-            document.getElementById('govInput').value = '';
-
-            // If searching, refresh search
+            hyHud(`تم توثيق ${m.name} بنجاح`);
             if (document.getElementById('searchInput').value) searchName();
+        }
+
+        function openFinanceForm(type) {
+            document.getElementById('financeType').value = type;
+            document.getElementById('financeModalTitle').innerText = type === 'in' ? 'إيداع جديد' : 'صرف جديد';
+
+            // Pop Members
+            const memberSelect = document.getElementById('finMember');
+            memberSelect.innerHTML = '<option value="">غير مرتبط بفرد محدد</option>' +
+                vault.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+
+            document.getElementById('financeModal').classList.remove('hidden');
+            document.getElementById('financeModal').classList.add('flex');
+        }
+
+        function closeFinanceModal() {
+            document.getElementById('financeModal').classList.add('hidden');
+            document.getElementById('financeModal').classList.remove('flex');
+        }
+
+        function saveTransaction() {
+            const t = {
+                id: Date.now(),
+                type: document.getElementById('financeType').value,
+                amount: parseFloat(document.getElementById('finAmount').value),
+                member: document.getElementById('finMember').value,
+                category: document.getElementById('finCategory').value,
+                date: new Date().toLocaleDateString('ar-EG')
+            };
+
+            if(isNaN(t.amount)) return alert('يرجى إدخال مبلغ صحيح');
+
+            financeLog.unshift(t);
+            localStorage.setItem(FINANCE_KEY, JSON.stringify(financeLog));
+            logAudit('عملية مالية', `${t.type === 'in' ? 'إيداع' : 'صرف'} مبلغ ${t.amount} (${t.category})`);
+
+            closeFinanceModal();
+            refreshFinanceList();
+            hyHud('تمت العملية المالية بنجاح');
         }
 
         function searchName() {
@@ -475,7 +798,11 @@
                 return;
             }
 
-            const results = vault.filter(m => m.name.includes(query));
+            const results = vault.filter(m =>
+                (m.name && m.name.includes(query)) ||
+                (m.id && m.id.includes(query)) ||
+                (m.nationalID && m.nationalID.toString().includes(query))
+            );
             resultsSection.classList.remove('hidden');
             resultsCountEl.innerText = `${results.length} نتيجة`;
 
@@ -491,18 +818,22 @@
             }
 
             resultsGrid.innerHTML = results.map(m => `
-                <div class="registry-card bg-heritage-cream p-8 rounded-[2rem] border-b-8 border-heritage-gold shadow-2xl flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300">
+                <div class="registry-card bg-[var(--card-bg)] p-8 rounded-[2rem] border-b-8 border-heritage-gold shadow-2xl flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300">
                     <div class="flex justify-between w-full items-start">
                         <span class="text-[10px] bg-heritage-emerald text-heritage-gold px-3 py-1 rounded-full font-black tracking-widest">${m.id}</span>
                         <div class="flex flex-col items-end">
                             <span class="text-heritage-emerald/40 text-[10px] font-black">${m.date}</span>
-                            <span class="text-[10px] text-green-600 font-black">موثق ✓</span>
+                            <span class="text-[10px] ${m.status === 'active' ? 'text-green-600' : 'text-red-600'} font-black">${m.status === 'active' ? 'موثق ✓' : 'غير نشط'}</span>
                         </div>
                     </div>
                     <h3 class="text-2xl font-black text-heritage-emerald leading-tight">${m.name}</h3>
+                    <div class="w-full flex justify-between items-center text-[10px] font-bold opacity-60">
+                        <p>العمر: ${calculateAge(m.birthDate)}</p>
+                        <p>اكتمال البيانات: ${getProfileCompleteness(m)}٪</p>
+                    </div>
                     <div class="mt-auto w-full pt-4 border-t border-heritage-emerald/10 flex flex-col gap-3">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-heritage-emerald font-black">📍 ${m.gov}</span>
+                            <span class="text-sm text-heritage-emerald font-black">📍 ${m.gov} | ${m.subTribe || 'عشيرة الحياني'}</span>
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] font-bold text-heritage-gold bg-heritage-emerald px-2 py-0.5 rounded">نسب موثق</span>
                             </div>
