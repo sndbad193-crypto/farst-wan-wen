@@ -170,12 +170,18 @@
             display: none;
             z-index: 10;
         }
+        .selected-label {
+            display: block !important;
+            border: 2px solid #00f2ff !important;
+            box-shadow: 0 0 15px #00f2ff !important;
+            z-index: 20;
+        }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
 
     <!-- Neon Portal (Splash Screen) -->
-    <div id="neon-portal" class="fixed inset-0 z-[200] flex flex-col items-center justify-center transition-opacity duration-1000">
+    <div id="neon-portal" class="fixed inset-0 z-[500] flex flex-col items-center justify-center transition-opacity duration-1000">
         <div id="particle-container" class="absolute inset-0 pointer-events-none"></div>
         <div class="scanline"></div>
 
@@ -229,7 +235,7 @@
     </style>
 
     <!-- Sidebar (Hidden by default, slides from left) -->
-    <div id="leftSidebar" class="fixed inset-y-0 left-0 w-80 bg-black/95 backdrop-blur-3xl z-[150] -translate-x-full transition-transform duration-500 border-r border-heritage-neonBlue/20 p-8 flex flex-col items-center overflow-y-auto">
+    <div id="leftSidebar" class="fixed inset-y-0 left-0 w-80 bg-black/95 backdrop-blur-3xl z-[250] -translate-x-full transition-transform duration-500 border-r border-heritage-neonBlue/20 p-8 flex flex-col items-center overflow-y-auto pointer-events-none [&.active]:pointer-events-auto">
         <button onclick="toggleSidebar()" class="absolute top-8 right-8 text-heritage-neonBlue/40 hover:text-heritage-neonBlue">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -247,7 +253,7 @@
         <div class="w-full space-y-4">
             <div class="text-[10px] font-black text-heritage-neonPink uppercase tracking-widest mb-4 opacity-60">الإدارة المركزية</div>
 
-            <button onclick="openBulkModal(); toggleSidebar()" class="w-full py-5 px-6 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-2xl border border-heritage-neonBlue/20 font-black text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all group">
+            <button onclick="openBulkModal()" class="w-full py-5 px-6 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-2xl border border-heritage-neonBlue/20 font-black text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all group">
                 <div>
                     <p class="text-sm">إضافة فرد جديد</p>
                     <p class="text-[8px] opacity-40">توثيق عضوية جديدة</p>
@@ -255,7 +261,7 @@
                 <span class="text-2xl group-hover:scale-125 transition-transform">⚡</span>
             </button>
 
-            <button onclick="openGroupModal(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonPink hover:text-heritage-neonPink transition-all group">
+            <button onclick="openGroupModal()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonPink hover:text-heritage-neonPink transition-all group">
                 <div>
                     <p class="text-sm">إدخال جماعي</p>
                     <p class="text-[8px] opacity-40">توثيق عدة أسماء</p>
@@ -263,7 +269,7 @@
                 <span class="text-2xl group-hover:rotate-12 transition-transform">📋</span>
             </button>
 
-            <button onclick="openWalletModal(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
+            <button onclick="openWalletModal()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
                 <div>
                     <p class="text-sm">المحفظة الرقمية</p>
                     <p class="text-[8px] opacity-40">الماليات والتبرعات</p>
@@ -271,7 +277,7 @@
                 <span class="text-2xl group-hover:scale-125 transition-transform">💰</span>
             </button>
 
-            <button onclick="open3DTree(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
+            <button onclick="open3DTree()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
                 <div>
                     <p class="text-sm">شجرة النسب 3D</p>
                     <p class="text-[8px] opacity-40">الواقع الرقمي</p>
@@ -279,7 +285,7 @@
                 <span class="text-2xl group-hover:scale-125 transition-transform">🧬</span>
             </button>
 
-            <button onclick="openFullRegistry(); toggleSidebar()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
+            <button onclick="openFullRegistry()" class="w-full py-5 px-6 bg-white/5 text-white/60 rounded-2xl border border-white/10 font-black text-right flex items-center justify-between hover:border-heritage-neonBlue hover:text-heritage-neonBlue transition-all group">
                 <div>
                     <p class="text-sm">سجل الأفراد</p>
                     <p class="text-[8px] opacity-40">كافة الأسماء الموثقة</p>
@@ -310,7 +316,7 @@
     </div>
 
     <!-- Control Panel Modal (Legacy, being integrated into sidebar) -->
-    <div id="adminPanel" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6">
+    <div id="adminPanel" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[300] hidden items-center justify-center p-6">
         <div class="max-w-4xl w-full glass-effect rounded-[4rem] p-10 md:p-16 border border-heritage-neonBlue/30 shadow-[0_0_100px_rgba(0,242,255,0.1)] relative text-heritage-cream">
             <button onclick="closePanels()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -381,13 +387,22 @@
     </div>
 
     <!-- Overlay -->
-    <div id="overlay" onclick="closePanels()" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-40 transition-opacity"></div>
+    <div id="overlay" onclick="closePanels()" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[200] transition-opacity"></div>
 
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-30 flex justify-end items-center p-10 bg-transparent pointer-events-none">
-        <!-- Sidebar Toggle (Premium Neon Header Button) -->
+    <header class="fixed top-0 left-0 right-0 z-[100] flex justify-between items-center p-10 bg-transparent pointer-events-none">
+        <!-- Sidebar Toggle (Now in top left as requested "أعلى ركن اليسار") -->
         <div class="pointer-events-auto">
-            <button onclick="toggleSidebar()" class="group relative px-10 py-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="group relative p-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Control Panel Direct Button (top corner) -->
+        <div class="pointer-events-auto">
+            <button onclick="toggleAdmin()" class="group relative px-10 py-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
                 <span class="text-xl">بوابة التحكم</span>
                 <div id="status-orb-main" class="w-3 h-3 bg-heritage-neonBlue rounded-full animate-pulse shadow-[0_0_20px_rgba(0,242,255,1)]"></div>
             </button>
@@ -462,13 +477,13 @@
     </main>
 
     <!-- Success Hud -->
-    <div id="hy-hud" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl text-heritage-neonBlue px-10 py-5 rounded-2xl font-black shadow-[0_0_50px_rgba(0,242,255,0.2)] border border-heritage-neonBlue/30 z-[100] transform translate-y-32 transition-transform duration-500 flex items-center gap-4">
+    <div id="hy-hud" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl text-heritage-neonBlue px-10 py-5 rounded-2xl font-black shadow-[0_0_50px_rgba(0,242,255,0.2)] border border-heritage-neonBlue/30 z-[400] transform translate-y-32 transition-transform duration-500 flex items-center gap-4">
         <span class="text-2xl">🛡️</span>
         <span id="hud-text">تمت العملية بنجاح</span>
     </div>
 
     <!-- Digital Gift Animation -->
-    <div id="gift-box" class="fixed inset-0 z-[150] hidden items-center justify-center bg-black/90 backdrop-blur-2xl">
+    <div id="gift-box" class="fixed inset-0 z-[350] hidden items-center justify-center bg-black/90 backdrop-blur-2xl">
         <div class="text-center">
             <div id="box-icon" class="text-9xl mb-8 animate-bounce drop-shadow-[0_0_50px_rgba(0,242,255,0.5)]">🎁</div>
             <h3 class="text-4xl font-black text-heritage-neonBlue mb-2">هدية ترحيبية</h3>
@@ -478,7 +493,7 @@
     </div>
 
     <!-- Registry Member Modal (Multi-Step Wizard) -->
-    <div id="bulkModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
+    <div id="bulkModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[300] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
         <div class="max-w-6xl w-full glass-effect rounded-[3.5rem] p-6 md:p-14 border border-heritage-neonBlue/30 shadow-[0_0_100px_rgba(0,242,255,0.1)] relative text-heritage-cream">
             <!-- Close Button -->
             <button onclick="closeBulkModal()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all z-10">
@@ -781,7 +796,7 @@
     </div>
 
     <!-- Wallet Modal -->
-    <div id="walletModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-xl z-[110] hidden items-center justify-center p-6">
+    <div id="walletModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-xl z-[300] hidden items-center justify-center p-6">
         <div class="max-w-4xl w-full glass-effect rounded-[3.5rem] p-10 border-2 border-heritage-gold/40 shadow-2xl relative text-heritage-emerald">
             <button onclick="closeWallet()" class="absolute top-10 left-10 text-heritage-emerald/40 hover:text-heritage-emerald transition-all">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -867,7 +882,7 @@
     </div>
 
     <!-- 3D Tree Modal -->
-    <div id="treeModal" class="fixed inset-0 bg-black z-[120] hidden flex-col">
+    <div id="treeModal" class="fixed inset-0 bg-black z-[300] hidden flex-col">
         <div class="p-6 bg-black/80 backdrop-blur-xl flex justify-between items-center border-b border-heritage-neonBlue/30">
             <h2 class="text-heritage-neonBlue font-black text-2xl">شجرة النسب التفاعلية 3D</h2>
             <button onclick="closeTree()" class="text-heritage-cream hover:text-heritage-neonBlue transition-colors">
@@ -885,7 +900,7 @@
     </div>
 
     <!-- Bulk Entry (Group) Modal -->
-    <div id="groupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[110] hidden items-center justify-center p-6">
+    <div id="groupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[300] hidden items-center justify-center p-6">
         <div class="max-w-2xl w-full glass-effect rounded-[3.5rem] p-10 border border-heritage-neonBlue/30 shadow-2xl relative text-heritage-cream text-center">
             <button onclick="closeGroupModal()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -906,7 +921,7 @@
     </div>
 
     <!-- OTP Modal -->
-    <div id="otpModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-md z-[110] hidden items-center justify-center p-6">
+    <div id="otpModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-md z-[310] hidden items-center justify-center p-6">
         <div class="max-w-md w-full glass-effect rounded-[3rem] p-10 border-2 border-heritage-gold/50 shadow-2xl text-center">
             <div class="w-20 h-20 bg-heritage-gold rounded-full flex items-center justify-center mx-auto mb-6 text-heritage-emerald text-3xl">
                 📱
@@ -1207,11 +1222,18 @@
             const overlay = document.getElementById('overlay');
             if(sb.classList.contains('-translate-x-full')) {
                 sb.classList.remove('-translate-x-full');
+                sb.classList.add('active');
                 overlay.classList.remove('hidden');
+                overlay.style.zIndex = "240";
                 updateStatusGlow('blue');
             } else {
                 sb.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
+                sb.classList.remove('active');
+                if (document.getElementById('bulkModal').classList.contains('hidden') &&
+                    document.getElementById('walletModal').classList.contains('hidden') &&
+                    document.getElementById('groupModal').classList.contains('hidden')) {
+                    overlay.classList.add('hidden');
+                }
             }
         }
 
@@ -1221,8 +1243,11 @@
             document.getElementById('leftSidebar').classList.add('-translate-x-full');
             document.getElementById('overlay').classList.add('hidden');
             document.getElementById('bulkModal').classList.add('hidden');
+            document.getElementById('bulkModal').classList.remove('flex');
             document.getElementById('walletModal').classList.add('hidden');
+            document.getElementById('walletModal').classList.remove('flex');
             document.getElementById('groupModal').classList.add('hidden');
+            document.getElementById('groupModal').classList.remove('flex');
         }
 
         function hyHud(m) {
@@ -1237,11 +1262,11 @@
         const totalSteps = 5;
 
         function openBulkModal() {
+            closePanels();
             currentStep = 1;
             showStep(1);
             document.getElementById('bulkModal').classList.remove('hidden');
             document.getElementById('bulkModal').classList.add('flex');
-            closePanels();
             initSignaturePad();
             loadDraft();
         }
@@ -1496,28 +1521,85 @@
 
         function focusOnMember(id) {
             const member = vault.find(m => m.id === id);
-            if (!member || !treeRenderer) return;
 
-            const node = treeNodes.find(n => n.userData.id === id);
-            if (!node) return;
+            // If tree isn't open, open it first
+            if (!document.getElementById('treeModal').classList.contains('flex')) {
+                open3DTree();
+            }
 
-            open3DTree();
+            // Wait a bit for initialization if needed
+            setTimeout(() => {
+                const node = treeNodes.find(n => n.userData.id === id);
+                if (node) {
+                    highlightNode(node);
+                }
+            }, 500);
 
-            const targetPos = node.position.clone().applyMatrix4(treeScene.children.find(c => c instanceof THREE.Group).matrixWorld);
+            hyHud(`جاري التركيز على ملف: ${member.name}`);
+        }
+
+        function highlightNode(node) {
+            if (!node || !selectionPointer) return;
+
+            selectionPointer.visible = true;
+            const targetPos = node.position.clone();
+            selectionPointer.position.set(targetPos.x, targetPos.y + 4, targetPos.z);
+
+            // Animate pointer bounce and rotation
+            gsap.killTweensOf(selectionPointer.position);
+            gsap.killTweensOf(selectionPointer.rotation);
+
+            gsap.to(selectionPointer.position, {
+                y: targetPos.y + 2.5,
+                duration: 0.6,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+
+            gsap.to(selectionPointer.rotation, {
+                y: Math.PI * 2,
+                duration: 2,
+                repeat: -1,
+                ease: "none"
+            });
+
+            // Focus camera
+            const group = treeScene.children.find(c => c instanceof THREE.Group);
+            const worldPos = node.position.clone().applyMatrix4(group.matrixWorld);
 
             gsap.to(treeCamera.position, {
-                x: targetPos.x + 10,
-                y: targetPos.y + 5,
-                z: targetPos.z + 20,
-                duration: 2,
-                ease: "power3.inOut",
+                x: worldPos.x + 12,
+                y: worldPos.y + 8,
+                z: worldPos.z + 20,
+                duration: 1.8,
+                ease: "expo.out",
                 onUpdate: () => {
-                    treeCamera.lookAt(targetPos);
-                    treeControls.target.copy(targetPos);
+                    treeCamera.lookAt(worldPos);
+                    treeControls.target.copy(worldPos);
                 }
             });
 
-            hyHud(`جاري التركيز على ملف: ${member.name}`);
+            // Pulse the node
+            gsap.to(node.scale, {
+                x: 3, y: 3, z: 3,
+                duration: 0.3,
+                yoyo: true,
+                repeat: 1
+            });
+
+            // Show label permanently for selected node
+            const labelObj = treeLabels.find(l => l.node === node);
+            if (labelObj) {
+                treeLabels.forEach(l => {
+                    l.element.classList.remove('selected-label');
+                    if (l !== labelObj) l.element.style.display = 'none';
+                });
+                labelObj.element.classList.add('selected-label');
+                labelObj.element.style.display = 'block';
+                labelObj.element.style.fontSize = '16px';
+                labelObj.element.innerHTML = `🌟 ${node.userData.name} 🌟`;
+            }
         }
 
         function updateFinalPreview() {
@@ -1644,15 +1726,19 @@
         }
 
         function openGroupModal() {
+            closePanels();
             document.getElementById('groupModal').classList.remove('hidden');
             document.getElementById('groupModal').classList.add('flex');
-            closePanels();
         }
 
         function closeGroupModal() {
             document.getElementById('groupModal').classList.add('hidden');
             document.getElementById('groupModal').classList.remove('flex');
-            toggleAdmin();
+            // If we came from admin panel, it might still be there but hidden by group modal.
+            // If we want to return to main UI:
+            if (document.getElementById('adminPanel').classList.contains('hidden')) {
+                document.getElementById('overlay').classList.add('hidden');
+            }
         }
 
         function bulkAddMembers() {
@@ -1708,6 +1794,7 @@
         }
 
         async function openWalletModal() {
+            closePanels();
             updateWalletUI();
             document.getElementById('walletModal').classList.remove('hidden');
             document.getElementById('walletModal').classList.add('flex');
@@ -1716,7 +1803,6 @@
             trMember.innerHTML = '<option value="">عضو مرتبط (اختياري)</option>' +
                 vault.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
 
-            closePanels();
             fetchCryptoPrices();
         }
 
@@ -1735,7 +1821,9 @@
             document.getElementById('walletModal').classList.add('hidden');
             document.getElementById('walletModal').classList.remove('flex');
             toggleTransForm(false);
-            toggleAdmin();
+            if (document.getElementById('adminPanel').classList.contains('hidden')) {
+                document.getElementById('overlay').classList.add('hidden');
+            }
         }
 
         function openTransaction(type) {
@@ -1826,8 +1914,8 @@
             }
 
         const results = showAll ? vault : vault.filter(m =>
-                (m.name && m.name.includes(query)) ||
-                (m.id && m.id.includes(query)) ||
+                (m.name && m.name.toLowerCase().includes(query.toLowerCase())) ||
+                (m.id && m.id.toLowerCase().includes(query.toLowerCase())) ||
                 (m.nationalID && m.nationalID.toString().includes(query))
             );
             resultsSection.classList.remove('hidden');
@@ -1946,10 +2034,12 @@
         }
 
         let treeScene, treeCamera, treeRenderer, treeControls, treeNodes = [], treeLabels = [];
+        let selectionPointer;
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
 
         function open3DTree() {
+            closePanels();
             document.getElementById('treeModal').classList.remove('hidden');
             document.getElementById('treeModal').classList.add('flex');
             init3DTree();
@@ -2063,19 +2153,41 @@
                 group.add(new THREE.Line(branchGeo, branchMat));
             });
 
+            // Add Selection Pointer (Arrow)
+            const pointerGeo = new THREE.ConeGeometry(0.6, 2, 8);
+            const pointerMat = new THREE.MeshStandardMaterial({
+                color: 0xffff00,
+                emissive: 0xffff00,
+                emissiveIntensity: 2
+            });
+            selectionPointer = new THREE.Mesh(pointerGeo, pointerMat);
+            selectionPointer.rotation.x = Math.PI; // Point down
+            selectionPointer.visible = false;
+            group.add(selectionPointer);
+
             treeScene.add(group);
             treeCamera.position.set(30, 10, 50);
             treeControls.update();
 
-            // Hover effects
+            // Mouse Events
             container.addEventListener('mousemove', (event) => {
                 const rect = container.getBoundingClientRect();
                 mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
                 mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
             });
 
+            container.addEventListener('mousedown', (event) => {
+                raycaster.setFromCamera(mouse, treeCamera);
+                const intersects = raycaster.intersectObjects(treeNodes);
+                if (intersects.length > 0) {
+                    highlightNode(intersects[0].object);
+                }
+            });
+
             function updateLabels() {
                 treeLabels.forEach(l => {
+                    const isSelected = l.element.classList.contains('selected-label');
+
                     const pos = l.node.position.clone().applyMatrix4(group.matrixWorld);
                     pos.project(treeCamera);
 
@@ -2085,9 +2197,13 @@
                     l.element.style.left = `${x}px`;
                     l.element.style.top = `${y}px`;
 
-                    // Hide if behind camera
+                    // Hide if behind camera or if very far away (z projection)
                     if (pos.z > 1) {
                         l.element.style.display = 'none';
+                    } else if (isSelected) {
+                        l.element.style.display = 'block';
+                        l.element.style.opacity = '1';
+                        l.element.style.zIndex = '50';
                     }
                 });
             }
@@ -2114,7 +2230,11 @@
                 raycaster.setFromCamera(mouse, treeCamera);
                 const intersects = raycaster.intersectObjects(treeNodes);
 
-                treeLabels.forEach(l => l.element.style.display = 'none');
+                treeLabels.forEach(l => {
+                    if (!l.element.classList.contains('selected-label')) {
+                        l.element.style.display = 'none';
+                    }
+                });
 
                 if (intersects.length > 0) {
                     const intersected = intersects[0].object;
