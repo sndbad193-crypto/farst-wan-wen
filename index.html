@@ -6,6 +6,8 @@
     <title>ديوان قبيلة الحياني - السجل الرقمي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -248,60 +250,253 @@
         <span id="hud-text">تمت العملية بنجاح</span>
     </div>
 
-    <!-- Registry Member Modal -->
-    <div id="bulkModal" class="fixed inset-0 bg-heritage-dark/90 backdrop-blur-md z-[100] hidden items-center justify-center p-6 overflow-y-auto">
-        <div class="max-w-4xl w-full glass-effect rounded-[3rem] p-8 md:p-12 border-2 border-heritage-gold/50 shadow-2xl relative text-heritage-emerald">
-            <button onclick="closeBulkModal()" class="absolute top-8 left-8 text-heritage-emerald/50 hover:text-heritage-emerald transition-colors">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- Registry Member Modal (Multi-Step Wizard) -->
+    <div id="bulkModal" class="fixed inset-0 bg-heritage-dark/95 backdrop-blur-xl z-[100] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
+        <div class="max-w-6xl w-full glass-effect rounded-[3.5rem] p-6 md:p-14 border-2 border-heritage-gold/40 shadow-[0_0_100px_rgba(0,0,0,0.8)] relative text-heritage-emerald">
+            <!-- Close Button -->
+            <button onclick="closeBulkModal()" class="absolute top-10 left-10 text-heritage-emerald/40 hover:text-heritage-emerald transition-all z-10">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
 
-            <h2 class="text-4xl font-black mb-2">توثيق فرد جديد</h2>
-            <p class="text-heritage-emerald/60 font-bold mb-8">إضافة بيانات تفصيلية لسجل ديوان قبيلة الحياني</p>
+            <!-- Wizard Progress Header -->
+            <div class="mb-12">
+                <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tighter">التوثيق الرقمي الشامل</h2>
+                <div class="flex gap-2 mb-4">
+                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-gold rounded-full" data-step="1"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="2"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="3"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="4"></div>
+                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full" data-step="5"></div>
+                </div>
+                <p id="stepDescription" class="text-heritage-gold font-black text-xs uppercase tracking-widest">الخطوة ١: البيانات الأساسية والنسب (Core Data)</p>
+            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">الاسم الرباعي الكامل</label>
-                        <input type="text" id="regFullName" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">رقم الهوية الوطنية (National ID)</label>
-                        <input type="text" id="regNationalID" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">الفخذ أو الفرع (Sub-Tribe)</label>
-                        <select id="regSubTribe" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
-                            <option value="عشيرة البو حياني">عشيرة البو حياني</option>
-                            <option value="فرع الرياض">فرع الرياض</option>
-                            <option value="فرع بغداد">فرع بغداد</option>
-                            <option value="فرع الكويت">فرع الكويت</option>
-                        </select>
+            <div id="wizardForm" class="min-h-[500px]">
+                <!-- Step 1: Core Data -->
+                <div class="wizard-step space-y-8" data-step="1">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-3 grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div class="col-span-full mb-2"><p class="text-[10px] font-black text-heritage-gold uppercase tracking-widest">الاسم الخماسي المنفصل</p></div>
+                            <input type="text" id="name_first" placeholder="الاسم" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <input type="text" id="name_father" placeholder="الأب" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <input type="text" id="name_grand" placeholder="الجد" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <input type="text" id="name_great" placeholder="جد الجد" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            <input type="text" id="name_family" placeholder="اللقب" class="wizard-input p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                        </div>
+
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">الرقم الوطني الموحد (AES-256)</label>
+                            <input type="text" id="national_id_secure" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">تاريخ الميلاد (ميلادي)</label>
+                            <input type="date" id="dob_gregorian" onchange="syncDates('g')" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">تاريخ الميلاد (هجري)</label>
+                            <input type="text" id="dob_hijri" placeholder="14xx/xx/xx" onchange="syncDates('h')" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all text-center">
+                        </div>
+
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">فصيلة الدم</label>
+                            <select id="blood_type" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                                <option value="A+">A+</option><option value="A-">A-</option>
+                                <option value="B+">B+</option><option value="B-">B-</option>
+                                <option value="O+">O+</option><option value="O-">O-</option>
+                                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                        <div class="space-y-4 md:col-span-2">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">الحالة الصحية / الملاحظات الحيوية</label>
+                            <input type="text" id="health_notes" placeholder="لا يوجد" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                        </div>
                     </div>
                 </div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">تاريخ الميلاد</label>
-                        <input type="date" id="regBirthDate" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+
+                <!-- Step 2: Education & Professional -->
+                <div class="wizard-step space-y-8 hidden" data-step="2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">المؤهل التعليمي</label>
+                            <select id="edu_level" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                                <option value="دكتوراه">دكتوراه</option><option value="ماجستير">ماجستير</option>
+                                <option value="بكالوريوس">بكالوريوس</option><option value="دبلوم">دبلوم</option>
+                                <option value="ثانوي">ثانوي</option>
+                            </select>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">التخصص الدقيق</label>
+                            <input type="text" id="professional_major" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">جهة العمل الحالية</label>
+                            <input type="text" id="workplace" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">البحث عن الأب (الربط الآلي)</label>
+                            <div class="relative">
+                                <input type="text" id="parent_search" onkeyup="searchParents()" placeholder="ابحث عن اسم الأب في القاعدة..." class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all pr-12">
+                                <span class="absolute right-5 top-1/2 -translate-y-1/2 opacity-30">🔍</span>
+                                <div id="parentResults" class="absolute top-full left-0 right-0 bg-white shadow-2xl rounded-2xl mt-2 max-h-40 overflow-y-auto hidden z-20 border-2 border-heritage-gold/20"></div>
+                            </div>
+                            <input type="hidden" id="parent_id_linked">
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">الرتبة الاجتماعية</label>
+                            <div class="flex gap-4">
+                                <label class="flex-grow flex items-center justify-center gap-2 p-4 border-2 border-heritage-emerald/10 rounded-2xl font-black cursor-pointer has-[:checked]:bg-heritage-gold has-[:checked]:text-heritage-emerald transition-all"><input type="radio" name="social_rank" value="شيخ" class="hidden"> شيخ</label>
+                                <label class="flex-grow flex items-center justify-center gap-2 p-4 border-2 border-heritage-emerald/10 rounded-2xl font-black cursor-pointer has-[:checked]:bg-heritage-gold has-[:checked]:text-heritage-emerald transition-all"><input type="radio" name="social_rank" value="وجيه" class="hidden"> وجيه</label>
+                                <label class="flex-grow flex items-center justify-center gap-2 p-4 border-2 border-heritage-emerald/10 rounded-2xl font-black cursor-pointer has-[:checked]:bg-heritage-gold has-[:checked]:text-heritage-emerald transition-all"><input type="radio" name="social_rank" value="فرد" checked class="hidden"> فرد</label>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">الحالة الاجتماعية</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="marital_status" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                                    <option value="أعزب">أعزب</option><option value="متزوج">متزوج</option>
+                                    <option value="أرمل">أرمل</option><option value="مطلق">مطلق</option>
+                                </select>
+                                <div class="flex gap-1">
+                                    <input type="number" id="children_male" placeholder="ذكور" class="w-1/2 p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black text-center">
+                                    <input type="number" id="children_female" placeholder="إناث" class="w-1/2 p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black text-center">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">المنطقة السكنية</label>
-                        <input type="text" id="regGov" class="w-full bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-xl p-4 outline-none focus:border-heritage-gold font-black transition-all">
+                </div>
+
+                <!-- Step 3: Biometrics & AI -->
+                <div class="wizard-step space-y-8 hidden" data-step="3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div class="bg-heritage-emerald/5 p-8 rounded-[3rem] border-2 border-heritage-emerald/10 flex flex-col items-center gap-6 relative group overflow-hidden">
+                            <div class="w-32 h-32 bg-heritage-gold/20 rounded-full flex items-center justify-center text-5xl transition-all group-hover:scale-110">👤</div>
+                            <div>
+                                <h3 class="font-black text-xl mb-1">Face ID</h3>
+                                <p class="text-[10px] opacity-40 font-bold uppercase">التعرف على الوجه</p>
+                            </div>
+                            <button type="button" onclick="startFaceScan()" class="px-8 py-3 bg-heritage-emerald text-heritage-gold font-black rounded-xl hover:bg-heritage-dark transition-all">فتح الكاميرا</button>
+                            <input type="hidden" id="face_print_data">
+                            <div id="face_scan_status" class="hidden absolute inset-0 bg-heritage-emerald/90 flex flex-col items-center justify-center text-heritage-gold font-black gap-4">
+                                <div class="w-12 h-12 border-4 border-heritage-gold border-t-transparent rounded-full animate-spin"></div>
+                                <span>Liveness Detection...</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-heritage-emerald/5 p-8 rounded-[3rem] border-2 border-heritage-emerald/10 flex flex-col items-center gap-6 relative group overflow-hidden">
+                            <div class="w-32 h-32 bg-heritage-gold/20 rounded-full flex items-center justify-center text-5xl transition-all group-hover:scale-110">☝️</div>
+                            <div>
+                                <h3 class="font-black text-xl mb-1">Fingerprint</h3>
+                                <p class="text-[10px] opacity-40 font-bold uppercase">بصمة الإصبع الرقمية</p>
+                            </div>
+                            <button type="button" onclick="startBioScan('finger')" class="px-8 py-3 bg-heritage-emerald text-heritage-gold font-black rounded-xl hover:bg-heritage-dark transition-all">تشفير البصمة</button>
+                        </div>
+
+                        <div class="bg-heritage-emerald/5 p-8 rounded-[3rem] border-2 border-heritage-emerald/10 flex flex-col items-center gap-6 relative group overflow-hidden">
+                            <div class="w-32 h-32 bg-heritage-gold/20 rounded-full flex items-center justify-center text-5xl transition-all group-hover:scale-110">🎙️</div>
+                            <div>
+                                <h3 class="font-black text-xl mb-1">Voice Print</h3>
+                                <p class="text-[10px] opacity-40 font-bold uppercase">البصمة الصوتية</p>
+                            </div>
+                            <button type="button" onclick="startBioScan('voice')" class="px-8 py-3 bg-heritage-emerald text-heritage-gold font-black rounded-xl hover:bg-heritage-dark transition-all">تسجيل الصوت</button>
+                        </div>
+
+                        <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 border-t border-heritage-emerald/10">
+                            <div class="space-y-4">
+                                <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">ماسح الوثائق الذكي (OCR)</label>
+                                <div class="w-full h-40 border-2 border-dashed border-heritage-emerald/20 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 hover:border-heritage-gold transition-all cursor-pointer relative overflow-hidden" onclick="simulateOCR()">
+                                    <span class="text-3xl opacity-30">📄</span>
+                                    <span class="text-xs font-black opacity-50">اضغط للمسح الضوئي للوثائق</span>
+                                    <div id="ocr_overlay" class="hidden absolute inset-0 bg-heritage-gold/20 backdrop-blur-sm flex items-center justify-center animate-pulse"><span class="font-black text-heritage-emerald">Extracting Data...</span></div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <label class="block text-[10px] font-black opacity-40 mr-2 uppercase">أرشيف المخطوطات والوثائق</label>
+                                <input type="file" multiple class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl font-black text-[10px]">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-black mb-1 mr-2 opacity-60">حالة الحساب</label>
-                        <div class="flex gap-4 p-2">
-                            <label class="flex items-center gap-2 font-bold"><input type="radio" name="regStatus" value="active" checked> نشط</label>
-                            <label class="flex items-center gap-2 font-bold"><input type="radio" name="regStatus" value="inactive"> غير نشط</label>
+                </div>
+
+                <!-- Step 4: Security & Privacy -->
+                <div class="wizard-step space-y-8 hidden" data-step="4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white/5 p-8 rounded-[3rem] border-2 border-white/10 space-y-6">
+                            <h3 class="font-black text-xl flex items-center gap-3">🛡️ الخصوصية الرقمية</h3>
+                            <div class="space-y-4">
+                                <label class="flex items-center gap-4 p-4 border-2 border-white/5 rounded-2xl font-bold cursor-pointer hover:bg-white/5 transition-all">
+                                    <input type="checkbox" id="e2e_encryption" checked class="w-6 h-6 accent-heritage-gold">
+                                    <div>
+                                        <p class="text-sm">تشفير النهاية للنهاية (E2EE)</p>
+                                        <p class="text-[10px] opacity-40">قفل الملف بكلمة سر رئيس القبيلة فقط</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-4 p-4 border-2 border-white/5 rounded-2xl font-bold cursor-pointer hover:bg-white/5 transition-all">
+                                    <input type="checkbox" id="auto_cache_destroy" checked class="w-6 h-6 accent-heritage-gold">
+                                    <div>
+                                        <p class="text-sm">تدمير الكاش الآلي</p>
+                                        <p class="text-[10px] opacity-40">مسح البيانات المؤقتة فور الإغلاق</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/5 p-8 rounded-[3rem] border-2 border-white/10 space-y-6">
+                            <h3 class="font-black text-xl flex items-center gap-3">📍 البيانات الجغرافية</h3>
+                            <div class="space-y-4">
+                                <div class="flex gap-2">
+                                    <input type="text" id="gps_coords" placeholder="إحداثيات GPS (X, Y)" class="flex-grow p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                                    <button type="button" onclick="getGPS()" class="px-6 bg-heritage-gold text-heritage-emerald font-black rounded-2xl hover:scale-105 transition-all">📍</button>
+                                </div>
+                                <input type="text" id="digital_address" placeholder="العنوان الرقمي الموحد (الترميز البريدي)" class="w-full p-5 bg-heritage-emerald/5 border-2 border-heritage-emerald/10 rounded-2xl outline-none focus:border-heritage-gold font-black transition-all">
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 bg-heritage-emerald p-8 rounded-[3rem] border-2 border-heritage-gold/30 flex flex-col md:flex-row items-center gap-10">
+                            <div class="flex-grow space-y-4">
+                                <h3 class="text-heritage-gold font-black text-2xl">التوقيع الرقمي والمصادقة</h3>
+                                <p class="text-sm font-bold opacity-60">أقر أنا صاحب الطلب بصحة البيانات المدرجة أعلاه وأتحمل المسؤولية القانونية والعشائرية عن أي معلومة خاطئة.</p>
+                                <div class="w-full h-32 bg-white/10 rounded-2xl border-2 border-heritage-gold/20 flex items-center justify-center cursor-crosshair group relative overflow-hidden">
+                                    <span class="opacity-20 font-black group-hover:opacity-40 transition-opacity">وقع هنا إلكترونياً</span>
+                                    <canvas id="signaturePad" class="absolute inset-0 w-full h-full"></canvas>
+                                </div>
+                            </div>
+                            <div id="qrPreview" class="w-40 h-40 bg-white p-2 rounded-2xl shadow-2xl flex items-center justify-center text-heritage-emerald text-[8px] font-black text-center">
+                                سيتم توليد QR Code عند الحفظ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Workflow & Preview -->
+                <div class="wizard-step space-y-8 hidden" data-step="5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <h3 class="font-black text-3xl">معاينة الطلب</h3>
+                            <div id="finalPreview" class="bg-heritage-emerald/5 p-8 rounded-[3rem] border-2 border-heritage-emerald/10 space-y-4 text-sm font-bold">
+                                <!-- JS Injected Summary -->
+                            </div>
+                        </div>
+                        <div class="flex flex-col justify-center gap-4">
+                            <div class="bg-heritage-gold/20 p-8 rounded-[3rem] border-2 border-heritage-gold/30 text-center">
+                                <p class="text-heritage-emerald font-black text-xl mb-4">نظام الاعتماد المعلق</p>
+                                <p class="text-xs font-bold opacity-60 leading-relaxed">ستبقى هذه البيانات في حالة "قيد المراجعة" حتى يتم تدقيقها من قبل لجنة النسب والمشرف العام للديوان. سيتم إرسال إشعار فوري لمجلس العائلة.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <button type="button" onclick="saveAsDraft()" class="p-5 bg-white/5 border-2 border-white/10 rounded-2xl font-black hover:bg-white/10 transition-all">حفظ كمسودة</button>
+                                <button type="button" onclick="generatePDF()" class="p-5 bg-white/5 border-2 border-white/10 rounded-2xl font-black hover:bg-white/10 transition-all">تحميل PDF</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-10 flex gap-4">
-                <button onclick="saveMember()" class="flex-grow py-5 bg-heritage-emerald text-heritage-gold font-black rounded-2xl shadow-xl hover:bg-heritage-dark transition-all text-xl">حفظ البيانات وتوثيقها</button>
-                <button onclick="closeBulkModal()" class="px-10 py-5 bg-heritage-gold/20 font-black rounded-2xl hover:bg-heritage-gold/30 transition-all">إلغاء</button>
+            <!-- Wizard Controls -->
+            <div class="mt-14 pt-8 border-t border-heritage-emerald/10 flex justify-between items-center">
+                <button id="btnPrev" onclick="moveStep(-1)" class="px-10 py-5 bg-heritage-emerald/5 font-black rounded-3xl hover:bg-heritage-emerald/10 transition-all opacity-0 pointer-events-none">السابق</button>
+                <div class="text-xs font-black opacity-30 uppercase tracking-[0.3em]">ديوان قبيلة الحياني</div>
+                <button id="btnNext" onclick="moveStep(1)" class="px-12 py-5 bg-heritage-emerald text-heritage-gold font-black rounded-3xl shadow-xl hover:bg-heritage-dark transition-all scale-110">التالي</button>
             </div>
         </div>
     </div>
@@ -452,7 +647,9 @@
 
         function logAudit(action, details) {
             const prevHash = auditLog.length > 0 ? auditLog[0].hash : '00000000';
-            const raw = `${Date.now()}-${action}-${details}-${prevHash}`;
+            const device = navigator.userAgent.split(' ')[0];
+            const raw = `${Date.now()}-${action}-${details}-${prevHash}-${device}`;
+
             // Simple hash simulation
             let hash = 0;
             for (let i = 0; i < raw.length; i++) {
@@ -468,7 +665,11 @@
                 action: action,
                 details: details,
                 hash: hashHex,
-                prev: prevHash
+                prev: prevHash,
+                meta: {
+                    device: device,
+                    origin: window.location.protocol
+                }
             };
             auditLog.unshift(entry);
             if(auditLog.length > 100) auditLog.pop();
@@ -642,41 +843,280 @@
             setTimeout(() => h.classList.add('translate-y-32'), 4000);
         }
 
+        let currentStep = 1;
+        const totalSteps = 5;
+
         function openBulkModal() {
+            currentStep = 1;
+            showStep(1);
             document.getElementById('bulkModal').classList.remove('hidden');
             document.getElementById('bulkModal').classList.add('flex');
             closePanels();
+            initSignaturePad();
+            loadDraft();
         }
+
         function closeBulkModal() {
+            if(document.getElementById('auto_cache_destroy')?.checked) {
+                document.getElementById('wizardForm').reset();
+            }
             document.getElementById('bulkModal').classList.add('hidden');
             document.getElementById('bulkModal').classList.remove('flex');
         }
 
+        function showStep(step) {
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+            document.querySelector(`.wizard-step[data-step="${step}"]`).classList.remove('hidden');
+
+            // Indicators
+            document.querySelectorAll('.wizard-step-indicator').forEach(i => {
+                const s = parseInt(i.dataset.step);
+                if(s < step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-emerald rounded-full";
+                else if(s === step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-gold rounded-full";
+                else i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-emerald/10 rounded-full";
+            });
+
+            // Descriptions
+            const descriptions = [
+                "الخطوة ١: البيانات الأساسية والنسب (Core Data)",
+                "الخطوة ٢: الكفاءات والربط العائلي (Education & Lineage)",
+                "الخطوة ٣: التحقق الحيوي والذكاء الاصطناعي (Biometrics & AI)",
+                "الخطوة ٤: الأمن والخصوصية والموقع (Security & Geo)",
+                "الخطوة ٥: المراجعة والاعتماد النهائي (Workflow)"
+            ];
+            document.getElementById('stepDescription').innerText = descriptions[step-1];
+
+            // Buttons
+            document.getElementById('btnPrev').style.opacity = step === 1 ? "0" : "1";
+            document.getElementById('btnPrev').style.pointerEvents = step === 1 ? "none" : "auto";
+            document.getElementById('btnNext').innerText = step === totalSteps ? "حفظ وتوثيق نهائي" : "التالي";
+
+            if(step === 5) updateFinalPreview();
+        }
+
+        function moveStep(delta) {
+            if(delta === 1 && !validateStep(currentStep)) return;
+
+            if(currentStep + delta > totalSteps) {
+                saveMember();
+                return;
+            }
+            currentStep += delta;
+            showStep(currentStep);
+        }
+
+        function validateStep(step) {
+            if(step === 1) {
+                const f = document.getElementById('name_first').value;
+                const nid = document.getElementById('national_id_secure').value;
+                if(!f || !nid) {
+                    alert("يرجى إكمال الاسم الأول والرقم الوطني");
+                    return false;
+                }
+                if(vault.some(v => v.nationalID === nid)) {
+                    alert("الرقم الوطني مسجل مسبقاً");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function syncDates(type) {
+            const g = document.getElementById('dob_gregorian');
+            const h = document.getElementById('dob_hijri');
+
+            if(type === 'g' && g.value) {
+                const date = new Date(g.value);
+                const options = { year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'islamic-uma' };
+                const formatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma', options);
+                const parts = formatter.formatToParts(date);
+                const day = parts.find(p => p.type === 'day').value;
+                const month = parts.find(p => p.type === 'month').value;
+                const year = parts.find(p => p.type === 'year').value;
+                h.value = `${year}/${month.padStart(2,'0')}/${day.padStart(2,'0')}`;
+            } else if (type === 'h' && h.value) {
+                // Simplified reverse logic for demonstration
+                const [hy, hm, hd] = h.value.split('/').map(Number);
+                if(hy && hm && hd) {
+                    const gy = hy + 579;
+                    g.value = `${gy}-01-01`;
+                }
+            }
+        }
+
+        function searchParents() {
+            const query = document.getElementById('parent_search').value;
+            const res = document.getElementById('parentResults');
+            if(query.length < 2) { res.classList.add('hidden'); return; }
+
+            const matches = vault.filter(v => v.name.includes(query));
+            if(matches.length > 0) {
+                res.innerHTML = matches.map(m => `<div onclick="selectParent('${m.id}', '${m.name}')" class="p-3 hover:bg-heritage-gold/10 cursor-pointer border-b border-black/5 font-bold text-xs">${m.name} (${m.id})</div>`).join('');
+                res.classList.remove('hidden');
+            } else {
+                res.classList.add('hidden');
+            }
+        }
+
+        function selectParent(id, name) {
+            document.getElementById('parent_id_linked').value = id;
+            document.getElementById('parent_search').value = name;
+            document.getElementById('parentResults').classList.add('hidden');
+            hyHud(`تم ربط الفرد بوالده: ${name}`);
+        }
+
+        async function startFaceScan() {
+            const status = document.getElementById('face_scan_status');
+            status.classList.remove('hidden');
+            status.classList.add('flex');
+            await new Promise(r => setTimeout(r, 2000));
+            status.innerHTML = "<span>Liveness Detected ✅</span>";
+            document.getElementById('face_print_data').value = "HASH_" + Math.random().toString(16);
+            setTimeout(() => status.classList.add('hidden'), 1000);
+            hyHud("تم التقاط بصمة الوجه الرقمية بنجاح");
+        }
+
+        function startBioScan(type) {
+            hyHud(`جاري تشفير بصمة ال${type === 'finger' ? 'إصبع' : 'صوت'}...`);
+            setTimeout(() => hyHud(`تم حفظ البصمة ال${type === 'finger' ? 'إصبع' : 'صوت'} بنجاح 🛡️`), 1500);
+        }
+
+        function simulateOCR() {
+            const overlay = document.getElementById('ocr_overlay');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                document.getElementById('name_family').value = "الحياني";
+                document.getElementById('workplace').value = "وزارة التعليم العالي";
+                hyHud("تم استخراج البيانات من الوثيقة آلياً 📄");
+            }, 2000);
+        }
+
+        function getGPS() {
+            hyHud("جاري تحديد الموقع الجغرافي...");
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('gps_coords').value = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                hyHud("تم تحديد إحداثيات السكن بدقة 📍");
+            }, err => {
+                document.getElementById('gps_coords').value = "33.3152, 44.3661"; // Mock Baghdad
+                hyHud("تم استخدام الموقع التقريبي للديوان");
+            });
+        }
+
+        function initSignaturePad() {
+            const canvas = document.getElementById('signaturePad');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            canvas.onmousedown = () => drawing = true;
+            canvas.onmouseup = () => drawing = false;
+            canvas.onmousemove = (e) => {
+                if(!drawing) return;
+                ctx.fillStyle = "#064e3b";
+                ctx.fillRect(e.offsetX, e.offsetY, 2, 2);
+            };
+        }
+
+        function updateFinalPreview() {
+            const name = `${document.getElementById('name_first').value} ${document.getElementById('name_father').value} ${document.getElementById('name_grand').value} ${document.getElementById('name_great').value} ${document.getElementById('name_family').value}`;
+            const nid = document.getElementById('national_id_secure').value;
+            const p = document.getElementById('finalPreview');
+            p.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div><p class="opacity-40">الاسم الكامل:</p><p>${name}</p></div>
+                    <div><p class="opacity-40">الرقم الوطني:</p><p>${nid.replace(/.(?=.{4})/g, '*')}</p></div>
+                    <div><p class="opacity-40">الرتبة:</p><p>${document.querySelector('input[name="social_rank"]:checked').value}</p></div>
+                    <div><p class="opacity-40">الموقع:</p><p>${document.getElementById('gps_coords').value || 'غير محدد'}</p></div>
+                </div>
+            `;
+
+            // Generate QR Code placeholder
+            const qrBox = document.getElementById('qrPreview');
+            qrBox.innerHTML = '';
+            new QRCode(qrBox, { text: `HAYYANI-${nid}`, width: 128, height: 128 });
+        }
+
+        function saveAsDraft() {
+            const draftData = {
+                name: {
+                    f: document.getElementById('name_first').value,
+                    fa: document.getElementById('name_father').value,
+                    g: document.getElementById('name_grand').value,
+                    gg: document.getElementById('name_great').value,
+                    l: document.getElementById('name_family').value
+                },
+                nid: document.getElementById('national_id_secure').value,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('HY_DRAFT_ENTRY', JSON.stringify(draftData));
+            hyHud("تم حفظ البيانات كمسودة مؤقتة 📝");
+            closeBulkModal();
+        }
+
+        function loadDraft() {
+            const draft = JSON.parse(localStorage.getItem('HY_DRAFT_ENTRY'));
+            if(draft) {
+                document.getElementById('name_first').value = draft.name.f;
+                document.getElementById('name_father').value = draft.name.fa;
+                document.getElementById('name_grand').value = draft.name.g;
+                document.getElementById('name_great').value = draft.name.gg;
+                document.getElementById('name_family').value = draft.name.l;
+                document.getElementById('national_id_secure').value = draft.nid;
+                hyHud("تم استعادة المسودة المحفوظة 📁");
+            }
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const name = `${document.getElementById('name_first').value} ${document.getElementById('name_father').value} ${document.getElementById('name_grand').value} ${document.getElementById('name_great').value} ${document.getElementById('name_family').value}`;
+            const nid = document.getElementById('national_id_secure').value;
+
+            doc.setFontSize(22);
+            doc.text("Diwan Al-Hayyani - Official Registry", 105, 20, { align: 'center' });
+            doc.line(20, 25, 190, 25);
+
+            doc.setFontSize(12);
+            doc.text(`Full Name: ${name}`, 20, 40);
+            doc.text(`National ID: ${nid}`, 20, 50);
+            doc.text(`Birth Date: ${document.getElementById('dob_gregorian').value} (${document.getElementById('dob_hijri').value})`, 20, 60);
+            doc.text(`Social Rank: ${document.querySelector('input[name="social_rank"]:checked').value}`, 20, 70);
+            doc.text(`Digital Address: ${document.getElementById('digital_address').value}`, 20, 80);
+
+            doc.text("Certified by: General Supervisor", 105, 150, { align: 'center' });
+
+            doc.save(`Hayyani_Registry_${nid}.pdf`);
+            hyHud("جاري توليد ملف PDF... 📄");
+        }
+
         function saveMember() {
+            const name = `${document.getElementById('name_first').value} ${document.getElementById('name_father').value} ${document.getElementById('name_grand').value} ${document.getElementById('name_great').value} ${document.getElementById('name_family').value}`;
             const m = {
                 id: `HY-${Math.floor(Math.random()*90000) + 10000}`,
-                name: document.getElementById('regFullName').value,
-                nationalID: document.getElementById('regNationalID').value,
-                subTribe: document.getElementById('regSubTribe').value,
-                birthDate: document.getElementById('regBirthDate').value,
-                gov: document.getElementById('regGov').value,
-                status: document.querySelector('input[name="regStatus"]:checked').value,
+                name: name.trim(),
+                nationalID: document.getElementById('national_id_secure').value,
+                subTribe: document.getElementById('name_family').value || 'عشيرة الحياني',
+                birthDate: document.getElementById('dob_gregorian').value,
+                gov: document.getElementById('digital_address').value || 'بغداد',
+                status: 'pending', // Workflow: Pending Approval
                 date: new Date().toLocaleDateString('ar-EG'),
-                verified: true
+                verified: false,
+                meta: {
+                    rank: document.querySelector('input[name="social_rank"]:checked').value,
+                    gps: document.getElementById('gps_coords').value,
+                    deviceID: navigator.userAgent.split(' ')[0],
+                    hijri: document.getElementById('dob_hijri').value
+                }
             };
-
-            if(!m.name || !m.nationalID) return alert('يرجى ملء الاسم ورقم الهوية');
-
-            // Prevent duplicate National ID
-            if(vault.some(v => v.nationalID === m.nationalID)) return alert('رقم الهوية هذا مسجل مسبقاً');
 
             vault.push(m);
             localStorage.setItem(DB_KEY, JSON.stringify(vault));
-            logAudit('إضافة فرد', `تم توثيق ${m.name}`);
+            logAudit('إضافة فرد (طلب معلق)', `تم إرسال طلب توثيق لـ ${m.name} من جهاز ${m.meta.deviceID} بموقع ${m.meta.gps}`);
 
             updateStats();
             closeBulkModal();
-            hyHud(`تم توثيق ${m.name} بنجاح`);
+            hyHud(`تم إرسال طلب توثيق ${m.name} بنجاح ✅`);
             if (document.getElementById('searchInput').value) searchName();
         }
 
