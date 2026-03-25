@@ -346,7 +346,7 @@
             </button>
 
             <!-- 4. الخرائط الجغرافية -->
-            <button onclick="closePanels(); hyHud('الخرائط الجغرافية قيد التطوير...')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openMap();" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">٤. الخرائط الجغرافية</span>
                 <span class="text-lg">🗺️</span>
             </button>
@@ -534,6 +534,50 @@
         <!-- Background Overlay -->
         <div class="absolute inset-0 bg-[#010c0a] pointer-events-none"></div>
         <div id="main-particle-container" class="absolute inset-0 pointer-events-none opacity-30"></div>
+
+        <!-- Floating Stats Panel (HUD) -->
+        <div id="sovereign-stats" class="fixed bottom-10 right-10 z-[150] w-64 p-6 bg-black/40 backdrop-blur-2xl border border-heritage-neonBlue/20 rounded-[2rem] shadow-2xl transition-all hover:scale-105 group pointer-events-auto">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-[10px] font-black text-heritage-neonBlue uppercase tracking-widest">Live Intelligence</p>
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-xs opacity-40">إجمالي السجل الرقمي</p>
+                    <div class="flex items-end gap-2">
+                        <span id="stat-total" class="text-3xl font-black text-heritage-cream">0</span>
+                        <span class="text-[10px] text-heritage-neonBlue pb-1">نسمة</span>
+                    </div>
+                </div>
+
+                <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div id="stat-progress" class="h-full bg-heritage-neonBlue shadow-[0_0_10px_#00f2ff]" style="width: 0%"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-[8px] font-bold">
+                    <div class="p-2 bg-white/5 rounded-lg">
+                        <p class="opacity-40">التوثيق</p>
+                        <p id="stat-verified" class="text-heritage-gold">٠٪</p>
+                    </div>
+                    <div class="p-2 bg-white/5 rounded-lg">
+                        <p class="opacity-40">النمو</p>
+                        <p class="text-green-500">+١٢.٥٪</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini Heatmap Mock -->
+            <div class="mt-4 pt-4 border-t border-white/10">
+                <p class="text-[8px] opacity-40 mb-2 uppercase tracking-widest">Geographical Heatmap</p>
+                <div class="w-full h-16 bg-heritage-emerald/10 rounded-xl relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+                    <div class="absolute top-4 left-6 w-3 h-3 bg-heritage-neonPink rounded-full blur-md animate-pulse"></div>
+                    <div class="absolute bottom-6 right-10 w-4 h-4 bg-heritage-neonBlue rounded-full blur-lg animate-pulse"></div>
+                    <div class="absolute top-1/2 left-1/2 w-2 h-2 bg-heritage-gold rounded-full blur-sm"></div>
+                </div>
+            </div>
+        </div>
 
         <div class="relative z-10 w-full max-w-5xl flex flex-col items-center">
             <!-- Logo Area -->
@@ -1011,11 +1055,109 @@
                 </svg>
             </button>
         </div>
-        <div id="tree-container" class="flex-grow relative cursor-crosshair overflow-hidden">
-            <div id="node-labels-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-            <div id="tree-instructions" class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full text-[10px] text-white/50 pointer-events-none border border-white/10">
-                استخدم الماوس للتدوير والتقريب • مرر الماوس فوق العقد لرؤية الأسماء
+        <div class="flex-grow relative flex overflow-hidden">
+            <!-- 3D Container -->
+            <div id="tree-container" class="flex-grow relative cursor-crosshair overflow-hidden">
+                <div id="node-labels-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                <div id="tree-instructions" class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full text-[10px] text-white/50 pointer-events-none border border-white/10 z-10">
+                    استخدم الماوس للتدوير والتقريب • انقر على العقد للتفاصيل
+                </div>
             </div>
+
+            <!-- Member Info Side Panel -->
+            <div id="memberSidePanel" class="w-96 bg-black/80 backdrop-blur-3xl border-l border-heritage-neonBlue/20 p-10 transform translate-x-full transition-transform duration-500 flex flex-col items-center text-center">
+                <button onclick="closeSidePanel()" class="absolute top-6 left-6 text-white/20 hover:text-white">✕</button>
+
+                <div id="sidePanelContent" class="w-full space-y-8 mt-10">
+                    <div class="relative w-32 h-32 mx-auto">
+                        <div class="absolute inset-0 bg-heritage-neonBlue blur-2xl opacity-30 animate-pulse"></div>
+                        <img id="sidePanelPhoto" src="" class="relative w-full h-full rounded-3xl border-2 border-heritage-neonBlue object-cover">
+                    </div>
+
+                    <div>
+                        <h3 id="sidePanelName" class="text-3xl font-black text-heritage-cream mb-2">الاسم بالكامل</h3>
+                        <p id="sidePanelID" class="text-heritage-neonBlue font-mono text-sm tracking-widest uppercase">ID: HY-00000</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 w-full text-right">
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                            <p class="text-[10px] opacity-40 mb-1">الرتبة العشائرية</p>
+                            <p id="sidePanelRank" class="font-black text-heritage-gold">فرد</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                            <p class="text-[10px] opacity-40 mb-1">تاريخ التوثيق</p>
+                            <p id="sidePanelDate" class="font-black">2024</p>
+                        </div>
+                    </div>
+
+                    <div class="w-full p-6 bg-heritage-neonBlue/10 rounded-3xl border border-heritage-neonBlue/30 flex items-center justify-between">
+                        <div class="text-right">
+                            <p class="text-xs font-black text-heritage-neonBlue">حالة التوثيق (Blockchain)</p>
+                            <p class="text-[10px] opacity-60">تشفير AES-256-GCM</p>
+                        </div>
+                        <span id="sidePanelVerified" class="text-3xl">🔒</span>
+                    </div>
+
+                    <button id="sidePanelFullView" class="w-full py-4 bg-heritage-neonBlue text-black font-black rounded-2xl hover:scale-105 transition-all">فتح السجل الكامل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Map Modal -->
+    <div id="mapModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[300] hidden items-center justify-center p-6">
+        <div class="max-w-6xl w-full glass-effect rounded-[3.5rem] p-10 border border-heritage-neonBlue/30 shadow-2xl relative text-heritage-cream flex flex-col h-[90vh]">
+            <button onclick="closeMap()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all z-10">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="mb-8 flex items-end justify-between">
+                <div>
+                    <h2 class="text-4xl font-black text-heritage-neonBlue mb-1">الانتشار الجغرافي للحياني</h2>
+                    <p class="text-xs font-bold opacity-40 uppercase tracking-widest">التوزيع السكاني لأبناء القبيلة في الوطن العربي</p>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                        <span class="w-3 h-3 bg-heritage-neonBlue rounded-full animate-pulse"></span>
+                        <span class="text-[10px] font-black">كثافة عالية</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                        <span class="w-3 h-3 bg-heritage-neonPink rounded-full opacity-50"></span>
+                        <span class="text-[10px] font-black">كثافة متوسطة</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-grow bg-black/40 rounded-[2.5rem] border border-white/5 relative overflow-hidden group">
+                <svg viewBox="0 0 800 400" class="w-full h-full opacity-60">
+                    <path d="M200 100 Q300 50 400 120 T600 100 T750 200 T600 350 T300 300 T150 250 Z" fill="none" stroke="rgba(0, 242, 255, 0.2)" stroke-width="1" />
+                    <circle cx="350" cy="180" r="15" fill="rgba(0, 242, 255, 0.4)" class="animate-pulse" />
+                    <circle cx="350" cy="180" r="4" fill="#00f2ff" />
+                    <text x="360" y="175" fill="#00f2ff" font-size="10" font-weight="black">العراق (المقر)</text>
+                    <circle cx="450" cy="160" r="10" fill="rgba(255, 0, 127, 0.3)" />
+                    <circle cx="450" cy="160" r="3" fill="#ff007f" />
+                    <text x="460" y="155" fill="#ff007f" font-size="8" font-weight="black">الأردن</text>
+                    <circle cx="420" cy="220" r="12" fill="rgba(0, 242, 255, 0.3)" />
+                    <circle cx="420" cy="220" r="3" fill="#00f2ff" />
+                    <text x="430" y="215" fill="#00f2ff" font-size="8" font-weight="black">السعودية</text>
+                    <circle cx="380" cy="140" r="8" fill="rgba(255, 0, 127, 0.2)" />
+                    <circle cx="380" cy="140" r="2" fill="#ff007f" />
+                    <text x="390" y="135" fill="#ff007f" font-size="8" font-weight="black">سوريا</text>
+                </svg>
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] pointer-events-none opacity-10"></div>
+                <div class="absolute bottom-10 right-10 bg-black/60 backdrop-blur-xl p-6 rounded-3xl border border-white/10 max-w-xs space-y-4">
+                    <p class="text-xs font-black text-heritage-gold uppercase tracking-tighter">مركز البيانات الجغرافية</p>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-[10px] font-bold"><span>العراق</span><span class="text-heritage-neonBlue">٦٥٪</span></div>
+                        <div class="h-1 bg-white/5 rounded-full"><div class="h-full bg-heritage-neonBlue w-[65%]"></div></div>
+                        <div class="flex justify-between text-[10px] font-bold"><span>الخليج العربي</span><span class="text-heritage-neonPink">٢٠٪</span></div>
+                        <div class="h-1 bg-white/5 rounded-full"><div class="h-full bg-heritage-neonPink w-[20%]"></div></div>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-6 text-center text-[10px] font-bold opacity-20 uppercase tracking-[0.4em]">نظام التتبع الجغرافي - ديوان الحياني</p>
         </div>
     </div>
 
@@ -1362,22 +1504,28 @@
             const badge = document.getElementById('stats-badge');
             const countEl = document.getElementById('memberCount');
             if(!countEl) return;
-            const vStats = document.getElementById('vaultStats');
-            const sStats = document.getElementById('searchStats');
 
-            const countStr = vault.length.toLocaleString('ar-EG');
+            const count = vault.length;
+            const countStr = count.toLocaleString('ar-EG');
             countEl.innerText = countStr;
-            if(vStats) vStats.innerText = countStr;
 
-            const searchCount = parseInt(localStorage.getItem('HY_SEARCH_COUNT') || '0');
-            if(sStats) sStats.innerText = searchCount.toLocaleString('ar-EG');
+            // Update Floating HUD
+            const statTotal = document.getElementById('stat-total');
+            if (statTotal) statTotal.innerText = countStr;
 
-            if (vault.length > 0) {
-                badge.classList.remove('scale-0');
-                badge.classList.add('scale-100');
+            const progress = document.getElementById('stat-progress');
+            if (progress) progress.style.width = Math.min(100, (count / 1000) * 100) + '%';
+
+            const verifiedPercent = vault.length > 0 ? Math.round((vault.filter(m => m.status === 'active').length / vault.length) * 100) : 0;
+            const statVerified = document.getElementById('stat-verified');
+            if (statVerified) statVerified.innerText = verifiedPercent.toLocaleString('ar-EG') + '٪';
+
+            if (count > 0) {
+                badge?.classList.remove('scale-0');
+                badge?.classList.add('scale-100');
             } else {
-                badge.classList.add('scale-0');
-                badge.classList.remove('scale-100');
+                badge?.classList.add('scale-0');
+                badge?.classList.remove('scale-100');
             }
         }
 
@@ -1772,6 +1920,38 @@
                 labelObj.element.style.fontSize = '16px';
                 labelObj.element.innerHTML = `🌟 ${node.userData.name} 🌟`;
             }
+
+            // Show Side Panel if not root
+            if (node.userData.id) {
+                showMemberSidePanel(node.userData.id);
+            } else {
+                closeSidePanel();
+            }
+        }
+
+        function showMemberSidePanel(id) {
+            const m = vault.find(v => v.id === id);
+            if (!m) return;
+
+            document.getElementById('sidePanelPhoto').src = m.photo || `https://ui-avatars.com/api/?name=${m.name}&background=010c0a&color=00f2ff`;
+            document.getElementById('sidePanelName').innerText = m.name;
+            document.getElementById('sidePanelID').innerText = `ID: ${m.id}`;
+            document.getElementById('sidePanelRank').innerText = m.meta?.rank || 'فرد';
+            document.getElementById('sidePanelDate').innerText = m.date || '2024';
+            document.getElementById('sidePanelVerified').innerText = m.status === 'active' ? '🛡️' : '🔒';
+
+            document.getElementById('sidePanelFullView').onclick = () => {
+                closeTree();
+                document.getElementById('searchInput').value = m.id;
+                searchName();
+            };
+
+            const panel = document.getElementById('memberSidePanel');
+            panel.classList.remove('translate-x-full');
+        }
+
+        function closeSidePanel() {
+            document.getElementById('memberSidePanel').classList.add('translate-x-full');
         }
 
         function updateFinalPreview() {
@@ -1908,6 +2088,21 @@
             document.getElementById('groupModal').classList.remove('flex');
             // If we came from admin panel, it might still be there but hidden by group modal.
             // If we want to return to main UI:
+            if (document.getElementById('adminPanel').classList.contains('hidden')) {
+                document.getElementById('overlay').classList.add('hidden');
+            }
+        }
+
+        function openMap() {
+            closePanels();
+            document.getElementById('mapModal').classList.remove('hidden');
+            document.getElementById('mapModal').classList.add('flex');
+            document.getElementById('overlay').classList.remove('hidden');
+        }
+
+        function closeMap() {
+            document.getElementById('mapModal').classList.add('hidden');
+            document.getElementById('mapModal').classList.remove('flex');
             if (document.getElementById('adminPanel').classList.contains('hidden')) {
                 document.getElementById('overlay').classList.add('hidden');
             }
@@ -2230,6 +2425,7 @@
         }
 
         function closeTree() {
+            closeSidePanel();
             document.getElementById('treeModal').classList.add('hidden');
             document.getElementById('treeModal').classList.remove('flex');
             if (treeRenderer) {
@@ -2286,17 +2482,25 @@
             group.add(new THREE.Line(helixGeo2, helixMat2));
 
             // Origin (Root) Node - Tribal Patriarch
-            const rootGeo = new THREE.SphereGeometry(2.0, 32, 32); // Made it larger (2.0)
+            const rootGeo = new THREE.SphereGeometry(3.5, 64, 64);
             const rootMat = new THREE.MeshStandardMaterial({
                 color: 0x00f2ff,
                 emissive: 0x00f2ff,
-                emissiveIntensity: 2
+                emissiveIntensity: 4,
+                transparent: true,
+                opacity: 0.9
             });
             const rootNode = new THREE.Mesh(rootGeo, rootMat);
             rootNode.position.set(0, -25, 0);
-            rootNode.userData = { name: "الجد الجامع (الأصل)", isRoot: true };
+            rootNode.userData = { name: "الجد الجامع (الأصل)", isRoot: true, type: 'patriarch' };
             group.add(rootNode);
             treeNodes.push(rootNode);
+
+            // Add a secondary glow sphere for the root
+            const rootGlowGeo = new THREE.SphereGeometry(5.0, 32, 32);
+            const rootGlowMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.15 });
+            const rootGlow = new THREE.Mesh(rootGlowGeo, rootGlowMat);
+            rootNode.add(rootGlow);
 
             // Origin Label
             const rootLabel = document.createElement('div');
@@ -2305,21 +2509,38 @@
             labelsContainer.appendChild(rootLabel);
             treeLabels.push({ element: rootLabel, node: rootNode });
 
-            // Create Neon Nodes for members
+            // Create Neon Nodes for members with color coding and curved branches
             vault.forEach((m, i) => {
-                const angle = (i / vault.length) * Math.PI * 8; // Spiral distribution
-                const radius = 6 + Math.random() * 8;
-                const height = (i / Math.max(1, vault.length)) * 48 - 24;
+                const angle = (i / vault.length) * Math.PI * 8;
+                const radius = 8 + Math.random() * 10;
+                const height = (i / Math.max(1, vault.length)) * 50 - 25;
 
-                const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+                // Color coding based on index (simulated generations/branches)
+                let color, emissive;
+                let type = 'member';
+                if (i < vault.length * 0.2) {
+                    color = 0x00f2ff; // Cyan (Ancestor/Core)
+                    emissive = 0x00f2ff;
+                    type = 'ancestor';
+                } else if (i < vault.length * 0.7) {
+                    color = 0xff007f; // Magenta (Branch/Main)
+                    emissive = 0xff007f;
+                    type = 'branch';
+                } else {
+                    color = 0xd4af37; // Gold (Descendant/New)
+                    emissive = 0xd4af37;
+                    type = 'descendant';
+                }
+
+                const geometry = new THREE.SphereGeometry(0.7, 24, 24);
                 const material = new THREE.MeshStandardMaterial({
-                    color: i % 2 === 0 ? 0x00f2ff : 0xff007f,
-                    emissive: i % 2 === 0 ? 0x00f2ff : 0xff007f,
-                    emissiveIntensity: 1.5
+                    color: color,
+                    emissive: emissive,
+                    emissiveIntensity: 2
                 });
                 const node = new THREE.Mesh(geometry, material);
                 node.position.set(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
-                node.userData = { name: m.name, id: m.id };
+                node.userData = { name: m.name, id: m.id, type: type };
                 group.add(node);
                 treeNodes.push(node);
 
@@ -2330,10 +2551,23 @@
                 labelsContainer.appendChild(label);
                 treeLabels.push({ element: label, node: node });
 
-                // Branch to trunk
+                // Curved Branch to trunk
                 const trunkPoint = new THREE.Vector3(Math.cos(angle) * 2, height, Math.sin(angle) * 2);
-                const branchGeo = new THREE.BufferGeometry().setFromPoints([trunkPoint, node.position]);
-                const branchMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
+                const midPoint = new THREE.Vector3(
+                    (trunkPoint.x + node.position.x) / 2 + (Math.random() - 0.5) * 5,
+                    (trunkPoint.y + node.position.y) / 2,
+                    (trunkPoint.z + node.position.z) / 2 + (Math.random() - 0.5) * 5
+                );
+
+                const curve = new THREE.CatmullRomCurve3([trunkPoint, midPoint, node.position]);
+                const curvePoints = curve.getPoints(20);
+                const branchGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
+                const branchMat = new THREE.LineBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.3,
+                    linewidth: 2
+                });
                 group.add(new THREE.Line(branchGeo, branchMat));
             });
 
@@ -2472,6 +2706,7 @@
                 closeTree();
                 closeOTPModal();
                 closeBulkModal();
+                closeMap();
             }
         });
 
