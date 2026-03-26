@@ -176,20 +176,25 @@
             font-size: 10px;
             font-weight: 900;
             pointer-events: none;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid rgba(0, 242, 255, 0.3);
+            background: rgba(0, 242, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 242, 255, 0.4);
             white-space: nowrap;
             transform: translate(-50%, -150%);
             display: none;
             z-index: 10;
+            text-shadow: 0 0 5px #00f2ff;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
         }
         .selected-label {
             display: block !important;
             border: 2px solid #00f2ff !important;
-            box-shadow: 0 0 15px #00f2ff !important;
+            box-shadow: 0 0 25px #00f2ff !important;
+            background: rgba(0, 242, 255, 0.2) !important;
             z-index: 20;
+            font-size: 14px !important;
         }
     </style>
 </head>
@@ -352,19 +357,19 @@
             </button>
 
             <!-- 5. الإحصائيات والرسوم البيانية -->
-            <button onclick="closePanels(); hyHud('الإحصائيات قيد التحديث...')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('stats')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">٥. الإحصائيات والرسوم البيانية</span>
                 <span class="text-lg">📊</span>
             </button>
 
             <!-- 6. المستندات الرسمية -->
-            <button onclick="closePanels(); hyHud('المستندات الرسمية محفوظة في الأرشيف')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('docs')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">٦. المستندات الرسمية</span>
                 <span class="text-lg">📄</span>
             </button>
 
             <!-- 7. العقود الذكية (بلوك تشين) -->
-            <button onclick="closePanels(); hyHud('تقنية البلوك تشين مفعلة للتوثيق')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('blockchain')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">٧. العقود الذكية (بلوك تشين)</span>
                 <span class="text-lg">⛓️</span>
             </button>
@@ -376,19 +381,19 @@
             </button>
 
             <!-- 9. الكتب والمراجع -->
-            <button onclick="closePanels(); hyHud('مكتبة الأنساب قيد التحميل...')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('books')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">٩. الكتب والمراجع</span>
                 <span class="text-lg">📚</span>
             </button>
 
             <!-- 10. المناسبات والأحداث -->
-            <button onclick="closePanels(); hyHud('لا توجد أحداث قادمة حالياً')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('events')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">١٠. المناسبات والأحداث</span>
                 <span class="text-lg">📅</span>
             </button>
 
             <!-- 11. الصور والفيديوهات -->
-            <button onclick="closePanels(); hyHud('معرض الوسائط قيد التجهيز')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('media')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">١١. الصور والفيديوهات</span>
                 <span class="text-lg">🎥</span>
             </button>
@@ -400,7 +405,7 @@
             </button>
 
             <!-- 13. اللغة -->
-            <button onclick="closePanels(); hyHud('اللغة الافتراضية: العربية')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('lang')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">١٣. اللغة</span>
                 <span class="text-lg">🌐</span>
             </button>
@@ -412,7 +417,7 @@
             </button>
 
             <!-- 15. حول المنصة -->
-            <button onclick="closePanels(); hyHud('ديوان الحياني: منصة التوثيق الرقمي الشاملة')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('about')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">١٥. حول المنصة</span>
                 <span class="text-lg">ℹ️</span>
             </button>
@@ -1045,60 +1050,70 @@
         </div>
     </div>
 
-    <!-- 3D Tree Modal -->
+    <!-- 3D Celestial Tree Modal -->
     <div id="treeModal" class="fixed inset-0 bg-black z-[300] hidden flex-col">
-        <div class="p-6 bg-black/80 backdrop-blur-xl flex justify-between items-center border-b border-heritage-neonBlue/30">
-            <h2 class="text-heritage-neonBlue font-black text-2xl">شجرة النسب التفاعلية 3D</h2>
-            <button onclick="closeTree()" class="text-heritage-cream hover:text-heritage-neonBlue transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="flex-grow relative flex overflow-hidden">
-            <!-- 3D Container -->
-            <div id="tree-container" class="flex-grow relative cursor-crosshair overflow-hidden">
-                <div id="node-labels-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-                <div id="tree-instructions" class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full text-[10px] text-white/50 pointer-events-none border border-white/10 z-10">
-                    استخدم الماوس للتدوير والتقريب • انقر على العقد للتفاصيل
+        <div class="p-6 bg-black/80 backdrop-blur-xl flex justify-between items-center border-b border-heritage-neonBlue/30 relative z-20">
+            <h2 class="text-heritage-neonBlue font-black text-2xl flex items-center gap-4">
+                <span class="text-3xl">🌌</span>
+                سديم النسب - ديوان الحياني
+            </h2>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/40">
+                    <span>تحكم الكاميرا: WASD / Mouse</span>
+                    <span class="w-1 h-1 bg-white/20 rounded-full"></span>
+                    <span>انقر على النجوم للتفاصيل</span>
                 </div>
+                <button onclick="closeTree()" class="text-heritage-cream hover:text-heritage-neonBlue transition-all hover:rotate-90">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-grow relative cursor-crosshair overflow-hidden">
+            <!-- 3D Container -->
+            <div id="tree-container" class="absolute inset-0"></div>
+
+            <!-- Node Labels Overlay -->
+            <div id="node-labels-container" class="absolute inset-0 pointer-events-none z-10"></div>
+
+            <!-- Holographic Info Overlay (Replaces side panel) -->
+            <div id="hologram-info" class="absolute bottom-10 left-10 p-8 glass-effect rounded-[3rem] border-2 border-heritage-neonBlue/40 hidden flex-col items-center text-center animate-slide-up z-20 max-w-sm pointer-events-auto">
+                <div class="relative mb-6">
+                    <div class="absolute -inset-4 bg-heritage-neonBlue blur-2xl opacity-20 animate-pulse"></div>
+                    <img id="holo-photo" src="" class="relative w-24 h-24 rounded-full border-2 border-heritage-neonBlue object-cover">
+                    <div class="absolute -bottom-2 -right-2 bg-heritage-neonBlue text-black p-2 rounded-full text-xs font-black shadow-lg">✓</div>
+                </div>
+                <h3 id="holo-name" class="text-2xl font-black text-heritage-cream mb-1">اسم الفرد</h3>
+                <p id="holo-rank" class="text-heritage-neonBlue text-[10px] font-black uppercase tracking-[0.3em] mb-4">Sovereign Member</p>
+                <div class="grid grid-cols-2 gap-2 w-full mb-6">
+                    <div class="p-3 bg-white/5 rounded-2xl border border-white/10">
+                        <p class="text-[8px] opacity-40 uppercase">Lineage ID</p>
+                        <p id="holo-id" class="text-xs font-black text-heritage-gold">HY-000</p>
+                    </div>
+                    <div class="p-3 bg-white/5 rounded-2xl border border-white/10">
+                        <p class="text-[8px] opacity-40 uppercase">Registry Year</p>
+                        <p id="holo-year" class="text-xs font-black">2024</p>
+                    </div>
+                </div>
+                <button id="holo-deep-link" class="w-full py-4 bg-heritage-neonBlue/10 text-heritage-neonBlue border border-heritage-neonBlue/40 font-black rounded-2xl hover:bg-heritage-neonBlue hover:text-black transition-all text-sm">استعراض السجل الكامل</button>
+                <button onclick="closeHologram()" class="mt-4 text-[10px] font-bold text-white/20 hover:text-white transition-colors">إغلاق العرض</button>
             </div>
 
-            <!-- Member Info Side Panel -->
-            <div id="memberSidePanel" class="w-96 bg-black/80 backdrop-blur-3xl border-l border-heritage-neonBlue/20 p-10 transform translate-x-full transition-transform duration-500 flex flex-col items-center text-center">
-                <button onclick="closeSidePanel()" class="absolute top-6 left-6 text-white/20 hover:text-white">✕</button>
-
-                <div id="sidePanelContent" class="w-full space-y-8 mt-10">
-                    <div class="relative w-32 h-32 mx-auto">
-                        <div class="absolute inset-0 bg-heritage-neonBlue blur-2xl opacity-30 animate-pulse"></div>
-                        <img id="sidePanelPhoto" src="" class="relative w-full h-full rounded-3xl border-2 border-heritage-neonBlue object-cover">
+            <!-- Celestial Stats HUD -->
+            <div class="absolute top-10 right-10 p-6 bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl pointer-events-none">
+                <p class="text-[8px] font-black text-heritage-neonPink uppercase tracking-widest mb-2">Celestial Density</p>
+                <div class="flex items-center gap-4">
+                    <div class="text-center">
+                        <p id="tree-node-count" class="text-2xl font-black text-white">0</p>
+                        <p class="text-[8px] opacity-40">Stars</p>
                     </div>
-
-                    <div>
-                        <h3 id="sidePanelName" class="text-3xl font-black text-heritage-cream mb-2">الاسم بالكامل</h3>
-                        <p id="sidePanelID" class="text-heritage-neonBlue font-mono text-sm tracking-widest uppercase">ID: HY-00000</p>
+                    <div class="w-[1px] h-8 bg-white/10"></div>
+                    <div class="text-center">
+                        <p class="text-2xl font-black text-heritage-neonBlue">∞</p>
+                        <p class="text-[8px] opacity-40">Branches</p>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4 w-full text-right">
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                            <p class="text-[10px] opacity-40 mb-1">الرتبة العشائرية</p>
-                            <p id="sidePanelRank" class="font-black text-heritage-gold">فرد</p>
-                        </div>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                            <p class="text-[10px] opacity-40 mb-1">تاريخ التوثيق</p>
-                            <p id="sidePanelDate" class="font-black">2024</p>
-                        </div>
-                    </div>
-
-                    <div class="w-full p-6 bg-heritage-neonBlue/10 rounded-3xl border border-heritage-neonBlue/30 flex items-center justify-between">
-                        <div class="text-right">
-                            <p class="text-xs font-black text-heritage-neonBlue">حالة التوثيق (Blockchain)</p>
-                            <p class="text-[10px] opacity-60">تشفير AES-256-GCM</p>
-                        </div>
-                        <span id="sidePanelVerified" class="text-3xl">🔒</span>
-                    </div>
-
-                    <button id="sidePanelFullView" class="w-full py-4 bg-heritage-neonBlue text-black font-black rounded-2xl hover:scale-105 transition-all">فتح السجل الكامل</button>
                 </div>
             </div>
         </div>
@@ -1158,6 +1173,23 @@
                 </div>
             </div>
             <p class="mt-6 text-center text-[10px] font-bold opacity-20 uppercase tracking-[0.4em]">نظام التتبع الجغرافي - ديوان الحياني</p>
+        </div>
+    </div>
+
+    <!-- Info Display Modal (Unified for Sidebar) -->
+    <div id="infoModal" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[350] hidden items-center justify-center p-6 overflow-y-auto">
+        <div class="max-w-5xl w-full glass-effect rounded-[4rem] p-10 md:p-16 border border-heritage-neonBlue/30 shadow-2xl relative text-heritage-cream">
+            <button onclick="closeInfoModal()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div id="infoModalContent">
+                <!-- Content injected dynamically -->
+            </div>
+
+            <p class="mt-12 text-center text-[10px] font-bold opacity-20 uppercase tracking-[0.4em]">مركز المعلومات الرقمي - ديوان الحياني</p>
         </div>
     </div>
 
@@ -1303,6 +1335,16 @@
             const config = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{"theme":"light"}');
             if(config.theme === 'dark') document.documentElement.classList.add('dark');
 
+            if(vault.length === 0) {
+                // Initial Seed Data for visualization
+                vault = [
+                    { id: 'HY-10201', name: 'أحمد جاسم الحياني', status: 'active', date: '٢٠٢٤/٠١/١٢', meta: { rank: 'شيخ', hijri: '١٤٤٥/٠٦/٢٨' }, gov: 'بغداد' },
+                    { id: 'HY-44291', name: 'محمد علي الحياني', status: 'active', date: '٢٠٢٤/٠٢/٠٥', meta: { rank: 'فرد' }, gov: 'الموصل' },
+                    { id: 'HY-88231', name: 'سارة يوسف الحياني', status: 'pending', date: '٢٠٢٤/٠٥/٢٠', meta: { rank: 'فرد' }, gov: 'عمان' },
+                    { id: 'HY-33210', name: 'خالد وليد الحياني', status: 'active', date: '٢٠٢٤/٠٣/١٥', meta: { rank: 'وجيه' }, gov: 'الرياض' }
+                ];
+                localStorage.setItem(DB_KEY, JSON.stringify(vault));
+            }
             updateStats();
             initChart();
         }
@@ -1581,6 +1623,310 @@
         let currentStep = 1;
         const totalSteps = 5;
 
+        function openInfoModal(type) {
+            closePanels();
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('infoModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('overlay').classList.remove('hidden');
+
+            let html = '';
+            switch(type) {
+                case 'stats':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">إحصائيات ديوان السيادة</h2>
+                            <p class="text-sm opacity-40">تحليل البيانات الديموغرافية لأفراد القبيلة</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 h-96">
+                            <div class="bg-white/5 p-6 rounded-3xl border border-white/10 flex flex-col items-center">
+                                <p class="text-xs font-black mb-4">توزيع الفروع (العشائر)</p>
+                                <canvas id="branchPieChart"></canvas>
+                            </div>
+                            <div class="bg-white/5 p-6 rounded-3xl border border-white/10 flex flex-col items-center">
+                                <p class="text-xs font-black mb-4">معدل النمو الشهري</p>
+                                <canvas id="monthlyLineChart"></canvas>
+                            </div>
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    setTimeout(initInfoCharts, 100);
+                    break;
+                case 'docs':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">الأرشيف الرقمي للمستندات</h2>
+                            <p class="text-sm opacity-40">الوثائق الرسمية والمخطوطات التاريخية الموثقة</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            ${[1,2,3,4,5,6].map(i => `
+                                <div class="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-heritage-neonBlue transition-all group">
+                                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">📜</div>
+                                    <h4 class="font-black text-lg">وثيقة نسب رقم ${i}</h4>
+                                    <p class="text-[10px] opacity-40 mb-4">تاريخ التوثيق: 2024/05/${i}</p>
+                                    <button class="w-full py-2 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-xl text-[10px] font-black">تحميل المستند</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    break;
+                case 'about':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">حول ديوان الحياني</h2>
+                            <div class="w-20 h-1.5 bg-heritage-neonPink rounded-full mx-auto mt-4"></div>
+                        </div>
+                        <div class="space-y-8 text-right leading-loose">
+                            <p class="text-xl font-bold">تعد منصة "ديوان قبيلة الحياني" أول نظام سيادي رقمي متكامل لتوثيق الأنساب في الوطن العربي باستخدام تقنيات الويب المتقدمة والواقع الافتراضي.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="p-6 bg-white/5 rounded-[2rem] border border-white/10">
+                                    <h4 class="text-heritage-gold font-black mb-2">رؤيتنا</h4>
+                                    <p class="text-sm opacity-60">بناء قاعدة بيانات عالمية مشفرة تربط كافة أبناء القبيلة عبر السلالات الموثقة تاريخياً.</p>
+                                </div>
+                                <div class="p-6 bg-white/5 rounded-[2rem] border border-white/10">
+                                    <h4 class="text-heritage-neonBlue font-black mb-2">التقنية</h4>
+                                    <p class="text-sm opacity-60">نستخدم محرك Three.js للتمثيل ثلاثي الأبعاد وخوارزميات التشفير AES-256 لحماية البيانات الحساسة.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    break;
+                case 'lang':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">إعدادات اللغة</h2>
+                            <p class="text-sm opacity-40">اختر لغة واجهة النظام السيادي</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button class="p-8 bg-heritage-neonBlue text-black font-black rounded-3xl text-2xl flex items-center justify-between">العربية (الأصلية) <span>🇸🇦</span></button>
+                            <button class="p-8 bg-white/5 border border-white/10 text-white font-black rounded-3xl text-2xl flex items-center justify-between opacity-50 cursor-not-allowed">English (Beta) <span>🇺🇸</span></button>
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    break;
+                case 'books':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">مكتبة الأنساب والمراجع</h2>
+                            <p class="text-sm opacity-40">أهم الكتب والمصادر التاريخية عن قبيلة الحياني</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            ${['تاريخ قبيلة الحياني', 'ديوان العرب - الحياني', 'سلالات المجد', 'موسوعة الأنساب'].map(book => `
+                                <div class="bg-white/5 p-6 rounded-3xl border border-white/10 hover:scale-105 transition-all">
+                                    <div class="w-full aspect-[3/4] bg-heritage-neonBlue/10 rounded-xl mb-4 flex items-center justify-center text-4xl shadow-inner">📚</div>
+                                    <h4 class="font-black text-center">${book}</h4>
+                                    <p class="text-[8px] opacity-40 text-center mt-2">المؤلف: لجنة التاريخ بالديوان</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    break;
+                case 'events':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">التقويم العشائري</h2>
+                            <p class="text-sm opacity-40">المناسبات والاجتماعات القادمة</p>
+                        </div>
+                        <div class="space-y-4">
+                            ${['اجتماع مجلس الحكماء', 'المهرجان السنوي للقبيلة', 'حفل تكريم المتفوقين'].map((ev, i) => `
+                                <div class="bg-white/5 p-6 rounded-3xl border border-white/10 flex items-center justify-between">
+                                    <div class="flex items-center gap-6">
+                                        <div class="text-center bg-heritage-neonBlue text-black p-3 rounded-2xl min-w-[80px]">
+                                            <p class="font-black text-lg">${10+i}</p>
+                                            <p class="text-[8px] font-bold">يونيو 2024</p>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-black text-xl">${ev}</h4>
+                                            <p class="text-xs opacity-40">الموقع: قاعة الديوان المركزية - بغداد</p>
+                                        </div>
+                                    </div>
+                                    <button class="px-6 py-3 bg-white/10 rounded-xl font-black text-xs hover:bg-heritage-neonBlue hover:text-black transition-all">تأكيد الحضور</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    break;
+                case 'media':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">معرض الوسائط الرقمية</h2>
+                            <p class="text-sm opacity-40">صور وفيديوهات من أرشيف الديوان</p>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            ${[1,2,3,4,5,6,7,8].map(i => `
+                                <div class="aspect-square bg-white/5 rounded-2xl border border-white/10 overflow-hidden group relative">
+                                    <div class="absolute inset-0 bg-heritage-neonBlue/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-4xl">🖼️</div>
+                                    <img src="https://picsum.photos/400/400?random=${i}" class="w-full h-full object-cover opacity-50">
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    break;
+                case 'blockchain':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">سلسلة الثقة (Blockchain Ledger)</h2>
+                            <p class="text-sm opacity-40">سجل المعاملات والتوثيقات المشفرة غير القابلة للتلاعب</p>
+                        </div>
+                        <div class="flex justify-center mb-8">
+                             <button onclick="simulateAuditAction()" class="px-8 py-3 bg-heritage-neonPink text-white font-black rounded-2xl shadow-[0_0_20px_rgba(255,0,127,0.3)] hover:scale-105 transition-all">إضافة توثيق جديد للسلسلة ⛓️</button>
+                        </div>
+                        <div id="blockchain-viz" class="flex flex-col gap-6 items-center py-10 overflow-x-hidden">
+                            <!-- Blocks injected here -->
+                        </div>
+                    `;
+                    content.innerHTML = html;
+                    setTimeout(renderBlockchain, 100);
+                    break;
+            }
+        }
+
+        function closeInfoModal() {
+            const modal = document.getElementById('infoModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('overlay').classList.add('hidden');
+        }
+
+        function initInfoCharts() {
+            const pieCtx = document.getElementById('branchPieChart');
+            if(pieCtx) {
+                new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['بغداد', 'الموصل', 'الأنبار', 'البصرة', 'أخرى'],
+                        datasets: [{
+                            data: [45, 20, 15, 10, 10],
+                            backgroundColor: ['#00f2ff', '#ff007f', '#bc13fe', '#d4af37', '#064e3b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { color: '#fff', font: { family: 'Cairo' } } } }
+                    }
+                });
+            }
+
+            const lineCtx = document.getElementById('monthlyLineChart');
+            if(lineCtx) {
+                new Chart(lineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو'],
+                        datasets: [{
+                            label: 'المنتسبين',
+                            data: [150, 280, 420, 390, 560],
+                            borderColor: '#00f2ff',
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(0, 242, 255, 0.1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#fff' } },
+                            x: { grid: { display: false }, ticks: { color: '#fff' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        }
+
+        function renderBlockchain() {
+            const viz = document.getElementById('blockchain-viz');
+            if(!viz) return;
+
+            let blocks = [...auditLog];
+            if(blocks.length === 0) {
+                // Genesis data if log is empty
+                blocks = [
+                    { hash: 'd9e2b4f0', prev: '8f43a2c1', action: 'تفعيل النظام الأساسي', timestamp: new Date(Date.now() - 86400000).toISOString() },
+                    { hash: '8f43a2c1', prev: '00000000', action: 'كتلة التكوين (Genesis Block)', timestamp: new Date(Date.now() - 172800000).toISOString() }
+                ];
+            }
+
+            viz.innerHTML = blocks.slice(0, 10).map((b, i) => `
+                <div class="relative w-full max-w-2xl group">
+                    ${i < Math.min(blocks.length, 10) - 1 ? `
+                        <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-20">
+                            <div class="w-1 h-4 bg-heritage-neonBlue"></div>
+                            <div class="w-2 h-2 border-2 border-heritage-neonBlue rounded-full"></div>
+                            <div class="w-1 h-4 bg-heritage-neonBlue"></div>
+                        </div>
+                    ` : ''}
+                    <div class="bg-black/60 backdrop-blur-xl p-8 rounded-[2rem] border border-heritage-neonBlue/20 hover:border-heritage-neonBlue transition-all shadow-[0_0_30px_rgba(0,242,255,0.05)] relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-heritage-neonBlue/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
+
+                        <div class="flex justify-between items-start mb-6 relative z-10">
+                            <div>
+                                <p class="text-[8px] font-black text-heritage-neonBlue uppercase tracking-[0.4em]">Block #${blocks.length - i}</p>
+                                <h4 class="text-xl font-black mt-1 text-heritage-cream">${b.action}</h4>
+                                <p class="text-[10px] text-white/30 font-bold mt-1">${b.details || 'تم التحقق من صحة البيانات وتشفيرها في السلسلة'}</p>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <div class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[8px] font-black border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]">VERIFIED</div>
+                                <span class="text-[8px] font-mono text-heritage-neonPink opacity-40">NONCE: ${Math.floor(Math.random()*99999)}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5 group-hover:bg-heritage-neonBlue/5 transition-colors">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[8px] opacity-40 uppercase font-black">Current Hash</span>
+                                    <span class="w-1 h-1 bg-heritage-gold rounded-full animate-pulse"></span>
+                                </div>
+                                <p class="font-mono text-[10px] text-heritage-gold break-all select-all cursor-pointer">${b.hash}</p>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <p class="text-[8px] opacity-40 uppercase mb-1 font-black">Previous Block Reference</p>
+                                <p class="font-mono text-[10px] opacity-60 break-all select-all cursor-pointer">${b.prev || '0000000000000000'}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-[8px] font-bold opacity-40 relative z-10">
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                <span>SECURE LEDGER NODE #731</span>
+                            </div>
+                            <span>DATA TIMESTAMP: ${new Date(b.timestamp).toLocaleString('ar-EG')}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            gsap.from("#blockchain-viz > div", {
+                opacity: 0,
+                x: i => (i % 2 === 0 ? -30 : 30),
+                stagger: 0.15,
+                duration: 1,
+                ease: "power4.out"
+            });
+        }
+
+        function simulateAuditAction() {
+            const actions = ['تحديث سجل العائلة', 'إضافة وثيقة تاريخية', 'تعديل بيانات فرد', 'مصادقة بصمة حيوية', 'تحويل تبرع للديوان'];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+
+            hyHud("جاري تشفير الكتلة وتوليد الهاش... ⛓️");
+
+            setTimeout(() => {
+                logAudit(action, "عملية محاكاة لعرض تدفق البيانات في البلوكجين");
+                renderBlockchain();
+                hyHud("✅ تم إضافة الكتلة بنجاح إلى السلسلة الموثقة");
+            }, 1500);
+        }
+
         function openBulkModal() {
             closePanels();
             currentStep = 1;
@@ -1841,6 +2187,7 @@
 
         function focusOnMember(id) {
             const member = vault.find(m => m.id === id);
+            if(!member) return;
 
             // If tree isn't open, open it first
             if (!document.getElementById('treeModal').classList.contains('flex')) {
@@ -1853,46 +2200,26 @@
                 if (node) {
                     highlightNode(node);
                 }
-            }, 500);
+            }, 1000);
 
             hyHud(`جاري التركيز على ملف: ${member.name}`);
         }
 
         function highlightNode(node) {
-            if (!node || !selectionPointer) return;
+            if (!node) return;
 
-            selectionPointer.visible = true;
             const targetPos = node.position.clone();
-            selectionPointer.position.set(targetPos.x, targetPos.y + 4, targetPos.z);
-
-            // Animate pointer bounce and rotation
-            gsap.killTweensOf(selectionPointer.position);
-            gsap.killTweensOf(selectionPointer.rotation);
-
-            gsap.to(selectionPointer.position, {
-                y: targetPos.y + 2.5,
-                duration: 0.6,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-
-            gsap.to(selectionPointer.rotation, {
-                y: Math.PI * 2,
-                duration: 2,
-                repeat: -1,
-                ease: "none"
-            });
 
             // Focus camera
             const group = treeScene.children.find(c => c instanceof THREE.Group);
+            if (!group) return;
             const worldPos = node.position.clone().applyMatrix4(group.matrixWorld);
 
             gsap.to(treeCamera.position, {
-                x: worldPos.x + 12,
-                y: worldPos.y + 8,
-                z: worldPos.z + 20,
-                duration: 1.8,
+                x: worldPos.x + 15,
+                y: worldPos.y + 10,
+                z: worldPos.z + 25,
+                duration: 2,
                 ease: "expo.out",
                 onUpdate: () => {
                     treeCamera.lookAt(worldPos);
@@ -1901,12 +2228,10 @@
             });
 
             // Pulse the node
-            gsap.to(node.scale, {
-                x: 3, y: 3, z: 3,
-                duration: 0.3,
-                yoyo: true,
-                repeat: 1
-            });
+            gsap.fromTo(node.scale,
+                { x: node.scale.x, y: node.scale.y, z: node.scale.z },
+                { x: 4, y: 4, z: 4, duration: 0.5, yoyo: true, repeat: 1, ease: "back.out" }
+            );
 
             // Show label permanently for selected node
             const labelObj = treeLabels.find(l => l.node === node);
@@ -1917,41 +2242,48 @@
                 });
                 labelObj.element.classList.add('selected-label');
                 labelObj.element.style.display = 'block';
-                labelObj.element.style.fontSize = '16px';
-                labelObj.element.innerHTML = `🌟 ${node.userData.name} 🌟`;
+                labelObj.element.innerHTML = `<div class="flex flex-col items-center gap-1">
+                    <span class="text-lg">✨</span>
+                    <span class="text-sm font-black text-heritage-neonBlue">${node.userData.name}</span>
+                </div>`;
             }
 
-            // Show Side Panel if not root
+            // Show Hologram if not root
             if (node.userData.id) {
-                showMemberSidePanel(node.userData.id);
+                showHologram(node.userData.id);
             } else {
-                closeSidePanel();
+                closeHologram();
             }
         }
 
-        function showMemberSidePanel(id) {
+        function showHologram(id) {
             const m = vault.find(v => v.id === id);
             if (!m) return;
 
-            document.getElementById('sidePanelPhoto').src = m.photo || `https://ui-avatars.com/api/?name=${m.name}&background=010c0a&color=00f2ff`;
-            document.getElementById('sidePanelName').innerText = m.name;
-            document.getElementById('sidePanelID').innerText = `ID: ${m.id}`;
-            document.getElementById('sidePanelRank').innerText = m.meta?.rank || 'فرد';
-            document.getElementById('sidePanelDate').innerText = m.date || '2024';
-            document.getElementById('sidePanelVerified').innerText = m.status === 'active' ? '🛡️' : '🔒';
+            const holo = document.getElementById('hologram-info');
+            document.getElementById('holo-photo').src = m.photo || `https://ui-avatars.com/api/?name=${m.name}&background=010c0a&color=00f2ff`;
+            document.getElementById('holo-name').innerText = m.name;
+            document.getElementById('holo-id').innerText = m.id;
+            document.getElementById('holo-rank').innerText = m.meta?.rank || 'فرد';
+            document.getElementById('holo-year').innerText = m.date?.split('/')[2] || '2024';
 
-            document.getElementById('sidePanelFullView').onclick = () => {
+            document.getElementById('holo-deep-link').onclick = () => {
                 closeTree();
                 document.getElementById('searchInput').value = m.id;
                 searchName();
             };
 
-            const panel = document.getElementById('memberSidePanel');
-            panel.classList.remove('translate-x-full');
+            holo.classList.remove('hidden');
+            holo.classList.add('flex');
+            gsap.fromTo(holo, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" });
         }
 
-        function closeSidePanel() {
-            document.getElementById('memberSidePanel').classList.add('translate-x-full');
+        function closeHologram() {
+            const holo = document.getElementById('hologram-info');
+            gsap.to(holo, { opacity: 0, y: 50, duration: 0.4, onComplete: () => {
+                holo.classList.add('hidden');
+                holo.classList.remove('flex');
+            }});
         }
 
         function updateFinalPreview() {
@@ -2425,7 +2757,6 @@
         }
 
         function closeTree() {
-            closeSidePanel();
             document.getElementById('treeModal').classList.add('hidden');
             document.getElementById('treeModal').classList.remove('flex');
             if (treeRenderer) {
@@ -2443,149 +2774,120 @@
             const labelsContainer = document.getElementById('node-labels-container');
             if(treeRenderer) return;
 
+            document.getElementById('tree-node-count').innerText = vault.length.toLocaleString('ar-EG');
+
             treeScene = new THREE.Scene();
             treeScene.background = new THREE.Color(0x010c0a);
-            treeCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            treeScene.fog = new THREE.FogExp2(0x010c0a, 0.005);
+
+            treeCamera = new THREE.PerspectiveCamera(65, container.clientWidth / container.clientHeight, 0.1, 2000);
             treeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             treeRenderer.setSize(container.clientWidth, container.clientHeight);
+            treeRenderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(treeRenderer.domElement);
 
             treeControls = new THREE.OrbitControls(treeCamera, treeRenderer.domElement);
             treeControls.enableDamping = true;
             treeControls.dampingFactor = 0.05;
+            treeControls.autoRotate = true;
+            treeControls.autoRotateSpeed = 0.5;
 
-            const light = new THREE.PointLight(0x00f2ff, 2, 100);
-            light.position.set(10, 10, 10);
-            treeScene.add(light);
-            treeScene.add(new THREE.AmbientLight(0xbc13fe, 0.3));
+            // Lights
+            const ambient = new THREE.AmbientLight(0x404040, 2);
+            treeScene.add(ambient);
+
+            const sun = new THREE.DirectionalLight(0xffffff, 1);
+            sun.position.set(10, 20, 10);
+            treeScene.add(sun);
 
             const group = new THREE.Group();
 
-            // Create Helix DNA Trunk
-            const helixPoints = [];
-            const helixPoints2 = [];
-            const helixSegments = 120;
-            for (let i = 0; i < helixSegments; i++) {
-                const angle = i * 0.4;
-                const radius = 2;
-                const y = i * 0.4 - 24;
-                helixPoints.push(new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius));
-                helixPoints2.push(new THREE.Vector3(Math.cos(angle + Math.PI) * radius, y, Math.sin(angle + Math.PI) * radius));
+            // Create Celestial Nebula Particles
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 2000;
+            const starPos = new Float32Array(starCount * 3);
+            for(let i=0; i<starCount; i++) {
+                starPos[i*3] = (Math.random() - 0.5) * 400;
+                starPos[i*3+1] = (Math.random() - 0.5) * 400;
+                starPos[i*3+2] = (Math.random() - 0.5) * 400;
             }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.5 });
+            const nebula = new THREE.Points(starGeo, starMat);
+            treeScene.add(nebula);
 
-            const helixGeo = new THREE.BufferGeometry().setFromPoints(helixPoints);
-            const helixGeo2 = new THREE.BufferGeometry().setFromPoints(helixPoints2);
-            const helixMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.4 });
-            const helixMat2 = new THREE.LineBasicMaterial({ color: 0xff007f, transparent: true, opacity: 0.4 });
-
-            group.add(new THREE.Line(helixGeo, helixMat));
-            group.add(new THREE.Line(helixGeo2, helixMat2));
-
-            // Origin (Root) Node - Tribal Patriarch
-            const rootGeo = new THREE.SphereGeometry(3.5, 64, 64);
-            const rootMat = new THREE.MeshStandardMaterial({
+            // Origin Fractal Core (Root)
+            const coreGeo = new THREE.IcosahedronGeometry(5, 15);
+            const coreMat = new THREE.MeshStandardMaterial({
                 color: 0x00f2ff,
                 emissive: 0x00f2ff,
-                emissiveIntensity: 4,
-                transparent: true,
-                opacity: 0.9
+                emissiveIntensity: 5,
+                wireframe: true
             });
-            const rootNode = new THREE.Mesh(rootGeo, rootMat);
-            rootNode.position.set(0, -25, 0);
-            rootNode.userData = { name: "الجد الجامع (الأصل)", isRoot: true, type: 'patriarch' };
+            const rootNode = new THREE.Mesh(coreGeo, coreMat);
+            rootNode.userData = { name: "الأصل الحياني الجامع", isRoot: true };
             group.add(rootNode);
             treeNodes.push(rootNode);
 
-            // Add a secondary glow sphere for the root
-            const rootGlowGeo = new THREE.SphereGeometry(5.0, 32, 32);
-            const rootGlowMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.15 });
-            const rootGlow = new THREE.Mesh(rootGlowGeo, rootGlowMat);
-            rootNode.add(rootGlow);
+            // Central Pulsing Light
+            const coreLight = new THREE.PointLight(0x00f2ff, 5, 100);
+            rootNode.add(coreLight);
 
-            // Origin Label
-            const rootLabel = document.createElement('div');
-            rootLabel.className = 'node-label';
-            rootLabel.innerText = rootNode.userData.name;
-            labelsContainer.appendChild(rootLabel);
-            treeLabels.push({ element: rootLabel, node: rootNode });
-
-            // Create Neon Nodes for members with color coding and curved branches
+            // Fractal Branches for Members
             vault.forEach((m, i) => {
-                const angle = (i / vault.length) * Math.PI * 8;
-                const radius = 8 + Math.random() * 10;
-                const height = (i / Math.max(1, vault.length)) * 50 - 25;
+                const phi = Math.acos(-1 + (2 * i) / vault.length);
+                const theta = Math.sqrt(vault.length * Math.PI) * phi;
+                const r = 40 + Math.random() * 20;
 
-                // Color coding based on index (simulated generations/branches)
-                let color, emissive;
-                let type = 'member';
-                if (i < vault.length * 0.2) {
-                    color = 0x00f2ff; // Cyan (Ancestor/Core)
-                    emissive = 0x00f2ff;
-                    type = 'ancestor';
-                } else if (i < vault.length * 0.7) {
-                    color = 0xff007f; // Magenta (Branch/Main)
-                    emissive = 0xff007f;
-                    type = 'branch';
-                } else {
-                    color = 0xd4af37; // Gold (Descendant/New)
-                    emissive = 0xd4af37;
-                    type = 'descendant';
-                }
+                const pos = new THREE.Vector3(
+                    r * Math.cos(theta) * Math.sin(phi),
+                    r * Math.sin(theta) * Math.sin(phi),
+                    r * Math.cos(phi)
+                );
 
-                const geometry = new THREE.SphereGeometry(0.7, 24, 24);
-                const material = new THREE.MeshStandardMaterial({
-                    color: color,
-                    emissive: emissive,
+                // Branching fibers (Light Paths)
+                const curve = new THREE.QuadraticBezierCurve3(
+                    new THREE.Vector3(0,0,0),
+                    new THREE.Vector3(pos.x * 0.5, pos.y * 1.2, pos.z * 0.5),
+                    pos
+                );
+
+                const points = curve.getPoints(30);
+                const branchGeo = new THREE.BufferGeometry().setFromPoints(points);
+                const branchMat = new THREE.LineBasicMaterial({
+                    color: (i % 2 === 0) ? 0x00f2ff : 0xff007f,
+                    transparent: true,
+                    opacity: 0.2
+                });
+                group.add(new THREE.Line(branchGeo, branchMat));
+
+                // Pulsing Star Node
+                const starNodeGeo = new THREE.SphereGeometry(0.8, 16, 16);
+                const starNodeMat = new THREE.MeshStandardMaterial({
+                    color: (i % 2 === 0) ? 0x00f2ff : 0xff007f,
+                    emissive: (i % 2 === 0) ? 0x00f2ff : 0xff007f,
                     emissiveIntensity: 2
                 });
-                const node = new THREE.Mesh(geometry, material);
-                node.position.set(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
-                node.userData = { name: m.name, id: m.id, type: type };
+                const node = new THREE.Mesh(starNodeGeo, starNodeMat);
+                node.position.copy(pos);
+                node.userData = { name: m.name, id: m.id };
                 group.add(node);
                 treeNodes.push(node);
 
-                // HTML Label
+                // Hover Label
                 const label = document.createElement('div');
                 label.className = 'node-label';
                 label.innerText = m.name;
                 labelsContainer.appendChild(label);
                 treeLabels.push({ element: label, node: node });
-
-                // Curved Branch to trunk
-                const trunkPoint = new THREE.Vector3(Math.cos(angle) * 2, height, Math.sin(angle) * 2);
-                const midPoint = new THREE.Vector3(
-                    (trunkPoint.x + node.position.x) / 2 + (Math.random() - 0.5) * 5,
-                    (trunkPoint.y + node.position.y) / 2,
-                    (trunkPoint.z + node.position.z) / 2 + (Math.random() - 0.5) * 5
-                );
-
-                const curve = new THREE.CatmullRomCurve3([trunkPoint, midPoint, node.position]);
-                const curvePoints = curve.getPoints(20);
-                const branchGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
-                const branchMat = new THREE.LineBasicMaterial({
-                    color: color,
-                    transparent: true,
-                    opacity: 0.3,
-                    linewidth: 2
-                });
-                group.add(new THREE.Line(branchGeo, branchMat));
             });
-
-            // Add Selection Pointer (Arrow)
-            const pointerGeo = new THREE.ConeGeometry(0.6, 2, 8);
-            const pointerMat = new THREE.MeshStandardMaterial({
-                color: 0xffff00,
-                emissive: 0xffff00,
-                emissiveIntensity: 2
-            });
-            selectionPointer = new THREE.Mesh(pointerGeo, pointerMat);
-            selectionPointer.rotation.x = Math.PI; // Point down
-            selectionPointer.visible = false;
-            group.add(selectionPointer);
 
             treeScene.add(group);
-            treeCamera.position.set(30, 10, 50);
+            treeCamera.position.set(80, 50, 80);
             treeControls.update();
+
+            // Star Core Rotation Animation
+            gsap.to(rootNode.rotation, { y: Math.PI * 2, duration: 20, repeat: -1, ease: "none" });
 
             // Mouse Events
             container.addEventListener('mousemove', (event) => {
@@ -2632,15 +2934,17 @@
                 requestAnimationFrame(animate);
                 treeControls.update();
 
-                // Pulsing animation
-                const time = Date.now() * 0.002;
-                group.rotation.y += 0.002;
+                const time = Date.now() * 0.001;
+
+                // Rotate Nebula slowly
+                nebula.rotation.y += 0.0005;
+                group.rotation.y += 0.001;
 
                 treeNodes.forEach((node, i) => {
-                    const pulse = (node.userData.isRoot ? 1.0 : 1.0) + Math.sin(time + i) * 0.1;
                     if (node !== lastHovered) {
+                        const pulse = (node.userData.isRoot ? 1.0 : 1.0) + Math.sin(time * 2 + i) * 0.1;
                         node.scale.set(pulse, pulse, pulse);
-                        node.material.emissiveIntensity = (node.userData.isRoot ? 2.0 : 1.5) + Math.sin(time + i) * 0.5;
+                        node.material.emissiveIntensity = (node.userData.isRoot ? 5.0 : 2.0) + Math.sin(time * 3 + i) * 1.0;
                     }
                 });
 
@@ -2661,14 +2965,14 @@
                             gsap.to(lastHovered.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
                         }
                         lastHovered = intersected;
-                        const targetScale = intersected.userData.isRoot ? 3.0 : 2.5;
+                        const targetScale = intersected.userData.isRoot ? 1.5 : 2.5;
                         gsap.to(intersected.scale, { x: targetScale, y: targetScale, z: targetScale, duration: 0.3, ease: "back.out" });
                     }
                     const label = treeLabels.find(l => l.node === intersected);
                     if (label) {
                         label.element.style.display = 'block';
-                        label.element.style.border = '2px solid #00f2ff';
-                        label.element.style.boxShadow = '0 0 15px #00f2ff';
+                        label.element.style.border = '1px solid rgba(0, 242, 255, 0.5)';
+                        label.element.style.background = 'rgba(0, 0, 0, 0.8)';
                     }
                 } else {
                     if (lastHovered) {
@@ -2707,6 +3011,7 @@
                 closeOTPModal();
                 closeBulkModal();
                 closeMap();
+                closeInfoModal();
             }
         });
 
