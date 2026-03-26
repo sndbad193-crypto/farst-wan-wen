@@ -290,13 +290,37 @@
                 </div>
 
                 <!-- Digital Official Seal -->
-                <div class="mt-12 opacity-30 grayscale hover:grayscale-0 transition-all cursor-help" title="ختم التوثيق الرقمي الرسمي">
-                    <svg width="100" height="100" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="1" />
-                        <text x="50" y="45" text-anchor="middle" font-size="8" fill="white" font-weight="bold">OFFICIAL SEAL</text>
-                        <text x="50" y="60" text-anchor="middle" font-size="6" fill="white">HAYYANI TRIBAL DIWAN</text>
-                        <path d="M30 70 Q50 80 70 70" stroke="white" fill="none" />
+                <div class="mt-12 opacity-30 grayscale hover:grayscale-0 transition-all cursor-help flex flex-col items-center gap-2" title="ختم التوثيق الرقمي الرسمي">
+                    <svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                          <filter id="glow-shield">
+                            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                            <feMerge>
+                              <feMergeNode in="coloredBlur"/>
+                              <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                          </filter>
+                          <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00f2ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#7000ff;stop-opacity:1" />
+                          </linearGradient>
+                        </defs>
+                        <path d="M50 10 L85 25 V55 C85 75 50 90 50 90 C50 90 15 75 15 55 V25 L50 10Z"
+                              fill="none"
+                              stroke="url(#shieldGradient)"
+                              stroke-width="2"
+                              filter="url(#glow-shield)">
+                          <animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite" />
+                        </path>
+                        <line x1="50" y1="20" x2="50" y2="80"
+                              stroke="#00f2ff"
+                              stroke-width="1"
+                              stroke-dasharray="2,2"
+                              filter="url(#glow-shield)" />
+                        <text x="30" y="55" fill="#fff" font-family="Arial" font-size="10" filter="url(#glow-shield)">D</text>
+                        <text x="62" y="55" fill="#fff" font-family="Arial" font-size="10" filter="url(#glow-shield)">S</text>
                     </svg>
+                    <p class="text-[8px] text-white/40 font-black uppercase tracking-widest">Sovereign Security Badge</p>
                 </div>
             </div>
         </div>
@@ -399,7 +423,7 @@
             </button>
 
             <!-- 12. التحقق الرسمي -->
-            <button onclick="closePanels(); openSovereigntyGate();" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
+            <button onclick="openInfoModal('verify')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
                 <span class="text-sm">١٢. التحقق الرسمي</span>
                 <span class="text-lg">🛡️</span>
             </button>
@@ -1783,6 +1807,61 @@
                     `;
                     content.innerHTML = html;
                     setTimeout(renderBlockchain, 100);
+                    break;
+                case 'verify':
+                    html = `
+                        <div class="text-center mb-10">
+                            <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">نظام التحقق السيادي</h2>
+                            <p class="text-sm opacity-40">تأكيد صحة الوثائق والانتساب للديوان</p>
+                        </div>
+                        <div class="flex flex-col items-center gap-8">
+                            <div class="relative group">
+                                <div class="absolute -inset-8 bg-heritage-neonBlue/20 blur-3xl opacity-50 animate-pulse"></div>
+                                <svg width="150" height="150" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="relative">
+                                    <defs>
+                                      <filter id="glow-shield-large">
+                                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                        <feMerge>
+                                          <feMergeNode in="coloredBlur"/>
+                                          <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                      </filter>
+                                    </defs>
+                                    <path d="M50 10 L85 25 V55 C85 75 50 90 50 90 C50 90 15 75 15 55 V25 L50 10Z"
+                                          fill="none"
+                                          stroke="url(#shieldGradient)"
+                                          stroke-width="2.5"
+                                          filter="url(#glow-shield-large)">
+                                      <animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="4s" repeatCount="indefinite" />
+                                    </path>
+                                    <line x1="50" y1="20" x2="50" y2="80"
+                                          stroke="#00f2ff"
+                                          stroke-width="1"
+                                          stroke-dasharray="3,3"
+                                          filter="url(#glow-shield-large)" />
+                                    <text x="28" y="55" fill="#fff" font-family="Cairo" font-weight="900" font-size="12" filter="url(#glow-shield-large)">D</text>
+                                    <text x="60" y="55" fill="#fff" font-family="Cairo" font-weight="900" font-size="12" filter="url(#glow-shield-large)">S</text>
+                                </svg>
+                            </div>
+
+                            <div class="w-full max-w-md space-y-4">
+                                <input type="text" placeholder="أدخل كود التحقق (HY-XXXX)..." class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-heritage-neonBlue font-black text-center text-xl">
+                                <button onclick="hyHud('جاري البحث في قاعدة بيانات السيادة...')" class="w-full py-5 bg-heritage-neonBlue text-black font-black rounded-2xl hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,242,255,0.3)]">تحقق من الصلاحية</button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 w-full">
+                                <div class="p-6 bg-green-500/5 border border-green-500/20 rounded-3xl text-center">
+                                    <p class="text-green-500 font-black text-lg">٣,٤٢١</p>
+                                    <p class="text-[8px] opacity-40 font-bold uppercase">وثيقة تم التحقق منها</p>
+                                </div>
+                                <div class="p-6 bg-heritage-neonPink/5 border border-heritage-neonPink/20 rounded-3xl text-center">
+                                    <p class="text-heritage-neonPink font-black text-lg">٠</p>
+                                    <p class="text-[8px] opacity-40 font-bold uppercase">محاولات تزوير مكتشفة</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    content.innerHTML = html;
                     break;
             }
         }
