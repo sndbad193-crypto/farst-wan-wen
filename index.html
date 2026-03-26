@@ -24,7 +24,8 @@
                             dark: '#022c22',    // Darker Emerald
                             neonBlue: '#00f2ff',
                             neonPink: '#ff007f',
-                            neonPurple: '#bc13fe'
+                            neonPurple: '#7000ff',
+                            goldSovereign: '#ff9900'
                         }
                     },
                     fontFamily: {
@@ -1681,13 +1682,25 @@
                     html = `
                         <div class="text-center mb-10">
                             <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">الأرشيف الرقمي للمستندات</h2>
-                            <p class="text-sm opacity-40">الوثائق الرسمية والمخطوطات التاريخية الموثقة</p>
+                            <p class="text-sm opacity-40 text-heritage-gold font-bold">المخطوطات الهاشمية الموثقة</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            ${[1,2,3,4,5,6].map(i => `
+                            <div class="bg-white/5 p-6 rounded-3xl border border-heritage-gold/30 hover:border-heritage-gold transition-all group">
+                                <div class="text-4xl mb-4 group-hover:rotate-12 transition-transform">📜</div>
+                                <h4 class="font-black text-lg">مخطوطة موسى الجون</h4>
+                                <p class="text-[10px] opacity-40 mb-4 text-heritage-gold">وثيقة النسب الأصلية</p>
+                                <button class="w-full py-2 bg-heritage-gold/10 text-heritage-gold rounded-xl text-[10px] font-black">معاينة المخطوطة</button>
+                            </div>
+                            <div class="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-heritage-neonBlue transition-all group">
+                                <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🛡️</div>
+                                <h4 class="font-black text-lg">مرسوم الإمارة الهاشمية</h4>
+                                <p class="text-[10px] opacity-40 mb-4">أرشيف السيادة</p>
+                                <button class="w-full py-2 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-xl text-[10px] font-black">تحميل المستند</button>
+                            </div>
+                            ${[3,4,5,6].map(i => `
                                 <div class="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-heritage-neonBlue transition-all group">
                                     <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">📜</div>
-                                    <h4 class="font-black text-lg">وثيقة نسب رقم ${i}</h4>
+                                    <h4 class="font-black text-lg">وثيقة نسب فرعية ${i}</h4>
                                     <p class="text-[10px] opacity-40 mb-4">تاريخ التوثيق: 2024/05/${i}</p>
                                     <button class="w-full py-2 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-xl text-[10px] font-black">تحميل المستند</button>
                                 </div>
@@ -1700,19 +1713,24 @@
                     html = `
                         <div class="text-center mb-10">
                             <h2 class="text-4xl font-black text-heritage-neonBlue mb-2">حول ديوان الحياني</h2>
+                            <p class="text-heritage-gold font-black text-sm uppercase tracking-widest">سلالة موسى الجون - آل البيت</p>
                             <div class="w-20 h-1.5 bg-heritage-neonPink rounded-full mx-auto mt-4"></div>
                         </div>
                         <div class="space-y-8 text-right leading-loose">
-                            <p class="text-xl font-bold">تعد منصة "ديوان قبيلة الحياني" أول نظام سيادي رقمي متكامل لتوثيق الأنساب في الوطن العربي باستخدام تقنيات الويب المتقدمة والواقع الافتراضي.</p>
+                            <p class="text-xl font-bold">تعد منصة "ديوان قبيلة الحياني" أول نظام سيادي رقمي لتوثيق النسب الهاشمي الشريف لأبناء القبيلة، المنتسبين إلى الإمام علي بن أبي طالب (عليه السلام) عبر سلالة موسى الجون.</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="p-6 bg-white/5 rounded-[2rem] border border-white/10">
-                                    <h4 class="text-heritage-gold font-black mb-2">رؤيتنا</h4>
-                                    <p class="text-sm opacity-60">بناء قاعدة بيانات عالمية مشفرة تربط كافة أبناء القبيلة عبر السلالات الموثقة تاريخياً.</p>
+                                    <h4 class="text-heritage-gold font-black mb-2">النسب الشريف</h4>
+                                    <p class="text-sm opacity-60">توثيق السلالة من الإمام الحسن السبط، مروراً بعبد الله المحض وصولاً إلى موسى الجون (الجد الجامع).</p>
                                 </div>
                                 <div class="p-6 bg-white/5 rounded-[2rem] border border-white/10">
-                                    <h4 class="text-heritage-neonBlue font-black mb-2">التقنية</h4>
-                                    <p class="text-sm opacity-60">نستخدم محرك Three.js للتمثيل ثلاثي الأبعاد وخوارزميات التشفير AES-256 لحماية البيانات الحساسة.</p>
+                                    <h4 class="text-heritage-neonBlue font-black mb-2">السيادة الرقمية</h4>
+                                    <p class="text-sm opacity-60">نظام تشفير AES-256 لحماية سجلات الأنساب الهاشمية من التلاعب أو الضياع.</p>
                                 </div>
+                            </div>
+                            <div class="p-8 bg-heritage-neonBlue/5 border-2 border-heritage-neonBlue/20 rounded-[3rem] text-center">
+                                <h4 class="text-heritage-neonBlue font-black text-2xl mb-4">أصل القبيلة</h4>
+                                <p class="text-sm leading-relaxed">تنتشر قبيلة آل الحياني في العراق والوطن العربي، وتفتخر بانتمائها إلى فروع "آل درويش" و"آل صالح"، وهي سلالة ضاربة في عمق التاريخ الإسلامي.</p>
                             </div>
                         </div>
                     `;
@@ -2711,7 +2729,7 @@
             }
 
             resultsGrid.innerHTML = results.map(m => `
-                <div class="registry-card glass-effect p-8 rounded-[2.5rem] border-b-4 border-heritage-neonBlue flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300 shadow-[0_0_30px_rgba(0,242,255,0.1)] hover:shadow-[0_0_50px_rgba(0,242,255,0.2)]">
+                <div class="registry-card glass-effect p-8 rounded-[2.5rem] border-2 border-heritage-neonPurple flex flex-col items-start gap-4 group hover:-translate-y-2 transition-all duration-300 shadow-[0_0_20px_rgba(112,0,255,0.2)] hover:shadow-[0_0_50px_rgba(0,242,255,0.4)] hover:border-heritage-neonBlue">
                     <div class="flex justify-between w-full items-start">
                         <button onclick="focusOnMember('${m.id}')" class="text-[10px] bg-heritage-neonBlue/20 text-heritage-neonBlue border border-heritage-neonBlue/30 px-3 py-1 rounded-full font-black tracking-widest hover:bg-heritage-neonBlue hover:text-black transition-all">🧬 تتبع في الشجرة: ${m.id}</button>
                         <div class="flex flex-col items-end text-left">
@@ -2881,6 +2899,51 @@
 
             const group = new THREE.Group();
 
+            // Define Historical Ancestry Path (Alid Lineage)
+            const ancestry = [
+                { id: 'AN-01', name: 'علي بن أبي طالب (عليه السلام)', color: 0x00f2ff, scale: 3.5, emissive: 5 },
+                { id: 'AN-02', name: 'الحسن السبط', color: 0x00f2ff, scale: 3.0, emissive: 4 },
+                { id: 'AN-03', name: 'الحسن المثنى', color: 0x00f2ff, scale: 2.5, emissive: 3 },
+                { id: 'AN-04', name: 'عبد الله المحض', color: 0x00f2ff, scale: 2.2, emissive: 2 },
+                { id: 'AN-05', name: 'موسى الجون (الجد الجامع)', color: 0xff9900, scale: 4.5, emissive: 8 }
+            ];
+
+            // Render Ancestry Path
+            ancestry.forEach((a, idx) => {
+                const yPos = 100 - (idx * 30);
+                const nodeGeo = idx === ancestry.length - 1 ? new THREE.IcosahedronGeometry(a.scale, 2) : new THREE.SphereGeometry(a.scale, 32, 32);
+                const nodeMat = new THREE.MeshStandardMaterial({
+                    color: a.color,
+                    emissive: a.color,
+                    emissiveIntensity: a.emissive,
+                    wireframe: idx === ancestry.length - 1
+                });
+                const node = new THREE.Mesh(nodeGeo, nodeMat);
+                node.position.set(0, yPos, 0);
+                node.userData = { name: a.name, id: a.id, isRoot: idx === 0 };
+                group.add(node);
+                treeNodes.push(node);
+
+                // Add labels for ancestry
+                const label = document.createElement('div');
+                label.className = 'node-label';
+                label.innerText = a.name;
+                labelsContainer.appendChild(label);
+                treeLabels.push({ element: label, node: node });
+
+                // Connect with vertical beams
+                if (idx > 0) {
+                    const beamGeo = new THREE.CylinderGeometry(0.5, 0.5, 30, 8);
+                    const beamMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.3 });
+                    const beam = new THREE.Mesh(beamGeo, beamMat);
+                    beam.position.set(0, yPos + 15, 0);
+                    group.add(beam);
+                }
+            });
+
+            // Origin Fractal Core (Root/Connector to Musa Al-Jawn)
+            const rootNode = treeNodes.find(n => n.userData.id === 'AN-05');
+
             // Create Celestial Nebula Particles
             const starGeo = new THREE.BufferGeometry();
             const starCount = 2000;
@@ -2895,46 +2958,33 @@
             const nebula = new THREE.Points(starGeo, starMat);
             treeScene.add(nebula);
 
-            // Origin Fractal Core (Root)
-            const coreGeo = new THREE.IcosahedronGeometry(5, 15);
-            const coreMat = new THREE.MeshStandardMaterial({
-                color: 0x00f2ff,
-                emissive: 0x00f2ff,
-                emissiveIntensity: 5,
-                wireframe: true
-            });
-            const rootNode = new THREE.Mesh(coreGeo, coreMat);
-            rootNode.userData = { name: "الأصل الحياني الجامع", isRoot: true };
-            group.add(rootNode);
-            treeNodes.push(rootNode);
-
-            // Central Pulsing Light
-            const coreLight = new THREE.PointLight(0x00f2ff, 5, 100);
+                // Central Pulsing Light for Musa Al-Jawn
+                const coreLight = new THREE.PointLight(0xff9900, 10, 200);
             rootNode.add(coreLight);
 
-            // Fractal Branches for Members
+                // Fractal Branches for Members (Branching from Musa Al-Jawn at y=-20)
             vault.forEach((m, i) => {
                 const phi = Math.acos(-1 + (2 * i) / vault.length);
                 const theta = Math.sqrt(vault.length * Math.PI) * phi;
-                const r = 40 + Math.random() * 20;
+                    const r = 60 + Math.random() * 20;
 
                 const pos = new THREE.Vector3(
                     r * Math.cos(theta) * Math.sin(phi),
-                    r * Math.sin(theta) * Math.sin(phi),
+                        (r * Math.sin(theta) * Math.sin(phi)) - 40, // Shifted relative to Musa Al-Jawn
                     r * Math.cos(phi)
                 );
 
-                // Branching fibers (Light Paths)
+                    // Branching fibers (Light Paths from Musa Al-Jawn)
                 const curve = new THREE.QuadraticBezierCurve3(
-                    new THREE.Vector3(0,0,0),
-                    new THREE.Vector3(pos.x * 0.5, pos.y * 1.2, pos.z * 0.5),
+                        new THREE.Vector3(0,-20,0),
+                        new THREE.Vector3(pos.x * 0.3, pos.y * 0.5, pos.z * 0.3),
                     pos
                 );
 
                 const points = curve.getPoints(30);
                 const branchGeo = new THREE.BufferGeometry().setFromPoints(points);
                 const branchMat = new THREE.LineBasicMaterial({
-                    color: (i % 2 === 0) ? 0x00f2ff : 0xff007f,
+                    color: 0x7000ff,
                     transparent: true,
                     opacity: 0.2
                 });
@@ -2943,8 +2993,8 @@
                 // Pulsing Star Node
                 const starNodeGeo = new THREE.SphereGeometry(0.8, 16, 16);
                 const starNodeMat = new THREE.MeshStandardMaterial({
-                    color: (i % 2 === 0) ? 0x00f2ff : 0xff007f,
-                    emissive: (i % 2 === 0) ? 0x00f2ff : 0xff007f,
+                    color: 0x7000ff,
+                    emissive: 0x7000ff,
                     emissiveIntensity: 2
                 });
                 const node = new THREE.Mesh(starNodeGeo, starNodeMat);
@@ -2967,6 +3017,10 @@
 
             // Star Core Rotation Animation
             gsap.to(rootNode.rotation, { y: Math.PI * 2, duration: 20, repeat: -1, ease: "none" });
+
+            // Adjust camera to see the full lineage
+            treeCamera.position.set(120, 50, 180);
+            treeControls.target.set(0, 0, 0);
 
             // Mouse Events
             container.addEventListener('mousemove', (event) => {
