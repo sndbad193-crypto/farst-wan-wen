@@ -127,6 +127,9 @@
 
         #neon-portal {
             background: radial-gradient(circle at center, #012a24 0%, #010c0a 100%);
+            background-image: url('tribal_bg.png');
+            background-size: cover;
+            background-position: center;
             overflow: hidden;
         }
 
@@ -196,6 +199,82 @@
             background: rgba(0, 242, 255, 0.2) !important;
             z-index: 20;
             font-size: 14px !important;
+        }
+
+        /* Living Tree Styles */
+        .living-tree-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            padding: 100px 20px;
+            background: url('tribal_bg.png') no-repeat center bottom;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .tree-node {
+            position: relative;
+            background: rgba(1, 12, 10, 0.8);
+            border: 2px solid #d4af37;
+            border-radius: 50px;
+            padding: 15px 30px;
+            margin: 20px 0;
+            color: #fdfbf7;
+            font-weight: 900;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 5;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .tree-node:hover {
+            transform: scale(1.1);
+            border-color: #00f2ff;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+            color: #00f2ff;
+        }
+
+        .tree-connector {
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, #d4af37, #00f2ff);
+            opacity: 0.5;
+        }
+
+        .wave-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: url('https://cdn.pixabay.com/photo/2017/02/07/16/47/waves-2046404_1280.png') repeat-x;
+            background-size: 1600px 150px;
+            opacity: 0.3;
+            animation: move-wave 20s linear infinite;
+            z-index: 1;
+            filter: hue-rotate(180deg);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes move-wave {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1600px; }
+        }
+
+        .node-highlight {
+            border-color: #00f2ff !important;
+            box-shadow: 0 0 50px #00f2ff !important;
+            transform: scale(1.2) !important;
         }
     </style>
 </head>
@@ -502,9 +581,9 @@
                 </button>
 
                 <button onclick="open3DTree()" class="group p-8 bg-white/5 border border-white/10 rounded-[2.5rem] shadow-lg hover:border-heritage-neonBlue hover:text-heritage-neonBlue hover:scale-[1.03] transition-all flex items-center gap-6 text-right">
-                    <span class="text-5xl group-hover:scale-125 transition-transform">🧬</span>
+                    <span class="text-5xl group-hover:scale-125 transition-transform">🌳</span>
                     <div>
-                        <p class="text-2xl font-black">شجرة النسب 3D</p>
+                        <p class="text-2xl font-black">الشجرة الحية</p>
                         <p class="text-xs opacity-40 font-bold">استعراض السلالة بالواقع الرقمي</p>
                     </div>
                 </button>
@@ -1075,18 +1154,18 @@
         </div>
     </div>
 
-    <!-- 3D Celestial Tree Modal -->
+    <!-- Living Tree Modal -->
     <div id="treeModal" class="fixed inset-0 bg-black z-[300] hidden flex-col">
         <div class="p-6 bg-black/80 backdrop-blur-xl flex justify-between items-center border-b border-heritage-neonBlue/30 relative z-20">
             <h2 class="text-heritage-neonBlue font-black text-2xl flex items-center gap-4">
-                <span class="text-3xl">🌌</span>
-                سديم النسب - ديوان الحياني
+                <span class="text-3xl">🌳</span>
+                الشجرة الحية - ديوان الحياني
             </h2>
             <div class="flex items-center gap-6">
                 <div class="hidden md:flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/40">
-                    <span>تحكم الكاميرا: WASD / Mouse</span>
+                    <span>تحريك الشجرة: Scroll / Swipe</span>
                     <span class="w-1 h-1 bg-white/20 rounded-full"></span>
-                    <span>انقر على النجوم للتفاصيل</span>
+                    <span>انقر على الأفراد للتفاصيل</span>
                 </div>
                 <button onclick="closeTree()" class="text-heritage-cream hover:text-heritage-neonBlue transition-all hover:rotate-90">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1096,14 +1175,15 @@
             </div>
         </div>
 
-        <div class="flex-grow relative cursor-crosshair overflow-hidden">
-            <!-- 3D Container -->
-            <div id="tree-container" class="absolute inset-0"></div>
+        <div class="flex-grow relative overflow-hidden">
+            <!-- Living Tree Container -->
+            <div id="living-tree" class="living-tree-container">
+                <!-- Tree nodes will be injected here -->
+            </div>
 
-            <!-- Node Labels Overlay -->
-            <div id="node-labels-container" class="absolute inset-0 pointer-events-none z-10"></div>
+            <div class="wave-bottom"></div>
 
-            <!-- Holographic Info Overlay (Replaces side panel) -->
+            <!-- Holographic Info Overlay -->
             <div id="hologram-info" class="absolute bottom-10 left-10 p-8 glass-effect rounded-[3rem] border-2 border-heritage-neonBlue/40 hidden flex-col items-center text-center animate-slide-up z-20 max-w-sm pointer-events-auto">
                 <div class="relative mb-6">
                     <div class="absolute -inset-4 bg-heritage-neonBlue blur-2xl opacity-20 animate-pulse"></div>
@@ -1126,18 +1206,18 @@
                 <button onclick="closeHologram()" class="mt-4 text-[10px] font-bold text-white/20 hover:text-white transition-colors">إغلاق العرض</button>
             </div>
 
-            <!-- Celestial Stats HUD -->
-            <div class="absolute top-10 right-10 p-6 bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl pointer-events-none">
-                <p class="text-[8px] font-black text-heritage-neonPink uppercase tracking-widest mb-2">Celestial Density</p>
+            <!-- Tree Stats HUD -->
+            <div class="absolute top-10 right-10 p-6 bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl pointer-events-none z-30">
+                <p class="text-[8px] font-black text-heritage-neonPink uppercase tracking-widest mb-2">إحصائيات الشجرة</p>
                 <div class="flex items-center gap-4">
                     <div class="text-center">
                         <p id="tree-node-count" class="text-2xl font-black text-white">0</p>
-                        <p class="text-[8px] opacity-40">Stars</p>
+                        <p class="text-[8px] opacity-40">عضو</p>
                     </div>
                     <div class="w-[1px] h-8 bg-white/10"></div>
                     <div class="text-center">
                         <p class="text-2xl font-black text-heritage-neonBlue">∞</p>
-                        <p class="text-[8px] opacity-40">Branches</p>
+                        <p class="text-[8px] opacity-40">أصل</p>
                     </div>
                 </div>
             </div>
@@ -2293,64 +2373,10 @@
 
             // Wait a bit for initialization if needed
             setTimeout(() => {
-                const node = treeNodes.find(n => n.userData.id === id);
-                if (node) {
-                    highlightNode(node);
-                }
-            }, 1000);
+                highlightNodeDOM(id);
+            }, 500);
 
             hyHud(`جاري التركيز على ملف: ${member.name}`);
-        }
-
-        function highlightNode(node) {
-            if (!node) return;
-
-            const targetPos = node.position.clone();
-
-            // Focus camera
-            const group = treeScene.children.find(c => c instanceof THREE.Group);
-            if (!group) return;
-            const worldPos = node.position.clone().applyMatrix4(group.matrixWorld);
-
-            gsap.to(treeCamera.position, {
-                x: worldPos.x + 15,
-                y: worldPos.y + 10,
-                z: worldPos.z + 25,
-                duration: 2,
-                ease: "expo.out",
-                onUpdate: () => {
-                    treeCamera.lookAt(worldPos);
-                    treeControls.target.copy(worldPos);
-                }
-            });
-
-            // Pulse the node
-            gsap.fromTo(node.scale,
-                { x: node.scale.x, y: node.scale.y, z: node.scale.z },
-                { x: 4, y: 4, z: 4, duration: 0.5, yoyo: true, repeat: 1, ease: "back.out" }
-            );
-
-            // Show label permanently for selected node
-            const labelObj = treeLabels.find(l => l.node === node);
-            if (labelObj) {
-                treeLabels.forEach(l => {
-                    l.element.classList.remove('selected-label');
-                    if (l !== labelObj) l.element.style.display = 'none';
-                });
-                labelObj.element.classList.add('selected-label');
-                labelObj.element.style.display = 'block';
-                labelObj.element.innerHTML = `<div class="flex flex-col items-center gap-1">
-                    <span class="text-lg">✨</span>
-                    <span class="text-sm font-black text-heritage-neonBlue">${node.userData.name}</span>
-                </div>`;
-            }
-
-            // Show Hologram if not root
-            if (node.userData.id) {
-                showHologram(node.userData.id);
-            } else {
-                closeHologram();
-            }
         }
 
         function showHologram(id) {
@@ -2841,291 +2867,86 @@
             orb.style.boxShadow = `0 0 15px ${bg}`;
         }
 
-        let treeScene, treeCamera, treeRenderer, treeControls, treeNodes = [], treeLabels = [];
-        let selectionPointer;
-        let raycaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
-
         function open3DTree() {
             closePanels();
             document.getElementById('treeModal').classList.remove('hidden');
             document.getElementById('treeModal').classList.add('flex');
-            init3DTree();
+            initLivingTree();
         }
 
         function closeTree() {
             document.getElementById('treeModal').classList.add('hidden');
             document.getElementById('treeModal').classList.remove('flex');
-            if (treeRenderer) {
-                treeRenderer.dispose();
-                document.getElementById('tree-container').removeChild(treeRenderer.domElement);
-                treeRenderer = null;
-                treeNodes = [];
-                treeLabels = [];
-                document.getElementById('node-labels-container').innerHTML = '';
-            }
+            document.getElementById('living-tree').innerHTML = '';
+            closeHologram();
         }
 
-        function init3DTree() {
-            const container = document.getElementById('tree-container');
-            const labelsContainer = document.getElementById('node-labels-container');
-            if(treeRenderer) return;
+        function initLivingTree() {
+            const container = document.getElementById('living-tree');
+            container.innerHTML = '';
 
             document.getElementById('tree-node-count').innerText = vault.length.toLocaleString('ar-EG');
 
-            treeScene = new THREE.Scene();
-            treeScene.background = new THREE.Color(0x010c0a);
-            treeScene.fog = new THREE.FogExp2(0x010c0a, 0.005);
-
-            treeCamera = new THREE.PerspectiveCamera(65, container.clientWidth / container.clientHeight, 0.1, 2000);
-            treeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            treeRenderer.setSize(container.clientWidth, container.clientHeight);
-            treeRenderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(treeRenderer.domElement);
-
-            treeControls = new THREE.OrbitControls(treeCamera, treeRenderer.domElement);
-            treeControls.enableDamping = true;
-            treeControls.dampingFactor = 0.05;
-            treeControls.autoRotate = true;
-            treeControls.autoRotateSpeed = 0.5;
-
-            // Lights
-            const ambient = new THREE.AmbientLight(0x404040, 2);
-            treeScene.add(ambient);
-
-            const sun = new THREE.DirectionalLight(0xffffff, 1);
-            sun.position.set(10, 20, 10);
-            treeScene.add(sun);
-
-            const group = new THREE.Group();
-
             // Define Historical Ancestry Path (Alid Lineage)
             const ancestry = [
-                { id: 'AN-01', name: 'علي بن أبي طالب (عليه السلام)', color: 0x00f2ff, scale: 3.5, emissive: 5 },
-                { id: 'AN-02', name: 'الحسن السبط', color: 0x00f2ff, scale: 3.0, emissive: 4 },
-                { id: 'AN-03', name: 'الحسن المثنى', color: 0x00f2ff, scale: 2.5, emissive: 3 },
-                { id: 'AN-04', name: 'عبد الله المحض', color: 0x00f2ff, scale: 2.2, emissive: 2 },
-                { id: 'AN-05', name: 'موسى الجون (الجد الجامع)', color: 0xff9900, scale: 4.5, emissive: 8 }
+                { id: 'AN-01', name: 'علي بن أبي طالب (عليه السلام)', color: 'blue' },
+                { id: 'AN-02', name: 'الحسن السبط', color: 'blue' },
+                { id: 'AN-03', name: 'الحسن المثنى', color: 'blue' },
+                { id: 'AN-04', name: 'عبد الله المحض', color: 'blue' },
+                { id: 'AN-05', name: 'موسى الجون (الجد الجامع)', color: 'gold' }
             ];
 
-            // Render Ancestry Path
             ancestry.forEach((a, idx) => {
-                const yPos = 100 - (idx * 30);
-                const nodeGeo = idx === ancestry.length - 1 ? new THREE.IcosahedronGeometry(a.scale, 2) : new THREE.SphereGeometry(a.scale, 32, 32);
-                const nodeMat = new THREE.MeshStandardMaterial({
-                    color: a.color,
-                    emissive: a.color,
-                    emissiveIntensity: a.emissive,
-                    wireframe: idx === ancestry.length - 1
-                });
-                const node = new THREE.Mesh(nodeGeo, nodeMat);
-                node.position.set(0, yPos, 0);
-                node.userData = { name: a.name, id: a.id, isRoot: idx === 0 };
-                group.add(node);
-                treeNodes.push(node);
+                const node = document.createElement('div');
+                node.className = 'tree-node';
+                node.style.animationDelay = `${idx * 0.5}s`;
+                if(a.color === 'gold') node.style.borderColor = '#d4af37';
+                node.id = `node-${a.id}`;
+                node.innerText = a.name;
+                node.onclick = () => highlightNodeDOM(a.id);
+                container.appendChild(node);
 
-                // Add labels for ancestry
-                const label = document.createElement('div');
-                label.className = 'node-label';
-                label.innerText = a.name;
-                labelsContainer.appendChild(label);
-                treeLabels.push({ element: label, node: node });
-
-                // Connect with vertical beams
-                if (idx > 0) {
-                    const beamGeo = new THREE.CylinderGeometry(0.5, 0.5, 30, 8);
-                    const beamMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.3 });
-                    const beam = new THREE.Mesh(beamGeo, beamMat);
-                    beam.position.set(0, yPos + 15, 0);
-                    group.add(beam);
+                if (idx < ancestry.length - 1) {
+                    const connector = document.createElement('div');
+                    connector.className = 'tree-connector';
+                    container.appendChild(connector);
                 }
             });
 
-            // Origin Fractal Core (Root/Connector to Musa Al-Jawn)
-            const rootNode = treeNodes.find(n => n.userData.id === 'AN-05');
+            // Branches connector
+            const branchStarter = document.createElement('div');
+            branchStarter.className = 'tree-connector';
+            branchStarter.style.height = '60px';
+            container.appendChild(branchStarter);
 
-            // Create Celestial Nebula Particles
-            const starGeo = new THREE.BufferGeometry();
-            const starCount = 2000;
-            const starPos = new Float32Array(starCount * 3);
-            for(let i=0; i<starCount; i++) {
-                starPos[i*3] = (Math.random() - 0.5) * 400;
-                starPos[i*3+1] = (Math.random() - 0.5) * 400;
-                starPos[i*3+2] = (Math.random() - 0.5) * 400;
-            }
-            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.5 });
-            const nebula = new THREE.Points(starGeo, starMat);
-            treeScene.add(nebula);
+            // Members
+            vault.forEach((m, idx) => {
+                const node = document.createElement('div');
+                node.className = 'tree-node';
+                node.style.animationDelay = `${(idx + ancestry.length) * 0.3}s`;
+                node.id = `node-${m.id}`;
+                node.innerText = m.name;
+                node.onclick = () => highlightNodeDOM(m.id);
+                container.appendChild(node);
 
-                // Central Pulsing Light for Musa Al-Jawn
-                const coreLight = new THREE.PointLight(0xff9900, 10, 200);
-            rootNode.add(coreLight);
-
-                // Fractal Branches for Members (Branching from Musa Al-Jawn at y=-20)
-            vault.forEach((m, i) => {
-                const phi = Math.acos(-1 + (2 * i) / vault.length);
-                const theta = Math.sqrt(vault.length * Math.PI) * phi;
-                    const r = 60 + Math.random() * 20;
-
-                const pos = new THREE.Vector3(
-                    r * Math.cos(theta) * Math.sin(phi),
-                        (r * Math.sin(theta) * Math.sin(phi)) - 40, // Shifted relative to Musa Al-Jawn
-                    r * Math.cos(phi)
-                );
-
-                    // Branching fibers (Light Paths from Musa Al-Jawn)
-                const curve = new THREE.QuadraticBezierCurve3(
-                        new THREE.Vector3(0,-20,0),
-                        new THREE.Vector3(pos.x * 0.3, pos.y * 0.5, pos.z * 0.3),
-                    pos
-                );
-
-                const points = curve.getPoints(30);
-                const branchGeo = new THREE.BufferGeometry().setFromPoints(points);
-                const branchMat = new THREE.LineBasicMaterial({
-                    color: 0x7000ff,
-                    transparent: true,
-                    opacity: 0.2
-                });
-                group.add(new THREE.Line(branchGeo, branchMat));
-
-                // Pulsing Star Node
-                const starNodeGeo = new THREE.SphereGeometry(0.8, 16, 16);
-                const starNodeMat = new THREE.MeshStandardMaterial({
-                    color: 0x7000ff,
-                    emissive: 0x7000ff,
-                    emissiveIntensity: 2
-                });
-                const node = new THREE.Mesh(starNodeGeo, starNodeMat);
-                node.position.copy(pos);
-                node.userData = { name: m.name, id: m.id };
-                group.add(node);
-                treeNodes.push(node);
-
-                // Hover Label
-                const label = document.createElement('div');
-                label.className = 'node-label';
-                label.innerText = m.name;
-                labelsContainer.appendChild(label);
-                treeLabels.push({ element: label, node: node });
-            });
-
-            treeScene.add(group);
-            treeCamera.position.set(80, 50, 80);
-            treeControls.update();
-
-            // Star Core Rotation Animation
-            gsap.to(rootNode.rotation, { y: Math.PI * 2, duration: 20, repeat: -1, ease: "none" });
-
-            // Adjust camera to see the full lineage
-            treeCamera.position.set(120, 50, 180);
-            treeControls.target.set(0, 0, 0);
-
-            // Mouse Events
-            container.addEventListener('mousemove', (event) => {
-                const rect = container.getBoundingClientRect();
-                mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
-                mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
-            });
-
-            container.addEventListener('mousedown', (event) => {
-                raycaster.setFromCamera(mouse, treeCamera);
-                const intersects = raycaster.intersectObjects(treeNodes);
-                if (intersects.length > 0) {
-                    highlightNode(intersects[0].object);
+                if (idx < vault.length - 1) {
+                    const connector = document.createElement('div');
+                    connector.className = 'tree-connector';
+                    container.appendChild(connector);
                 }
             });
+        }
 
-            function updateLabels() {
-                treeLabels.forEach(l => {
-                    const isSelected = l.element.classList.contains('selected-label');
+        function highlightNodeDOM(id) {
+            // Remove previous highlights
+            document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('node-highlight'));
 
-                    const pos = l.node.position.clone().applyMatrix4(group.matrixWorld);
-                    pos.project(treeCamera);
-
-                    const x = (pos.x * 0.5 + 0.5) * container.clientWidth;
-                    const y = (pos.y * -0.5 + 0.5) * container.clientHeight;
-
-                    l.element.style.left = `${x}px`;
-                    l.element.style.top = `${y}px`;
-
-                    // Hide if behind camera or if very far away (z projection)
-                    if (pos.z > 1) {
-                        l.element.style.display = 'none';
-                    } else if (isSelected) {
-                        l.element.style.display = 'block';
-                        l.element.style.opacity = '1';
-                        l.element.style.zIndex = '50';
-                    }
-                });
+            const node = document.getElementById(`node-${id}`);
+            if (node) {
+                node.classList.add('node-highlight');
+                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showHologram(id);
             }
-
-            let lastHovered = null;
-
-            function animate() {
-                requestAnimationFrame(animate);
-                treeControls.update();
-
-                const time = Date.now() * 0.001;
-
-                // Rotate Nebula slowly
-                nebula.rotation.y += 0.0005;
-                group.rotation.y += 0.001;
-
-                treeNodes.forEach((node, i) => {
-                    if (node !== lastHovered) {
-                        const pulse = (node.userData.isRoot ? 1.0 : 1.0) + Math.sin(time * 2 + i) * 0.1;
-                        node.scale.set(pulse, pulse, pulse);
-                        node.material.emissiveIntensity = (node.userData.isRoot ? 5.0 : 2.0) + Math.sin(time * 3 + i) * 1.0;
-                    }
-                });
-
-                // Raycasting for labels
-                raycaster.setFromCamera(mouse, treeCamera);
-                const intersects = raycaster.intersectObjects(treeNodes);
-
-                treeLabels.forEach(l => {
-                    if (!l.element.classList.contains('selected-label')) {
-                        l.element.style.display = 'none';
-                    }
-                });
-
-                if (intersects.length > 0) {
-                    const intersected = intersects[0].object;
-                    if (lastHovered !== intersected) {
-                        if (lastHovered) {
-                            gsap.to(lastHovered.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
-                        }
-                        lastHovered = intersected;
-                        const targetScale = intersected.userData.isRoot ? 1.5 : 2.5;
-                        gsap.to(intersected.scale, { x: targetScale, y: targetScale, z: targetScale, duration: 0.3, ease: "back.out" });
-                    }
-                    const label = treeLabels.find(l => l.node === intersected);
-                    if (label) {
-                        label.element.style.display = 'block';
-                        label.element.style.border = '1px solid rgba(0, 242, 255, 0.5)';
-                        label.element.style.background = 'rgba(0, 0, 0, 0.8)';
-                    }
-                } else {
-                    if (lastHovered) {
-                        gsap.to(lastHovered.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
-                        lastHovered = null;
-                    }
-                }
-
-                updateLabels();
-                treeRenderer.render(treeScene, treeCamera);
-            }
-            animate();
-
-            // Resize handling
-            window.addEventListener('resize', () => {
-                if (!treeRenderer) return;
-                treeCamera.aspect = container.clientWidth / container.clientHeight;
-                treeCamera.updateProjectionMatrix();
-                treeRenderer.setSize(container.clientWidth, container.clientHeight);
-            });
         }
 
         // Keyboard Shortcuts
