@@ -82,9 +82,15 @@
             color: #fdfbf7;
         }
         .glass-effect input, .glass-effect select, .glass-effect textarea {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(212, 175, 55, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 242, 255, 0.2);
             color: #fdfbf7;
+            transition: all 0.3s ease;
+        }
+        .glass-effect input:focus, .glass-effect select:focus, .glass-effect textarea:focus {
+            border-color: #ff007f;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+            background: rgba(255, 255, 255, 0.07);
         }
         .glass-effect label {
             color: rgba(212, 175, 55, 0.8);
@@ -126,18 +132,19 @@
         }
 
         #neon-portal {
+            background-color: #010c0a;
             background: radial-gradient(circle at center, #012a24 0%, #010c0a 100%);
             background-image: url('tribal_bg.png');
             background-size: cover;
             background-position: center;
             overflow: hidden;
+            opacity: 1 !important;
         }
 
-        .animated-stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: transparent;
+        #star-field {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
             pointer-events: none;
         }
 
@@ -145,8 +152,7 @@
             position: absolute;
             background: white;
             border-radius: 50%;
-            opacity: 0.3;
-            animation: blink var(--duration) infinite;
+            opacity: 0.5;
         }
 
         @keyframes blink {
@@ -218,19 +224,30 @@
 
         .tree-node {
             position: relative;
-            background: rgba(1, 12, 10, 0.8);
-            border: 2px solid #d4af37;
+            background: rgba(1, 12, 10, 0.9);
+            border: 2px solid #00f2ff;
             border-radius: 50px;
-            padding: 15px 30px;
-            margin: 20px 0;
+            padding: 10px 25px;
+            margin: 10px 0;
             color: #fdfbf7;
-            font-weight: 900;
+            font-weight: 700;
             text-align: center;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
             transition: all 0.3s ease;
             cursor: pointer;
+            white-space: nowrap;
             z-index: 5;
-            animation: float 4s ease-in-out infinite;
+        }
+
+        .tree-node.ancestor {
+            border-color: #d4af37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            font-size: 1.2rem;
+        }
+
+        .tree-node.new-member {
+            border-color: #ff007f;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
         }
 
         .tree-node:hover {
@@ -280,9 +297,11 @@
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
 
+    <div id="star-field"></div>
+    <div id="global-wave" class="fixed bottom-0 left-0 w-full h-[100px] bg-gradient-to-t from-heritage-neonBlue/10 to-transparent z-[-1] pointer-events-none"></div>
+
     <!-- Neon Portal (Splash Screen) -->
-    <div id="neon-portal" class="fixed inset-0 z-[500] flex flex-col items-center justify-center transition-opacity duration-1000">
-        <div id="star-field" class="animated-stars"></div>
+    <div id="neon-portal" class="fixed inset-0 z-[500] flex flex-col items-center justify-center transition-opacity duration-1000 bg-[#010c0a]">
         <div id="particle-container" class="absolute inset-0 pointer-events-none"></div>
         <div id="sparkle-container" class="absolute inset-0 pointer-events-none"></div>
 
@@ -349,14 +368,14 @@
                 <div class="relative w-full group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-heritage-neonBlue to-heritage-neonPink rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
                     <input type="email" id="auth-email" placeholder="أدخل بريدك الإلكتروني للتوثيق..."
-                        class="relative w-full px-8 py-6 bg-black/80 text-heritage-cream border border-heritage-neonBlue/30 rounded-2xl outline-none focus:border-heritage-neonBlue text-center font-bold text-xl placeholder:text-white/20">
+                        class="relative w-full px-8 py-6 bg-black/80 text-heritage-cream border border-heritage-neonBlue/30 rounded-2xl outline-none focus:border-heritage-neonPink text-center font-bold text-xl placeholder:text-white/20 shadow-[0_0_30px_rgba(0,242,255,0.1)]">
                 </div>
 
                 <div class="relative group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-heritage-neonBlue to-heritage-neonPink rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000"></div>
-                    <button onclick="enterSovereignSystem()" class="group relative px-24 py-8 bg-black text-heritage-neonBlue border border-heritage-neonBlue/50 font-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.1)] transition-all hover:scale-110 active:scale-95 flex items-center gap-4">
+                    <button onclick="enterSovereignSystem()" class="group relative px-24 py-8 bg-black text-white border border-heritage-neonPink font-black rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(255,0,127,0.2)] transition-all hover:scale-110 hover:bg-heritage-neonPink active:scale-95 flex items-center gap-4">
                         <span class="text-3xl">🧬</span>
-                        <span class="relative z-10 text-3xl tracking-widest">بوابة الدخول</span>
+                        <span class="relative z-10 text-3xl tracking-widest">بوابة الدخول السيادية</span>
                         <span class="text-xl opacity-40">🔒</span>
                     </button>
                 </div>
@@ -766,26 +785,28 @@
     </div>
 
     <!-- Registry Member Modal (Multi-Step Wizard) -->
-    <div id="bulkModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[300] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
-        <div class="max-w-6xl w-full glass-effect rounded-[3.5rem] p-6 md:p-14 border border-heritage-neonBlue/30 shadow-[0_0_100px_rgba(0,242,255,0.1)] relative text-heritage-cream">
+    <div id="bulkModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[550] hidden items-center justify-center p-4 md:p-10 overflow-y-auto">
+        <div class="max-w-6xl w-full glass-effect rounded-[4rem] p-6 md:p-14 border border-heritage-neonPink/30 shadow-[0_0_150px_rgba(255,0,127,0.15)] relative text-heritage-cream">
             <!-- Close Button -->
-            <button onclick="closeBulkModal()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all z-10">
+            <button onclick="closeBulkModal()" class="absolute top-10 left-10 text-white/20 hover:text-heritage-neonPink transition-all z-10">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
 
             <!-- Wizard Progress Header -->
-            <div class="mb-12">
-                <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tighter text-heritage-neonBlue">التوثيق الرقمي الشامل</h2>
-                <div class="flex gap-2 mb-4">
-                    <div class="wizard-step-indicator h-3 flex-grow bg-heritage-neonBlue rounded-full" data-step="1"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="2"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="3"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="4"></div>
-                    <div class="wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full" data-step="5"></div>
+            <div class="mb-12 text-center">
+                <div class="inline-block px-6 py-2 bg-heritage-neonPink/10 border border-heritage-neonPink/30 rounded-full text-heritage-neonPink font-black text-[10px] uppercase tracking-[0.4em] mb-6">Sovereign Identification Protocol</div>
+                <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-heritage-cream drop-shadow-[0_0_20px_rgba(255,0,127,0.4)]">بوابة التوثيق السيادي</h2>
+
+                <div class="flex gap-3 mb-6 max-w-2xl mx-auto">
+                    <div class="wizard-step-indicator h-2 flex-grow bg-heritage-neonPink rounded-full transition-all duration-500" data-step="1"></div>
+                    <div class="wizard-step-indicator h-2 flex-grow bg-white/5 rounded-full transition-all duration-500" data-step="2"></div>
+                    <div class="wizard-step-indicator h-2 flex-grow bg-white/5 rounded-full transition-all duration-500" data-step="3"></div>
+                    <div class="wizard-step-indicator h-2 flex-grow bg-white/5 rounded-full transition-all duration-500" data-step="4"></div>
+                    <div class="wizard-step-indicator h-2 flex-grow bg-white/5 rounded-full transition-all duration-500" data-step="5"></div>
                 </div>
-                <p id="stepDescription" class="text-heritage-neonPink font-black text-xs uppercase tracking-widest">الخطوة ١: البيانات الأساسية والنسب (Core Data)</p>
+                <p id="stepDescription" class="text-heritage-neonBlue font-black text-xs uppercase tracking-widest opacity-60">الخطوة ١: البيانات الأساسية والنسب (Core Data)</p>
             </div>
 
             <div id="wizardForm" class="min-h-[500px]">
@@ -1299,23 +1320,16 @@
     </div>
 
     <!-- Bulk Entry (Group) Modal -->
-    <div id="groupModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[300] hidden items-center justify-center p-6">
-        <div class="max-w-2xl w-full glass-effect rounded-[3.5rem] p-10 border border-heritage-neonBlue/30 shadow-2xl relative text-heritage-cream text-center">
-            <button onclick="closeGroupModal()" class="absolute top-10 left-10 text-heritage-neonBlue/40 hover:text-heritage-neonBlue transition-all">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <div class="w-20 h-20 bg-heritage-neonBlue/20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-[0_0_30px_rgba(0,242,255,0.3)] text-heritage-neonBlue">⚡</div>
-            <h2 class="text-3xl font-black mb-2 text-heritage-neonBlue">إضافة مجموعة (إدخال جماعي)</h2>
-            <p class="text-xs font-bold opacity-40 mb-8 uppercase">قم بلصق قائمة الأسماء أدناه، اسم واحد في كل سطر</p>
-
-            <div class="space-y-4">
-                <textarea id="bulkNamesArea" placeholder="مثال:&#10;أحمد حسين الحياني&#10;محمد علي الحياني&#10;زياد فهد الحياني" class="w-full p-8 bg-white/5 border border-white/10 rounded-3xl font-black outline-none focus:border-heritage-neonBlue transition-all h-80 text-right leading-relaxed text-heritage-cream" dir="rtl"></textarea>
-            </div>
-
-            <button onclick="bulkAddMembers()" class="w-full mt-8 py-5 bg-heritage-neonBlue text-black font-black rounded-2xl shadow-xl hover:scale-105 transition-all text-xl">بدء التوثيق الجماعي</button>
-            <p class="mt-4 text-[10px] font-bold opacity-30">سيتم إنشاء سجلات "قيد المراجعة" لكافة الأسماء المذكورة أعلاه آلياً</p>
+    <div id="groupModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[600] hidden items-center justify-center p-4">
+        <div class="max-w-2xl w-full glass-effect p-8 rounded-[2rem] border-pink-500/30 relative text-center">
+            <button onclick="closeGroupModal()" class="absolute top-6 left-6 text-white/40 hover:text-pink-500">✕</button>
+            <h2 class="text-2xl font-black text-pink-500 mb-4">توثيق أفراد جدد (إدخال جماعي)</h2>
+            <p class="text-xs font-bold opacity-40 mb-6 uppercase">أدخل الأسماء مفصولة بفاصلة (,) أو سطر جديد</p>
+            <textarea id="bulkNamesArea" rows="10"
+                class="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-pink-500 transition-all text-right"
+                placeholder="أدخل الأسماء هنا..."></textarea>
+            <button onclick="bulkAddMembers()" class="w-full mt-6 py-4 bg-pink-600 text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-all">تحديث السجل الرقمي 🧬</button>
+            <button onclick="if(confirm('هل أنت متأكد من مسح جميع البيانات؟')){localStorage.removeItem(DB_KEY); vault=[]; updateStats(); hyHud('تم مسح السجل الرقمي بالكامل');}" class="w-full mt-4 text-xs text-white/20 hover:text-red-500 transition-all">مسح كافة البيانات المخزنة ⚠️</button>
         </div>
     </div>
 
@@ -1356,15 +1370,14 @@
         function createStars() {
             const container = document.getElementById('star-field');
             if(!container) return;
-            for(let i=0; i<100; i++) {
+            for(let i=0; i<150; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                const size = Math.random() * 2;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
+                const size = Math.random() * 2.5 + 'px';
+                star.style.width = star.style.height = size;
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
-                star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+                star.style.opacity = Math.random() * 0.8 + 0.2;
                 container.appendChild(star);
             }
         }
@@ -2134,14 +2147,16 @@
 
         function showStep(step) {
             document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
-            document.querySelector(`.wizard-step[data-step="${step}"]`).classList.remove('hidden');
+            const target = document.querySelector(`.wizard-step[data-step="${step}"]`);
+            target.classList.remove('hidden');
+            gsap.from(target, { opacity: 0, x: 20, duration: 0.5 });
 
             // Indicators
             document.querySelectorAll('.wizard-step-indicator').forEach(i => {
                 const s = parseInt(i.dataset.step);
-                if(s < step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-neonBlue rounded-full";
-                else if(s === step) i.className = "wizard-step-indicator h-3 flex-grow bg-heritage-neonPink rounded-full shadow-[0_0_15px_rgba(255,0,127,0.5)]";
-                else i.className = "wizard-step-indicator h-3 flex-grow bg-white/10 rounded-full";
+                if(s < step) i.className = "wizard-step-indicator h-2 flex-grow bg-heritage-neonBlue rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(0,242,255,0.3)]";
+                else if(s === step) i.className = "wizard-step-indicator h-2 flex-grow bg-heritage-neonPink rounded-full transition-all duration-500 shadow-[0_0_20px_rgba(255,0,127,0.6)]";
+                else i.className = "wizard-step-indicator h-2 flex-grow bg-white/5 rounded-full transition-all duration-500";
             });
 
             // Descriptions
@@ -2157,7 +2172,8 @@
             // Buttons
             document.getElementById('btnPrev').style.opacity = step === 1 ? "0" : "1";
             document.getElementById('btnPrev').style.pointerEvents = step === 1 ? "none" : "auto";
-            document.getElementById('btnNext').innerText = step === totalSteps ? "حفظ وتوثيق نهائي" : "التالي";
+            document.getElementById('btnNext').innerText = step === totalSteps ? "حفظ وتوثيق نهائي 🧬" : "التالي ❯";
+            document.getElementById('btnNext').className = step === totalSteps ? "px-12 py-5 bg-heritage-neonPink text-white font-black rounded-3xl shadow-[0_0_40px_rgba(255,0,127,0.4)] hover:scale-110 transition-all" : "px-12 py-5 bg-heritage-neonBlue text-black font-black rounded-3xl shadow-[0_0_30px_rgba(0,242,255,0.3)] hover:scale-110 transition-all";
 
             if(step === 5) updateFinalPreview();
         }
@@ -2541,8 +2557,6 @@
         function closeGroupModal() {
             document.getElementById('groupModal').classList.add('hidden');
             document.getElementById('groupModal').classList.remove('flex');
-            // If we came from admin panel, it might still be there but hidden by group modal.
-            // If we want to return to main UI:
             if (document.getElementById('adminPanel').classList.contains('hidden')) {
                 document.getElementById('overlay').classList.add('hidden');
             }
@@ -2567,8 +2581,14 @@
             const text = document.getElementById('bulkNamesArea').value.trim();
             if(!text) return alert("يرجى إدخال أسماء للتوثيق");
 
-            // AI-Smart Bulk logic (Detect job, location, name)
-            const lines = text.split('\n').map(n => n.trim()).filter(n => n.length > 2);
+            // AI-Smart Bulk logic (Detect job, location, name) - Supports commas or newlines
+            let lines = [];
+            if (text.includes(',')) {
+                lines = text.split(',').map(n => n.trim()).filter(n => n.length > 2);
+            } else {
+                lines = text.split('\n').map(n => n.trim()).filter(n => n.length > 2);
+            }
+
             if(lines.length === 0) return alert("لم يتم العثور على أسماء صالحة");
 
             const newMembers = lines.map(line => {
@@ -2606,6 +2626,10 @@
 
             vault.push(...newMembers);
             localStorage.setItem(DB_KEY, JSON.stringify(vault));
+
+            // Also update the specific key from user request if needed for compatibility
+            localStorage.setItem('hyyani_members', JSON.stringify(vault.map(v => v.name)));
+
             logAudit('إدخال جماعي', `تم إضافة ${newMembers.length} فرد عبر ميزة النسخ`);
 
             document.getElementById('bulkNamesArea').value = '';
@@ -2613,6 +2637,7 @@
             updateStats();
             hyHud(`✅ تم توثيق ${newMembers.length} أفراد بنجاح`);
             if (document.getElementById('searchInput').value) searchName();
+            if (document.getElementById('treeModal').classList.contains('flex')) initLivingTree();
         }
 
         async function openWalletModal() {
@@ -2725,7 +2750,7 @@
             localStorage.setItem('HY_SEARCH_COUNT', sCount + 1);
             updateStats();
 
-            const query = document.getElementById('searchInput').value.trim();
+            const query = document.getElementById('searchInput') ? document.getElementById('searchInput').value.trim() : '';
             const resultsSection = document.getElementById('results');
             const resultsGrid = document.getElementById('resultsGrid');
             const resultsCountEl = document.getElementById('resultsCount');
@@ -2883,57 +2908,49 @@
 
         function initLivingTree() {
             const container = document.getElementById('living-tree');
-            container.innerHTML = '';
+            container.innerHTML = `
+                <div class="flex flex-col items-center w-full mb-12">
+                    <div id="node-AN-01" class="tree-node ancestor opacity-0" onclick="highlightNodeDOM('AN-01')">علي بن أبي طالب (عليه السلام)</div>
+                    <div class="w-0.5 h-10 bg-gradient-to-b from-heritage-gold to-heritage-neonBlue"></div>
+                    <div id="node-AN-05" class="tree-node ancestor opacity-0" onclick="highlightNodeDOM('AN-05')">موسى الجون (الجد الجامع)</div>
+                    <h1 class="text-5xl font-black my-12 text-heritage-neonBlue drop-shadow-[0_0_15px_rgba(0,242,255,0.5)]">قبيلة آل الحياني</h1>
+                </div>
+                <div id="dynamicLeavesContainer" class="flex flex-wrap justify-center gap-6 px-10 max-w-6xl w-full"></div>
+            `;
 
             document.getElementById('tree-node-count').innerText = vault.length.toLocaleString('ar-EG');
 
-            // Define Historical Ancestry Path (Alid Lineage)
-            const ancestry = [
-                { id: 'AN-01', name: 'علي بن أبي طالب (عليه السلام)', color: 'blue' },
-                { id: 'AN-02', name: 'الحسن السبط', color: 'blue' },
-                { id: 'AN-03', name: 'الحسن المثنى', color: 'blue' },
-                { id: 'AN-04', name: 'عبد الله المحض', color: 'blue' },
-                { id: 'AN-05', name: 'موسى الجون (الجد الجامع)', color: 'gold' }
-            ];
-
-            ancestry.forEach((a, idx) => {
-                const node = document.createElement('div');
-                node.className = 'tree-node';
-                node.style.animationDelay = `${idx * 0.5}s`;
-                if(a.color === 'gold') node.style.borderColor = '#d4af37';
-                node.id = `node-${a.id}`;
-                node.innerText = a.name;
-                node.onclick = () => highlightNodeDOM(a.id);
-                container.appendChild(node);
-
-                if (idx < ancestry.length - 1) {
-                    const connector = document.createElement('div');
-                    connector.className = 'tree-connector';
-                    container.appendChild(connector);
+            // Animate Ancestors
+            gsap.to(".tree-node.ancestor", {
+                opacity: 1,
+                y: 0,
+                stagger: 0.3,
+                duration: 1,
+                onComplete: () => {
+                    gsap.to(".tree-node.ancestor", { y: -5, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut" });
                 }
             });
 
-            // Branches connector
-            const branchStarter = document.createElement('div');
-            branchStarter.className = 'tree-connector';
-            branchStarter.style.height = '60px';
-            container.appendChild(branchStarter);
+            const leavesContainer = document.getElementById('dynamicLeavesContainer');
 
             // Members
             vault.forEach((m, idx) => {
                 const node = document.createElement('div');
-                node.className = 'tree-node';
-                node.style.animationDelay = `${(idx + ancestry.length) * 0.3}s`;
+                node.className = 'tree-node new-member opacity-0';
                 node.id = `node-${m.id}`;
-                node.innerText = m.name;
+                node.innerHTML = `👤 ${m.name}`;
                 node.onclick = () => highlightNodeDOM(m.id);
-                container.appendChild(node);
+                leavesContainer.appendChild(node);
 
-                if (idx < vault.length - 1) {
-                    const connector = document.createElement('div');
-                    connector.className = 'tree-connector';
-                    container.appendChild(connector);
-                }
+                gsap.to(node, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    delay: idx * 0.05,
+                    onComplete: () => {
+                        gsap.to(node, { y: -3, duration: 2 + Math.random(), repeat: -1, yoyo: true, ease: "sine.inOut" });
+                    }
+                });
             });
         }
 
