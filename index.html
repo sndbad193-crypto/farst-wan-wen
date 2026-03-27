@@ -414,7 +414,7 @@
 
     <!-- Sidebar (Hidden by default, slides from left) -->
     <div id="leftSidebar" class="fixed inset-y-0 left-0 w-80 bg-black/95 backdrop-blur-3xl z-[250] -translate-x-full transition-transform duration-500 border-r border-heritage-neonBlue/20 p-8 flex flex-col items-center overflow-y-auto pointer-events-none [&.active]:pointer-events-auto">
-        <button onclick="toggleSidebar()" class="absolute top-8 right-8 text-heritage-neonBlue/40 hover:text-heritage-neonBlue">
+        <button onclick="toggleSidebar()" aria-label="إغلاق القائمة الجانبية" class="absolute top-8 right-8 text-heritage-neonBlue/40 hover:text-heritage-neonBlue">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -617,21 +617,21 @@
     <header class="fixed top-0 left-0 right-0 z-[100] flex justify-between items-center p-10 bg-transparent pointer-events-none">
         <!-- Control Panel & Language (Top Right in RTL) -->
         <div class="pointer-events-auto flex items-center gap-4">
-            <button onclick="toggleAdmin()" class="group relative px-10 py-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
+            <button onclick="toggleAdmin()" aria-label="بوابة التحكم الإدارية" class="group relative px-10 py-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
                 <span class="text-xl">بوابة التحكم</span>
                 <div id="status-orb-main" class="w-3 h-3 bg-heritage-neonBlue rounded-full animate-pulse shadow-[0_0_20px_rgba(0,242,255,1)]"></div>
             </button>
-            <button onclick="toggleTheme()" class="p-5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl text-heritage-neonPink hover:scale-110 transition-all shadow-lg" title="تبديل المظهر">
+            <button onclick="toggleTheme()" aria-label="تبديل المظهر الليلي والنهاري" class="p-5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl text-heritage-neonPink hover:scale-110 transition-all shadow-lg" title="تبديل المظهر">
                 🌓
             </button>
         </div>
 
         <!-- Sidebar Toggle & Language (Top Left in RTL) -->
         <div class="pointer-events-auto flex items-center gap-4">
-            <button onclick="hyHud('Switching to English...')" class="px-4 py-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl text-[10px] font-black text-heritage-cream hover:text-heritage-neonBlue transition-all">
+            <button onclick="hyHud('Switching to English...')" aria-label="تبديل اللغة" class="px-4 py-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl text-[10px] font-black text-heritage-cream hover:text-heritage-neonBlue transition-all">
                 EN / عربي
             </button>
-            <button onclick="toggleSidebar()" class="group relative p-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
+            <button onclick="toggleSidebar()" aria-label="فتح القائمة الجانبية" class="group relative p-5 bg-black/60 backdrop-blur-3xl text-heritage-neonBlue font-black rounded-2xl border-2 border-heritage-neonBlue/30 shadow-[0_0_50px_rgba(0,242,255,0.1)] hover:border-heritage-neonBlue hover:shadow-[0_0_50px_rgba(0,242,255,0.3)] transition-all active:scale-95 flex items-center gap-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
@@ -708,12 +708,12 @@
                 <div class="relative group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-heritage-neonBlue via-heritage-neonPurple to-heritage-neonPink rounded-[2.5rem] blur opacity-30 group-hover:opacity-100 transition duration-1000"></div>
                     <div class="relative bg-black/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 p-2 flex items-center shadow-2xl overflow-hidden">
-                        <button onclick="searchName()" class="p-6 text-heritage-neonBlue hover:scale-110 transition-all active:rotate-12">
+                        <button onclick="searchName()" aria-label="بدء البحث" class="p-6 text-heritage-neonBlue hover:scale-110 transition-all active:rotate-12">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
-                        <input type="text" id="searchInput" onkeyup="searchName()" placeholder="ابحث في السجل الرقمي الموحد..."
+                        <input type="text" id="searchInput" onkeyup="searchName()" aria-label="ابحث في السجل الرقمي الموحد" placeholder="ابحث في السجل الرقمي الموحد..."
                             class="flex-grow bg-transparent text-heritage-cream text-3xl font-black py-6 px-4 outline-none placeholder:text-white/20 selection:bg-heritage-neonBlue/30">
 
                         <div class="flex gap-2 px-6 border-r border-white/10">
@@ -751,7 +751,7 @@
     </main>
 
     <!-- Success Hud -->
-    <div id="hy-hud" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl text-heritage-neonBlue px-10 py-5 rounded-2xl font-black shadow-[0_0_50px_rgba(0,242,255,0.2)] border border-heritage-neonBlue/30 z-[400] transform translate-y-32 transition-transform duration-500 flex items-center gap-4">
+    <div id="hy-hud" role="status" aria-live="polite" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl text-heritage-neonBlue px-10 py-5 rounded-2xl font-black shadow-[0_0_50px_rgba(0,242,255,0.2)] border border-heritage-neonBlue/30 z-[400] transform translate-y-32 transition-transform duration-500 flex items-center gap-4">
         <span class="text-2xl">🛡️</span>
         <span id="hud-text">تمت العملية بنجاح</span>
     </div>
@@ -1559,7 +1559,7 @@
                     hyHud("⚠️ خطأ في نظام البصمة: " + err);
                 }
             } else {
-                alert("جهازك لا يدعم البصمة أو المتصفح لا يدعم WebAuthn. استخدم كود الهاتف.");
+                hyHud("جهازك لا يدعم البصمة أو المتصفح لا يدعم WebAuthn. استخدم كود الهاتف.");
             }
         }
 
@@ -1610,7 +1610,7 @@
                     hyHud("✅ تم التحقق بنجاح");
                 }, 800);
             } else {
-                alert("يرجى إدخال رمز التحقق المكون من ٤ أرقام");
+                hyHud("يرجى إدخال رمز التحقق المكون من ٤ أرقام");
             }
         }
 
@@ -2176,11 +2176,11 @@
                 const f = document.getElementById('name_first').value;
                 const nid = document.getElementById('national_id_secure').value;
                 if(!f || !nid) {
-                    alert("يرجى إكمال الاسم الأول والرقم الوطني");
+                    hyHud("يرجى إكمال الاسم الأول والرقم الوطني");
                     return false;
                 }
                 if(vault.some(v => v.nationalID === nid)) {
-                    alert("الرقم الوطني مسجل مسبقاً");
+                    hyHud("الرقم الوطني مسجل مسبقاً");
                     return false;
                 }
             }
@@ -2245,7 +2245,7 @@
                 btnCapture.classList.remove('hidden');
                 hyHud("تم فتح الكاميرا.. يرجى الثبات للالتقاط");
             } catch (err) {
-                alert("تعذر الوصول للكاميرا: " + err);
+                hyHud("تعذر الوصول للكاميرا: " + err);
             }
         }
 
@@ -2561,7 +2561,10 @@
 
         function bulkAddMembers() {
             const text = document.getElementById('bulkNamesArea').value.trim();
-            if(!text) return alert("يرجى إدخال أسماء للتوثيق");
+            if(!text) {
+                hyHud("يرجى إدخال أسماء للتوثيق");
+                return;
+            }
 
             // AI-Smart Bulk logic (Detect job, location, name) - Supports commas or newlines
             let lines = [];
@@ -2571,7 +2574,10 @@
                 lines = text.split('\n').map(n => n.trim()).filter(n => n.length > 2);
             }
 
-            if(lines.length === 0) return alert("لم يتم العثور على أسماء صالحة");
+            if(lines.length === 0) {
+                hyHud("لم يتم العثور على أسماء صالحة");
+                return;
+            }
 
             const newMembers = lines.map(line => {
                 let name = line;
@@ -2675,7 +2681,10 @@
                 date: new Date().toLocaleDateString('ar-EG')
             };
 
-            if(isNaN(t.amount)) return alert("يرجى إدخال مبلغ صحيح");
+            if(isNaN(t.amount)) {
+                hyHud("يرجى إدخال مبلغ صحيح");
+                return;
+            }
 
             financeLog.unshift(t);
             localStorage.setItem(FINANCE_KEY, JSON.stringify(financeLog));
