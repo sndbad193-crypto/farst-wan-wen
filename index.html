@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -198,7 +199,99 @@
             font-size: 14px !important;
         }
 
+            .animate-spin-slow { animation: spin 8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
+        /* Portal & Card Enhancements */
+        .pillar-card:hover .pillar-icon {
+            transform: scale(1.2) rotate(5deg);
+            filter: drop-shadow(0 0 20px currentColor);
+        }
+        .pillar-icon {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .price-flicker {
+            animation: flicker 2s linear infinite;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .dna-path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: dna-flow 3s linear infinite;
+        }
+        @keyframes dna-flow {
+            to { stroke-dashoffset: 0; }
+        }
+        /* High-Fidelity Landing Styles */
+        .breathing-seal {
+            animation: breathing 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.5));
+        }
+        @keyframes breathing {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.4)); }
+    <!-- Loading / Encryption Tunnel Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 z-[1000] bg-black flex flex-col items-center justify-center transition-opacity duration-1000">
+        <div class="relative mb-8">
+            <div class="w-24 h-24 border-4 border-heritage-gold/20 border-t-heritage-gold rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <span class="text-heritage-gold font-black text-xs">HY</span>
+            </div>
+        </div>
+        <div class="w-64 h-1 bg-white/10 rounded-full overflow-hidden mb-4">
+            <div id="loading-progress" class="h-full bg-heritage-gold w-0 transition-all duration-[2000ms]"></div>
+        </div>
+        <p id="loading-text" class="text-heritage-gold font-black text-[10px] uppercase tracking-[0.5em] animate-pulse">Establishing Secure Tunnel</p>
+        <div id="hex-codes" class="mt-8 font-mono text-[8px] text-heritage-gold/20 grid grid-cols-4 gap-4"></div>
+    </div>
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 60px rgba(212, 175, 55, 0.8)); }
+        }
+        .text-glow-gold {
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .news-ticker-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 10px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: 50;
+        }
+        .news-ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 30s linear infinite;
+            color: #d4af37;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .face-id-scan {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 242, 255, 0.1);
+            border-top: 2px solid #00f2ff;
+            box-shadow: 0 -20px 40px rgba(0, 242, 255, 0.3);
+            animation: scan 2s ease-in-out infinite;
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+        }
+        @keyframes scan {
+            0%, 100% { top: 0%; }
+            50% { top: 100%; }
+        }
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
 
@@ -209,6 +302,8 @@
 
     <style>
         .vertical-text { writing-mode: vertical-rl; transform: rotate(180deg); }
+            .animate-spin-slow { animation: spin 8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 
     <!-- Sidebar (Hidden by default, slides from left) -->
@@ -222,11 +317,15 @@
         <div class="mt-8 mb-8 flex flex-col items-center w-full px-4">
             <!-- Sidebar Header with Logo -->
             <div class="mb-10 relative flex flex-col items-center">
-                <div class="absolute inset-0 bg-heritage-neonBlue blur-3xl opacity-10"></div>
-                <div class="relative w-24 h-24 bg-black/40 rounded-full border-2 border-heritage-neonBlue/40 flex items-center justify-center mb-4 backdrop-blur-xl">
-                    <span class="text-heritage-neonBlue font-black text-xl">الحياني</span>
+                <div class="absolute inset-0 bg-heritage-gold blur-3xl opacity-20"></div>
+                <div class="relative w-28 h-28 flex items-center justify-center mb-4">
+                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                        <circle cx="100" cy="100" r="95" fill="none" stroke="#d4af37" stroke-width="1" stroke-dasharray="5 5" class="animate-[spin_30s_linear_infinite]" />
+                        <circle cx="100" cy="100" r="80" fill="rgba(0,0,0,0.6)" stroke="#d4af37" stroke-width="3" />
+                        <text x="50%" y="115" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="36" fill="#d4af37">H</text>
+                    </svg>
                 </div>
-                <h3 class="text-heritage-cream font-black text-lg">ديوان قبيلة الحياني</h3>
+                <h3 class="text-heritage-gold font-black text-xl tracking-wide">ديوان السيادة</h3>
                 <p class="text-[8px] text-heritage-neonBlue/60 font-bold uppercase tracking-[0.2em]">Official Tribal Registry</p>
             </div>
 
@@ -264,90 +363,90 @@
                 <span class="text-lg">🔍</span>
             </button>
 
-            <!-- 3. الخرائط الجغرافية -->
+            <!-- 3. شجرة النسب التفاعلية -->
+            <button onclick="openTree();" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-gold hover:text-black transition-all">
+                <span class="text-sm">٣. شجرة النسب التفاعلية</span>
+                <span class="text-lg">🌳</span>
+            </button>
+
+            <!-- 4. الخرائط الجغرافية -->
             <button onclick="openMap();" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">٣. الخرائط الجغرافية</span>
+                <span class="text-sm">٤. الخرائط الجغرافية</span>
                 <span class="text-lg">🗺️</span>
             </button>
 
-            <!-- 4. الإحصائيات والرسوم البيانية -->
+            <!-- 5. الإحصائيات والرسوم البيانية -->
             <button onclick="openInfoModal('stats')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">٤. الإحصائيات والرسوم البيانية</span>
+                <span class="text-sm">٥. الإحصائيات والرسوم البيانية</span>
                 <span class="text-lg">📊</span>
             </button>
 
-            <!-- 5. المستندات الرسمية -->
+            <!-- 6. المستندات الرسمية -->
             <button onclick="openInfoModal('docs')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">٥. المستندات الرسمية</span>
+                <span class="text-sm">٦. المستندات الرسمية</span>
                 <span class="text-lg">📄</span>
             </button>
 
-            <!-- 6. العقود الذكية (بلوك تشين) -->
+            <!-- 7. العقود الذكية (بلوك تشين) -->
             <button onclick="openInfoModal('blockchain')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">٦. العقود الذكية (بلوك تشين)</span>
+                <span class="text-sm">٧. العقود الذكية (بلوك تشين)</span>
                 <span class="text-lg">⛓️</span>
             </button>
 
-            <!-- 7. لوحة التحكم -->
-            <button onclick="toggleAdmin();" class="w-full py-3 px-4 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-xl border border-heritage-neonBlue/20 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">٧. لوحة التحكم</span>
-                <span class="text-lg">⚙️</span>
+            <!-- 8. لوحة التحكم -->
+            <button onclick="toggleAdmin();" class="w-full py-4 px-4 bg-heritage-neonBlue/20 text-heritage-neonBlue rounded-2xl border-2 border-heritage-neonBlue/40 font-black text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all shadow-[0_0_20px_rgba(0,242,255,0.1)] hover:shadow-[0_0_30px_rgba(0,242,255,0.3)]">
+                <span class="text-sm">٨. لوحة التحكم (السيادة)</span>
+                <span class="text-2xl animate-spin-slow">⚙️</span>
             </button>
 
-            <!-- 8. الكتب والمراجع -->
+            <!-- 9. الكتب والمراجع -->
             <button onclick="openInfoModal('books')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">٨. الكتب والمراجع</span>
+                <span class="text-sm">٩. الكتب والمراجع</span>
                 <span class="text-lg">📚</span>
             </button>
 
-            <!-- 9. المناسبات والأحداث -->
+            <!-- 10. المناسبات والأحداث -->
             <button onclick="openInfoModal('events')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">٩. المناسبات والأحداث</span>
+                <span class="text-sm">١٠. المناسبات والأحداث</span>
                 <span class="text-lg">📅</span>
             </button>
 
-            <!-- 10. الصور والفيديوهات -->
+            <!-- 11. الصور والفيديوهات -->
             <button onclick="openInfoModal('media')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">١٠. الصور والفيديوهات</span>
+                <span class="text-sm">١١. الصور والفيديوهات</span>
                 <span class="text-lg">🎥</span>
             </button>
 
-            <!-- 11. التحقق الرسمي -->
+            <!-- 12. التحقق الرسمي -->
             <button onclick="openInfoModal('verify')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">١١. التحقق الرسمي</span>
+                <span class="text-sm">١٢. التحقق الرسمي</span>
                 <span class="text-lg">🛡️</span>
             </button>
 
-            <!-- 12. اللغة -->
+            <!-- 13. اللغة -->
             <button onclick="openInfoModal('lang')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">١٢. اللغة</span>
+                <span class="text-sm">١٣. اللغة</span>
                 <span class="text-lg">🌐</span>
             </button>
 
-            <!-- 13. الوضع الليلي/النهاري -->
+            <!-- 14. الوضع الليلي/النهاري -->
             <button onclick="toggleTheme();" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">١٣. الوضع الليلي/النهاري</span>
+                <span class="text-sm">١٤. الوضع الليلي/النهاري</span>
                 <span class="text-lg">🌓</span>
             </button>
 
-            <!-- 14. حول المنصة -->
+            <!-- 15. حول المنصة -->
             <button onclick="openInfoModal('about')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">١٤. حول المنصة</span>
+                <span class="text-sm">١٥. حول المنصة</span>
                 <span class="text-lg">ℹ️</span>
             </button>
 
-            <!-- 15. المكافآت والهدايا -->
+            <!-- 16. المكافآت والهدايا -->
             <button onclick="openInfoModal('rewards')" class="w-full py-3 px-4 bg-white/5 text-white/80 rounded-xl border border-white/10 font-bold text-right flex items-center justify-between hover:bg-heritage-neonBlue hover:text-black transition-all">
-                <span class="text-sm">١٥. المكافآت والهدايا</span>
+                <span class="text-sm">١٦. المكافآت والهدايا</span>
                 <span class="text-lg">🎁</span>
             </button>
-
-            <!-- 16. تسجيل الدخول / تسجيل الخروج -->
-            <button onclick="logout();" class="w-full py-3 px-4 bg-red-600/10 text-red-600 rounded-xl border border-red-600/20 font-bold text-right flex items-center justify-between hover:bg-red-600 hover:text-white transition-all">
-                <span class="text-sm">١٦. تسجيل الدخول / الخروج</span>
-                <span class="text-lg">👤</span>
-            </button>
-        </div>
+    </div>
 
         <div class="mt-12 pt-8 border-t border-white/5 w-full text-center">
             <p class="text-[10px] font-black opacity-20 uppercase tracking-[0.3em]">HAYYANI OS v2.0</p>
@@ -448,110 +547,160 @@
     </header>
 
     <!-- Landing Page -->
-    <section id="landing-page" class="min-h-screen flex flex-col items-center justify-center pt-24 pb-20 px-4 md:px-6 relative overflow-hidden">
-        <div class="absolute inset-0 bg-[#010c0a] pointer-events-none"></div>
-        <div id="landing-particle-container" class="absolute inset-0 pointer-events-none opacity-20"></div>
+    <!-- High-Fidelity Landing Page -->
+    <section id="landing-page" class="min-h-screen flex flex-col items-center justify-center pt-24 pb-20 px-4 md:px-6 relative overflow-hidden bg-black">
+        <div class="absolute inset-0 bg-radial-gradient from-heritage-emerald/20 to-black pointer-events-none"></div>
+        <canvas id="digital-winds" class="absolute inset-0 pointer-events-none opacity-40"></canvas>
 
-        <div class="relative z-10 w-full max-w-6xl text-center space-y-12">
-            <!-- Animated Tribal Seal -->
-            <div class="flex justify-center mb-6">
-                <div class="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center group">
-                    <div class="absolute inset-0 bg-heritage-neonBlue blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                    <svg viewBox="0 0 200 200" class="relative w-full h-full drop-shadow-[0_0_50px_rgba(0,242,255,0.4)] animate-[pulse_5s_infinite]">
-                        <circle cx="100" cy="100" r="95" fill="none" stroke="#00f2ff" stroke-width="1" stroke-dasharray="10 5" class="animate-[spin_40s_linear_infinite]" />
-                        <circle cx="100" cy="100" r="88" fill="none" stroke="#ff007f" stroke-width="0.5" opacity="0.2" />
-                        <text x="50%" y="108" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="28" fill="#00f2ff" style="text-shadow: 0 0 15px #00f2ff;">الحياني</text>
-                        <path d="M70 140 L130 140" stroke="#ff9900" stroke-width="2" stroke-linecap="round" opacity="0.5" />
+        <div class="relative z-10 w-full max-w-6xl text-center space-y-16">
+            <!-- Central Tribal Seal (Breathing Golden Neon) -->
+            <div class="flex justify-center">
+                <div class="relative w-64 h-64 md:w-96 md:h-96 flex items-center justify-center breathing-seal">
+                    <div class="absolute inset-0 bg-heritage-gold blur-[120px] opacity-20 animate-pulse"></div>
+                    <svg viewBox="0 0 200 200" class="relative w-full h-full drop-shadow-[0_0_80px_rgba(212,175,55,0.6)]">
+                        <!-- Outer Ornate Rings -->
+                        <circle cx="100" cy="100" r="98" fill="none" stroke="#d4af37" stroke-width="0.5" stroke-dasharray="4 2" class="animate-[spin_60s_linear_infinite]" />
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="#d4af37" stroke-width="2" stroke-dasharray="20 10" class="animate-[spin_40s_linear_infinite_reverse]" />
+
+                        <!-- Core Seal -->
+                        <circle cx="100" cy="100" r="75" fill="rgba(0,0,0,0.8)" stroke="#d4af37" stroke-width="4" />
+                        <path d="M60 100 Q100 40 140 100 T60 160" fill="none" stroke="#d4af37" stroke-width="1" opacity="0.3" />
+
+                        <!-- Tribal Name -->
+                        <text x="50%" y="115" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="32" fill="#d4af37" style="text-shadow: 0 0 25px #d4af37;">الحياني</text>
+                        <text x="50%" y="145" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="8" fill="#d4af37" opacity="0.5" letter-spacing="4">DIWAN SOVEREIGNTY</text>
                     </svg>
                 </div>
             </div>
 
+            <!-- Title & Slogan -->
             <div class="space-y-6">
-                <h1 class="text-5xl md:text-9xl font-black text-heritage-cream tracking-tighter drop-shadow-2xl">ديوان السيادة الرقمي</h1>
-                <p class="text-heritage-gold text-lg md:text-3xl font-bold tracking-widest opacity-80 max-w-3xl mx-auto">المنصة الرسمية والموثقة لأبناء قبيلة الحياني في الوطن العربي والعالم</p>
+                <h1 id="landing-title" class="text-6xl md:text-[10rem] font-black text-heritage-cream tracking-tighter opacity-0 translate-y-10 transition-all duration-1000 text-glow-gold">ديوان السيادة</h1>
+                <p id="landing-subtitle" class="text-heritage-gold text-xl md:text-4xl font-bold tracking-[0.3em] opacity-0 transition-all duration-1000 delay-500">المرجع الرقمي الأول لقبيلة الحياني</p>
             </div>
 
-            <!-- Landing Auth Gate -->
-            <div id="landing-auth" class="max-w-md mx-auto w-full space-y-6 pt-10">
+            <!-- Stats Bar -->
+            <div class="flex flex-wrap justify-center gap-8 md:gap-20 py-8 border-y border-white/5 backdrop-blur-sm bg-white/5 rounded-[3rem]">
+                <div class="text-center">
+                    <p class="text-[10px] font-black text-heritage-gold uppercase tracking-widest mb-1">القوة البشرية الموثقة</p>
+                    <p class="text-4xl font-black text-heritage-cream" id="stats-human-power">24,832</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[10px] font-black text-heritage-gold uppercase tracking-widest mb-1">الانتشار العالمي</p>
+                    <p class="text-4xl font-black text-heritage-cream">14 دولة</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[10px] font-black text-heritage-gold uppercase tracking-widest mb-1">الأمان الرقمي</p>
+                    <p class="text-4xl font-black text-heritage-cream">AES-512</p>
+                </div>
+            </div>
+
+            <!-- Access Portal -->
+            <div id="landing-auth" class="max-w-2xl mx-auto w-full space-y-10 pt-10">
                 <div class="relative group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-heritage-neonBlue to-heritage-neonPink rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                    <input type="email" id="landing-email" placeholder="أدخل بريدك الإلكتروني للوصول..."
-                        class="relative w-full px-8 py-5 bg-black/60 text-heritage-cream border border-heritage-neonBlue/30 rounded-2xl outline-none focus:border-heritage-neonPink text-center font-bold text-lg placeholder:text-white/20 shadow-xl">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-heritage-gold via-heritage-neonBlue to-heritage-gold rounded-3xl blur opacity-20 group-hover:opacity-60 transition duration-1000"></div>
+                    <div class="relative flex flex-col md:flex-row gap-4">
+                        <input type="email" id="landing-email" placeholder="البريد الإلكتروني للسيادة..."
+                            class="flex-grow px-10 py-6 bg-black/80 text-heritage-cream border border-heritage-gold/30 rounded-2xl outline-none focus:border-heritage-gold text-center font-black text-xl placeholder:text-white/10 shadow-2xl">
+
+                        <button onclick="simulateFaceIDScan()" class="px-8 py-6 bg-heritage-gold text-black font-black rounded-2xl flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-lg active:scale-95">
+                            <span class="text-2xl">👤</span>
+                            <span>Face ID</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row items-center justify-center gap-4">
-                    <button onclick="handleLandingLogin()" class="group relative px-10 py-5 bg-heritage-neonBlue text-black font-black rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(0,242,255,0.2)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3 w-full md:w-auto">
-                        <span class="text-xl">🔑</span>
-                        <span class="text-lg tracking-tight">تسجيل الدخول</span>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                    <button onclick="handleLandingLogin()" class="group relative px-12 py-6 bg-white text-black font-black rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.2)] transition-all hover:scale-105 active:scale-95 flex items-center gap-4 w-full md:w-auto">
+                        <span class="text-2xl">🛡️</span>
+                        <span class="text-xl">دخول الديوان</span>
                     </button>
 
-                    <button onclick="openBulkModal()" class="group relative px-10 py-5 bg-black/40 backdrop-blur-xl text-heritage-neonPink font-black rounded-2xl border-2 border-heritage-neonPink shadow-[0_0_30px_rgba(255,0,127,0.1)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3 w-full md:w-auto">
-                        <span class="text-xl">🧬</span>
-                        <span class="text-lg tracking-tight">طلب توثيق جديد</span>
+                    <button onclick="connectMetaMask()" class="group relative px-12 py-6 bg-orange-600/20 text-orange-500 font-black rounded-3xl border-2 border-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.2)] transition-all hover:bg-orange-600 hover:text-white hover:scale-105 active:scale-95 flex items-center gap-4 w-full md:w-auto">
+                        <span class="text-2xl">🦊</span>
+                        <span class="text-xl">MetaMask</span>
                     </button>
+
+                    <button onclick="enterRegistry()" class="px-8 py-4 text-white/40 font-black hover:text-white transition-all text-sm uppercase tracking-widest">Guest Access ❯</button>
                 </div>
 
-                <div class="flex flex-col items-center gap-2 pt-4">
-                    <p class="text-[10px] text-white/30 font-mono tracking-widest uppercase">System Status: Active & Encrypted</p>
-                    <div class="flex gap-4 items-center">
-                        <span class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[8px] font-black border border-green-500/20">● WEB3 SECURE</span>
-                        <span class="px-3 py-1 bg-heritage-neonBlue/10 text-heritage-neonBlue rounded-full text-[8px] font-black border border-heritage-neonBlue/20">● ARABIC CORE</span>
+                <!-- Face ID Scan Animation Overlay -->
+                <div id="face-id-overlay" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-3xl hidden items-center justify-center">
+                    <div class="relative w-80 h-80 rounded-[4rem] border-4 border-heritage-neonBlue/20 overflow-hidden flex items-center justify-center">
+                        <div class="face-id-scan"></div>
+                        <div class="text-8xl animate-pulse">👤</div>
+                        <div class="absolute bottom-10 left-0 right-0 text-center">
+                            <p class="text-heritage-neonBlue font-black tracking-widest text-xs uppercase">Scanning Identity...</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Rewards & Gifts Showcase -->
-            <div class="pt-24 space-y-10">
-                <div class="flex flex-col items-center">
-                    <h2 class="text-2xl md:text-4xl font-black text-heritage-cream mb-2">مكافآت وهدايا الولاء</h2>
-                    <div class="w-24 h-1 bg-heritage-neonPink rounded-full opacity-50"></div>
+            <!-- Sovereign Pillars -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 pt-20">
+                <!-- DNA Pillar -->
+                <div class="p-12 glass-effect rounded-[4rem] border border-heritage-gold/20 relative overflow-hidden group pillar-card hover:border-heritage-gold/60 transition-all">
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-heritage-gold/10 blur-[80px] rounded-full group-hover:bg-heritage-gold/20 transition-all"></div>
+                    <div class="pillar-icon mb-8 text-heritage-gold relative">
+                        <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path class="dna-path" d="M4.5 4.5C6 6 9 9 12 12C15 15 18 18 19.5 19.5" stroke="#d4af37"/>
+                            <path class="dna-path" d="M19.5 4.5C18 6 15 9 12 12C9 15 6 18 4.5 19.5" stroke="#ff9900" opacity="0.5"/>
+                            <circle cx="4.5" cy="4.5" r="1" fill="#d4af37"/>
+                            <circle cx="19.5" cy="19.5" r="1" fill="#d4af37"/>
+                            <circle cx="19.5" cy="4.5" r="1" fill="#ff9900"/>
+                            <circle cx="4.5" cy="19.5" r="1" fill="#ff9900"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-heritage-cream mb-4">شجرة السيادة</h3>
+                    <p class="text-sm opacity-40 font-bold leading-relaxed">أرشيف جيني متكامل يوثق الفروع الهاشمية لقبيلة الحياني بدقة متناهية عبر العقود.</p>
+                    <div class="mt-6 flex gap-1">
+                        <div class="h-1 w-8 bg-heritage-gold rounded-full opacity-30"></div>
+                        <div class="h-1 w-4 bg-heritage-gold rounded-full opacity-10"></div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="p-10 glass-effect rounded-[3rem] border border-heritage-gold/30 relative overflow-hidden group hover:scale-105 transition-all">
-                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-heritage-gold opacity-10 blur-3xl group-hover:opacity-20 transition-opacity"></div>
-                        <div class="text-6xl mb-6 drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]">🎖️</div>
-                        <h3 class="text-xl font-black text-heritage-gold mb-2">وسام الولاء الرقمي</h3>
-                        <p class="text-xs opacity-40 font-bold leading-relaxed">يمنح لكل عضو يقوم بتوثيق بياناته بنجاح في الديوان.</p>
+                <!-- Token Pillar -->
+                <div class="p-12 glass-effect rounded-[4rem] border border-heritage-neonBlue/20 relative overflow-hidden group pillar-card hover:border-heritage-neonBlue/60 transition-all">
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-heritage-neonBlue/10 blur-[80px] rounded-full group-hover:bg-heritage-neonBlue/20 transition-all"></div>
+                    <div class="pillar-icon text-7xl mb-8 text-heritage-neonBlue">🪙</div>
+                    <h3 class="text-2xl font-black text-heritage-cream mb-4">عملة HAY</h3>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-heritage-neonBlue font-black text-xl price-flicker">.42</span>
+                        <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">+4.2%</span>
                     </div>
+                    <p class="text-sm opacity-40 font-bold leading-relaxed">نظام مكافآت رقمي مبني على تقنيات البلوكشين لدعم المبادرات الاجتماعية للقبيلة.</p>
+                </div>
 
-                    <div class="p-10 glass-effect rounded-[3rem] border border-heritage-neonBlue/30 relative overflow-hidden group hover:scale-105 transition-all scale-110 z-10 shadow-2xl">
-                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-heritage-neonBlue opacity-10 blur-3xl group-hover:opacity-20 transition-opacity"></div>
-                        <div class="text-6xl mb-6 drop-shadow-[0_0_20px_rgba(0,242,255,0.4)]">🎁</div>
-                        <h3 class="text-xl font-black text-heritage-neonBlue mb-2">هدية الانضمام</h3>
-                        <p class="text-xs opacity-40 font-bold leading-relaxed">باقة ترحيبية رقمية تشمل هويتك الموثقة كفرد من قبيلة الحياني.</p>
-                    </div>
-
-                    <div class="p-10 glass-effect rounded-[3rem] border border-heritage-neonPink/30 relative overflow-hidden group hover:scale-105 transition-all">
-                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-heritage-neonPink opacity-10 blur-3xl group-hover:opacity-20 transition-opacity"></div>
-                        <div class="text-6xl mb-6 drop-shadow-[0_0_20px_rgba(255,0,127,0.4)]">🪙</div>
-                        <h3 class="text-xl font-black text-heritage-neonPink mb-2">عملات القبيلة</h3>
-                        <p class="text-xs opacity-40 font-bold leading-relaxed">نقاط ولاء يمكن استبدالها بخدمات حصرية داخل المنصة.</p>
+                <!-- Vault Pillar -->
+                <div class="p-12 glass-effect rounded-[4rem] border border-heritage-neonPink/20 relative overflow-hidden group pillar-card hover:border-heritage-neonPink/60 transition-all">
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-heritage-neonPink/10 blur-[80px] rounded-full group-hover:bg-heritage-neonPink/20 transition-all"></div>
+                    <div class="pillar-icon text-7xl mb-8 text-heritage-neonPink">🛡️</div>
+                    <h3 class="text-2xl font-black text-heritage-cream mb-4">خزنة الخصوصية</h3>
+                    <p class="text-sm opacity-40 font-bold leading-relaxed">بياناتك مشفرة في "خزنة السيادة" (Vault v2.1) ولا يمكن الوصول إليها إلا بصلاحيات عليا.</p>
+                    <div class="mt-6 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-heritage-neonPink rounded-full animate-ping"></span>
+                        <span class="text-[8px] font-black opacity-20 uppercase tracking-widest">Protected by AES-512</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Features Quick View -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-20">
-                <div class="p-8 bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-sm hover:border-heritage-neonBlue transition-all group">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🛡️</div>
-                    <h3 class="text-xl font-black text-heritage-cream mb-2">توثيق سيادي</h3>
-                    <p class="text-xs opacity-40 font-bold leading-relaxed">نظام تشفير متطور لحماية الأنساب الهاشمية الموثقة.</p>
-                </div>
-                <div class="p-8 bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-sm hover:border-heritage-neonPink transition-all group">
-                    <div class="text-4xl mb-4 group-hover:rotate-12 transition-transform">📊</div>
-                    <h3 class="text-xl font-black text-heritage-cream mb-2">إحصائيات حية</h3>
-                    <p class="text-xs opacity-40 font-bold leading-relaxed">تتبع لحظي للنمو السكاني والانتشار الجغرافي للقبيلة.</p>
-                </div>
-                <div class="p-8 bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-sm hover:border-heritage-gold transition-all group">
-                    <div class="text-4xl mb-4 group-hover:scale-125 transition-transform">💰</div>
-                    <h3 class="text-xl font-black text-heritage-cream mb-2">المحفظة الرقمية</h3>
-                    <p class="text-xs opacity-40 font-bold leading-relaxed">إدارة المساهمات المالية والتبرعات لدعم أبناء القبيلة.</p>
+            <!-- Gift Teaser -->
+            <div class="pt-20 pb-40">
+                <div class="inline-flex items-center gap-4 px-10 py-5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all cursor-pointer group" onclick="handleLandingLogin()">
+                    <span class="text-2xl group-hover:bounce">🎁</span>
+                    <span class="text-sm font-black text-heritage-gold">اكتشف هدية الانضمام الخاصة بك للديوان</span>
+                    <span class="text-white/20">❯</span>
                 </div>
             </div>
         </div>
-    </section>
 
+        <!-- News Ticker -->
+        <div class="news-ticker-container">
+            <div class="news-ticker-content">
+                تم توثيق فرع جديد في الموصل • إطلاق عملة HAY للتداول الداخلي • اجتماع مجلس السيادة الأسبوع القادم • نظام Face ID متاح الآن لجميع الأعضاء • فوز أحد أفراد القبيلة بجائزة التوثيق الرقمي • الحياني: سلالة المجد والسيادة •
+            </div>
+        </div>
+    </section>
     <!-- Main Content (Search/Registry) -->
     <main id="registry-main" class="min-h-screen hidden flex-col items-center pt-24 md:pt-32 pb-20 px-4 md:px-6 relative overflow-x-hidden">
         <!-- Background Overlay -->
@@ -1027,6 +1176,34 @@
         </div>
     </div>
 
+
+
+    <!-- 3D Tree Modal -->
+    <div id="treeModal" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[300] hidden items-center justify-center p-4">
+        <div class="max-w-6xl w-full h-[90vh] glass-effect rounded-[4rem] p-10 border border-heritage-gold/30 relative flex flex-col overflow-hidden">
+            <button onclick="closeTree()" class="absolute top-10 left-10 text-heritage-gold/40 hover:text-heritage-gold transition-all z-20">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="mb-6 flex justify-between items-end relative z-10">
+                <div>
+                    <h2 class="text-4xl font-black text-heritage-gold">شجرة النسب الرقمية (3D)</h2>
+                    <p class="text-xs font-bold opacity-40 uppercase tracking-widest">تجسيد تفاعلي لسلالة قبيلة الحياني</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="initLivingTree()" class="px-6 py-2 bg-heritage-gold/10 text-heritage-gold rounded-full text-[10px] font-black border border-heritage-gold/20">تحديث الشجرة 🔄</button>
+                </div>
+            </div>
+            <div id="tree-3d-container" class="flex-grow bg-black/20 rounded-[3rem] border border-white/5 relative cursor-move">
+                <div id="node-info-label" class="node-label"></div>
+            </div>
+            <div class="mt-6 flex justify-between text-[10px] font-bold opacity-40 uppercase tracking-widest relative z-10">
+                <span>Touch to rotate / Scroll to zoom</span>
+                <span>Powered by Three.js & Diwan AI</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Interactive Map Modal -->
     <div id="mapModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[300] hidden items-center justify-center p-6">
@@ -2393,6 +2570,130 @@
             document.getElementById('overlay').classList.remove('hidden');
         }
 
+
+        function openTree() {
+            closePanels();
+            document.getElementById('treeModal').classList.remove('hidden');
+            document.getElementById('treeModal').classList.add('flex');
+            document.getElementById('overlay').classList.remove('hidden');
+            initLivingTree();
+        }
+
+        function closeTree() {
+            document.getElementById('treeModal').classList.add('hidden');
+            document.getElementById('treeModal').classList.remove('flex');
+            if (document.getElementById('adminPanel').classList.contains('hidden')) {
+                document.getElementById('overlay').classList.add('hidden');
+            }
+            if(window.treeAnimationId) cancelAnimationFrame(window.treeAnimationId);
+        }
+
+        function initLivingTree() {
+            const container = document.getElementById('tree-3d-container');
+            if(!container) return;
+            container.innerHTML = '<div id="node-info-label" class="node-label"></div>';
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0x00f2ff, 1);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            const nodes = [];
+            const connections = [];
+
+            // Create a stylized tree structure based on vault data
+            const treeData = vault.slice(0, 15); // Show first 15 for performance
+
+            // Genesis Node
+            const genesisGeo = new THREE.SphereGeometry(0.8, 32, 32);
+            const genesisMat = new THREE.MeshPhongMaterial({ color: 0xd4af37, emissive: 0xd4af37, emissiveIntensity: 0.5 });
+            const genesisNode = new THREE.Mesh(genesisGeo, genesisMat);
+            genesisNode.position.set(0, 0, 0);
+            genesisNode.userData = { name: "موسى الجون (الجد الجامع)", info: "سلالة الهاشميين" };
+            scene.add(genesisNode);
+            nodes.push(genesisNode);
+
+            // Child Nodes
+            treeData.forEach((m, i) => {
+                const angle = (i / treeData.length) * Math.PI * 2;
+                const radius = 5 + Math.random() * 2;
+                const x = Math.cos(angle) * radius;
+                const y = (Math.random() - 0.5) * 4;
+                const z = Math.sin(angle) * radius;
+
+                const geo = new THREE.SphereGeometry(0.4, 16, 16);
+                const mat = new THREE.MeshPhongMaterial({ color: 0x00f2ff });
+                const node = new THREE.Mesh(geo, mat);
+                node.position.set(x, y, z);
+                node.userData = { name: m.name, info: m.id };
+                scene.add(node);
+                nodes.push(node);
+
+                // Connection line
+                const points = [new THREE.Vector3(0,0,0), new THREE.Vector3(x,y,z)];
+                const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                const lineMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.2 });
+                const line = new THREE.Line(lineGeo, lineMat);
+                scene.add(line);
+                connections.push(line);
+            });
+
+            camera.position.z = 12;
+
+            // Interaction
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            const label = document.getElementById('node-info-label');
+
+            container.onmousemove = (e) => {
+                const rect = container.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / height) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(nodes);
+
+                nodes.forEach(n => n.scale.set(1, 1, 1));
+                label.style.display = 'none';
+                label.classList.remove('selected-label');
+
+                if (intersects.length > 0) {
+                    const obj = intersects[0].object;
+                    obj.scale.set(1.5, 1.5, 1.5);
+                    label.style.display = 'block';
+                    label.classList.add('selected-label');
+                    label.innerText = obj.userData.name;
+                    label.style.left = (e.clientX - rect.left) + 'px';
+                    label.style.top = (e.clientY - rect.top) + 'px';
+                }
+            };
+
+            let rotationY = 0;
+            const animate = () => {
+                window.treeAnimationId = requestAnimationFrame(animate);
+                rotationY += 0.005;
+                scene.rotation.y = rotationY;
+
+                nodes.forEach((n, i) => {
+                    if(i > 0) n.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
+                });
+
+                renderer.render(scene, camera);
+            };
+            animate();
+        }
+
         function closeMap() {
             document.getElementById('mapModal').classList.add('hidden');
             document.getElementById('mapModal').classList.remove('flex');
@@ -2770,11 +3071,133 @@
             showLandingPage();
         }
 
-        window.onload = () => {
-            initSystem();
+
+        function initDigitalWinds() {
+            const canvas = document.getElementById('digital-winds');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let w, h, particles = [];
+
+            const init = () => {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+                particles = [];
+                for (let i = 0; i < 100; i++) {
+                    particles.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        size: Math.random() * 2 + 1,
+                        speedX: (Math.random() - 0.5) * 2,
+                        speedY: (Math.random() - 0.5) * 2,
+                        color: Math.random() > 0.5 ? '#d4af37' : '#00f2ff'
+                    });
+                }
+            };
+
+            const animate = () => {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    if (p.x < 0 || p.x > w) p.speedX *= -1;
+                    if (p.y < 0 || p.y > h) p.speedY *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = 0.5;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            };
+
+            window.addEventListener('resize', init);
+            init();
+            animate();
+        }
+
+        function simulateFaceIDScan() {
+            const overlay = document.getElementById('face-id-overlay');
+            const scanLine = document.querySelector('.face-id-scan');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            scanLine.style.display = 'block';
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+                scanLine.style.display = 'none';
+                hyHud('✅ تم التحقق من الهوية الحيوية بنجاح');
+                document.getElementById('landing-email').value = 'member@hayyani.com';
+            }, 3000);
+        }
+
+        function connectMetaMask() {
+            hyHud('🦊 جاري الاتصال بمحفظة MetaMask...');
+            setTimeout(() => {
+                hyHud('✅ تم ربط المحفظة بنجاح: 0x71C...a49');
+                handleLandingLogin();
+            }, 1500);
+        }
+
+        function startLandingAnimations() {
+            setTimeout(() => {
+                const title = document.getElementById('landing-title');
+                if(title) title.classList.remove('opacity-0', 'translate-y-10');
+            }, 500);
+            setTimeout(() => {
+                const subtitle = document.getElementById('landing-subtitle');
+                if(subtitle) subtitle.classList.remove('opacity-0');
+            }, 1500);
+
+            // Counter animation
+            const counter = document.getElementById('stats-human-power');
+            if(counter) {
+                let count = 24000;
+                const target = 24832;
+                const interval = setInterval(() => {
+                    if (count < target) {
+                        count += Math.floor(Math.random() * 50);
+                        counter.innerText = count.toLocaleString();
+                    } else {
+                        counter.innerText = target.toLocaleString();
+                        clearInterval(interval);
+                    }
+                }, 20);
+            }
+        }
+
+
+        function startLoadingSimulation() {
+            const progress = document.getElementById('loading-progress');
+            const text = document.getElementById('loading-text');
+            const hexContainer = document.getElementById('hex-codes');
+            const phrases = ['Initializing DNA Vault', 'Decrypting Lineage', 'Verifying Sovereignty', 'Accessing Diwan'];
+
+            let p = 0;
+            const interval = setInterval(() => {
+                p += Math.random() * 15;
+                if(p >= 100) {
+                    p = 100;
+                    clearInterval(interval);
+                    document.getElementById('loading-overlay').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loading-overlay').classList.add('hidden'), 1000);
+                }
+                progress.style.width = p + '%';
+                text.innerText = phrases[Math.floor((p/100) * phrases.length)];
+
+                // Add some hex noise
+                if(hexContainer) {
+                    hexContainer.innerHTML = Array(8).fill(0).map(() => '0x' + Math.floor(Math.random()*16777215).toString(16)).join(' ');
+                }
+            }, 150);
+        }
+
+window.onload = () => {
+            initSystem(); startLoadingSimulation();
+            initDigitalWinds();
+            startLandingAnimations();
             createParticles('landing-particle-container');
-            gsap.from("#landing-page .space-y-6", { opacity: 0, y: 30, duration: 1.5, delay: 0.5 });
-            gsap.from("#landing-page button", { opacity: 0, scale: 0.8, stagger: 0.2, duration: 1, delay: 1, ease: "back.out(1.7)" });
         };
     </script>
 </body>
