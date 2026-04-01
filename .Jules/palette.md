@@ -1,0 +1,3 @@
+## 2025-05-15 - [UX/Accessibility Fixes for HUD and Deletion]
+**Learning:** Found a recurring pattern where IDs were incorrectly used as classes (e.g., `id="hy-hud text-sm"`), which broke both CSS targeting and `document.getElementById` logic for the notification system. Also identified a lack of safety for destructive actions (deletion) and missing ARIA labels for icon-only buttons.
+**Action:** Always verify that IDs are unique and do not contain spaces or class names. Ensure all icon-only buttons have descriptive `aria-label` attributes and destructive actions are gated by a `confirm()` dialog.
