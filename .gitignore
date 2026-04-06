@@ -1,0 +1,8 @@
+node_modules/
+package-lock.json
+*.log
+*.png
+test_api.json
+verification_output.log
+server.log
+final_verification.png
