@@ -21,7 +21,7 @@
 </head>
 <body class="bg-grid h-screen flex" onload="initSystem()">
 
-    <div id="hy-hud text-sm">تمت العملية بنجاح 🛡️</div>
+    <div id="hy-hud" class="text-sm" role="status" aria-live="polite">تمت العملية بنجاح 🛡️</div>
 
     <div id="bulkModal">
         <div class="max-w-2xl w-full glass-card rounded-[2rem] p-8 border-purple-500/30">
@@ -86,8 +86,8 @@
         function processBulkData() {
             const names = document.getElementById('bulkInput').value.split('\n').filter(n => n.trim() !== "");
             const gov = document.getElementById('govInput').value || "غير محدد";
-            
-            if(names.length === 0) return alert("يرجى إدخال أسماء!");
+
+            if(names.length === 0) return hyHud("يرجى إدخال أسماء!");
 
             names.forEach(name => {
                 vault.push({
@@ -108,11 +108,15 @@
         function renderUI() {
             const container = document.getElementById('matrixContainer');
             document.getElementById('totalCountDisplay').innerText = vault.length;
+            if (vault.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500 font-bold">لا توجد سجلات حالياً في النظام</div>`;
+                return;
+            }
             container.innerHTML = vault.map((m, index) => `
                 <div class="option-box">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] text-purple-500 font-bold uppercase">${m.id}</span>
-                        <button onclick="deleteItem(${index})" class="text-gray-600 hover:text-red-500 text-xs">✕</button>
+                        <button onclick="deleteItem(${index})" class="text-gray-600 hover:text-red-500 text-xs" aria-label="حذف السجل">✕</button>
                     </div>
                     <h3 class="text-white font-bold mb-1">${m.name}</h3>
                     <p class="text-[10px] text-gray-500 font-bold">📍 ${m.gov}</p>
@@ -159,6 +163,6 @@
                 renderUI();
             }
         }
-    </nav>
+    </script>
 </body>
 </html>
