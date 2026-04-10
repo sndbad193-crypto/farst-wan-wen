@@ -21,7 +21,7 @@
 </head>
 <body class="bg-grid h-screen flex" onload="initSystem()">
 
-    <div id="hy-hud text-sm">تمت العملية بنجاح 🛡️</div>
+    <div id="hy-hud" class="text-sm" role="status" aria-live="polite">تمت العملية بنجاح 🛡️</div>
 
     <div id="bulkModal">
         <div class="max-w-2xl w-full glass-card rounded-[2rem] p-8 border-purple-500/30">
@@ -159,6 +159,6 @@
                 renderUI();
             }
         }
-    </nav>
+    </script>
 </body>
 </html>
